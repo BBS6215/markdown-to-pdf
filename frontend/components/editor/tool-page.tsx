@@ -1,0 +1,161 @@
+'use client';
+
+/**
+ * Shared tool page layout — used by PDF, Word, and HTML pages.
+ * Source: 03-产品结构 §4.3 (工具页模块), 04-UI规范 §2.1 (工具页层级)
+ */
+
+import { useState, useRef } from 'react';
+import type { ConvertFormat } from '@/lib/types';
+import { FORMAT_CONFIG } from '@/lib/types';
+import { FormatSwitcher } from '@/components/layout/format-switcher';
+import { MarkdownEditor } from '@/components/editor/markdown-editor';
+import { MarkdownPreview } from '@/components/editor/markdown-preview';
+import { FileDropzone } from '@/components/editor/file-dropzone';
+import { EditorToolbar } from '@/components/editor/editor-toolbar';
+import { RateLimitModal } from '@/components/auth/rate-limit-modal';
+import { useEditorContent } from '@/hooks/use-editor-content';
+import { useConversion } from '@/hooks/use-conversion';
+import { useRateLimit } from '@/hooks/use-rate-limit';
+import { useMobileDetect } from '@/hooks/use-mobile-detect';
+
+interface ToolPageProps {
+  format: ConvertFormat;
+}
+
+type MobileTab = 'edit' | 'preview';
+
+export function ToolPage({ format }: ToolPageProps) {
+  const { content, updateContent, getContent, isInitialized } = useEditorContent();
+  const { status, errorMessage, convert, copyHtml, retry } = useConversion(format);
+  const rateLimit = useRateLimit(format);
+  const isMobile = useMobileDetect();
+  const [mobileTab, setMobileTab] = useState<MobileTab>('edit');
+  const [showRateLimitModal, setShowRateLimitModal] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const config = FORMAT_CONFIG[format];
+
+  const handleConvert = () => {
+    if (!rateLimit.canConvert && !rateLimit.isHtml) {
+      setShowRateLimitModal(true);
+      return;
+    }
+    convert(content, () => rateLimit.refresh());
+  };
+
+  const handleCopyHtml = format === 'html' ? () => copyHtml(content) : undefined;
+  const handleUpload = () => fileInputRef.current?.click();
+  const handleFileContent = (fileContent: string) => updateContent(fileContent);
+
+  if (!isInitialized) {
+    return (
+      <div className="flex items-center justify-center h-96">
+        <div className="text-gray-400 text-sm">Loading editor...</div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="max-w-7xl mx-auto">
+      {/* H1 + Sub-heading */}
+      <div className="px-4 pt-4 pb-2">
+        <h1 className="text-2xl font-semibold text-gray-800">
+          Convert Markdown (.md) to {config.label}
+        </h1>
+        <p className="mt-1 text-base text-gray-500">
+          Convert your Markdown or AI-generated text into a professional {config.label} in seconds.
+        </p>
+      </div>
+
+      {/* Format Switcher */}
+      <div className="px-4">
+        <FormatSwitcher currentFormat={format} getContent={getContent} />
+      </div>
+
+      {/* Mobile: edit/preview tab selector */}
+      {isMobile && (
+        <div className="flex border-b border-gray-200 px-4">
+          <button
+            onClick={() => setMobileTab('edit')}
+            className={`py-2 px-4 text-sm border-b-2 ${
+              mobileTab === 'edit'
+                ? 'text-gray-900 font-medium border-gray-900'
+                : 'text-gray-500 border-transparent'
+            }`}
+          >
+            Edit
+          </button>
+          <button
+            onClick={() => setMobileTab('preview')}
+            className={`py-2 px-4 text-sm border-b-2 ${
+              mobileTab === 'preview'
+                ? 'text-gray-900 font-medium border-gray-900'
+                : 'text-gray-500 border-transparent'
+            }`}
+          >
+            Preview
+          </button>
+        </div>
+      )}
+
+      {/* Editor + Preview */}
+      <FileDropzone onFileContent={handleFileContent}>
+        <div className={`${isMobile ? '' : 'grid grid-cols-2'} border-b border-gray-200`}>
+          <div
+            className={`${!isMobile ? 'border-r border-gray-200' : ''} ${
+              isMobile && mobileTab !== 'edit' ? 'hidden' : ''
+            }`}
+          >
+            <MarkdownEditor value={content} onChange={updateContent} />
+          </div>
+          <div className={`${isMobile && mobileTab !== 'preview' ? 'hidden' : ''}`}>
+            <MarkdownPreview markdown={content} />
+          </div>
+        </div>
+      </FileDropzone>
+
+      {/* Toolbar with usage info */}
+      <EditorToolbar
+        format={format}
+        status={status}
+        errorMessage={errorMessage}
+        onConvert={handleConvert}
+        onCopyHtml={handleCopyHtml}
+        onUpload={handleUpload}
+        onRetry={retry}
+        remaining={rateLimit.remaining}
+        limit={rateLimit.limit}
+        canConvert={rateLimit.canConvert}
+        isHtml={rateLimit.isHtml}
+        isLoggedIn={rateLimit.isLoggedIn}
+      />
+
+      {/* Hidden file input */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept=".md,.markdown,.txt"
+        className="hidden"
+        onChange={(e) => {
+          const file = e.target.files?.[0];
+          if (file) {
+            file.arrayBuffer().then(async (buffer) => {
+              const { decodeFileBuffer } = await import('@/lib/editor/encoding-detector');
+              const text = await decodeFileBuffer(buffer);
+              handleFileContent(text);
+            });
+          }
+          e.target.value = '';
+        }}
+      />
+
+      {/* Rate limit modal (fallback) */}
+      <RateLimitModal
+        open={showRateLimitModal}
+        onClose={() => setShowRateLimitModal(false)}
+        isLoggedIn={rateLimit.isLoggedIn}
+      />
+    </div>
+  );
+}

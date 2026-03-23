@@ -1,0 +1,26 @@
+{
+  "name": "markdown-to-pdf-app",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Markdown to PDF/Word/HTML converter - Online tool",
+  "scripts": {
+    "dev": "pnpm run --parallel dev:frontend dev:backend",
+    "dev:frontend": "pnpm --filter frontend dev",
+    "dev:backend": "pnpm --filter backend dev",
+    "build": "pnpm -r build",
+    "typecheck": "pnpm -r typecheck",
+    "lint": "pnpm -r lint"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "packageManager": "pnpm@10.28.1",
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild",
+      "puppeteer",
+      "sharp",
+      "unrs-resolver"
+    ]
+  }
+}

@@ -1,0 +1,32 @@
+/*
+ * PDF page break control CSS.
+ * Source: 05-技术方案 附录 B
+ *
+ * Injected into Puppeteer page alongside github-markdown.css
+ * to control page break behavior in generated PDFs.
+ */
+
+/* Headings: never break right after a heading */
+h1, h2, h3, h4, h5, h6 {
+  page-break-after: avoid;
+  break-after: avoid;
+}
+
+/* Tables and code blocks: don't split across pages */
+table, pre, blockquote {
+  page-break-inside: avoid;
+  break-inside: avoid;
+}
+
+/* Images: keep intact */
+img {
+  page-break-inside: avoid;
+  break-inside: avoid;
+  max-width: 100%;
+}
+
+/* List items: try to keep together */
+li {
+  page-break-inside: avoid;
+  break-inside: avoid;
+}

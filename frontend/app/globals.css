@@ -1,0 +1,20 @@
+@import "tailwindcss";
+
+/*
+ * Custom theme configuration for Tailwind CSS 4.
+ * Source: 04-UI设计与视觉规范建议 §3 (字体) + §4 (色彩)
+ *
+ * Tailwind 4 uses CSS-first configuration via @theme directive
+ * instead of tailwind.config.ts (documented in 05 but adapted here).
+ */
+
+@theme {
+  /* ─── Font Families (04 §3.1) ──────────────────────────── */
+  --font-sans: "Inter", system-ui, -apple-system, sans-serif;
+  --font-mono: "JetBrains Mono", "Fira Code", monospace;
+
+  /* ─── Format-specific Colors (04 §4.2) ─────────────────── */
+  --color-format-pdf: #DC2626;       /* red-600 */
+  --color-format-word: #2563EB;      /* blue-600 */
+  --color-format-html: #F97316;      /* orange-500 */
+}
