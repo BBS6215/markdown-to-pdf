@@ -12,13 +12,15 @@ import { USAGE_LIMITS } from './constants.js';
 
 export const convertRateLimiter = rateLimit({
   windowMs: 24 * 60 * 60 * 1000, // 24 hours
-  max: USAGE_LIMITS.IP_DAILY, // 10 requests per IP per day
+  max: USAGE_LIMITS.IP_DAILY,
   standardHeaders: true,
   legacyHeaders: false,
   message: {
     error: 'RATE_LIMITED',
     message: 'Daily limit exceeded. Try again tomorrow.',
   },
+  // Skip authenticated users — they are gated by per-user quota instead.
+  skip: (req) => Boolean(req.user),
   keyGenerator: (req) => {
     // Use X-Forwarded-For if behind proxy (Render), otherwise remoteAddress
     return (

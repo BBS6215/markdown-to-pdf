@@ -17,7 +17,10 @@ export const config = {
   puppeteerExecutablePath:
     process.env.PUPPETEER_EXECUTABLE_PATH || undefined,
 
-  /** Optional: Supabase for JWT verification */
+  /** Supabase URL (required for logged-in flows) */
   supabaseUrl: process.env.SUPABASE_URL,
+  /** Service role key — used for quota RPCs and history writes (bypasses RLS) */
   supabaseServiceRoleKey: process.env.SUPABASE_SERVICE_ROLE_KEY,
+  /** Anon key — used to verify user JWTs via auth.getUser(token) */
+  supabaseAnonKey: process.env.SUPABASE_ANON_KEY,
 } as const;

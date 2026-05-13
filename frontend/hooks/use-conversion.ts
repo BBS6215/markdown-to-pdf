@@ -1,12 +1,13 @@
 'use client';
 
 /**
- * Conversion state management hook — with DB writes and rate limit integration.
- * Source: 07 §4 Phase 3 任务 3.13-3.15, 06-数据库设计 §5
+ * Conversion state management hook.
+ * Source: docs/09-服务端权威用量补丁.md
  *
- * Write order on success: UPSERT daily_usage → INSERT conversion_history
- * Failure: skip daily_usage → INSERT conversion_history(status='failed')
- * HTML: skip daily_usage → INSERT conversion_history(format='html')
+ * - PDF/Word: backend now owns quota + history. Frontend just calls the API
+ *   with the access token; backend writes daily_usage and conversion_history.
+ * - HTML: pure frontend. Inserts conversion_history directly per docs/06 §5.2
+ *   (no quota impact, INSERT RLS policy still allows own-user rows).
  */
 
 import { useState, useCallback } from 'react';
@@ -30,7 +31,9 @@ export function useConversion(format: ConvertFormat) {
       setErrorMessage(undefined);
 
       const supabase = getSupabaseBrowserClient();
-      const { data: { user } } = await supabase.auth.getUser();
+      const { data: { session } } = await supabase.auth.getSession();
+      const user = session?.user ?? null;
+      const accessToken = session?.access_token ?? null;
       const sourceSize = new Blob([markdown]).size;
 
       try {
@@ -38,47 +41,22 @@ export function useConversion(format: ConvertFormat) {
         let filename: string;
 
         if (format === 'html') {
-          // HTML: pure frontend, no API call, no rate limit
+          // HTML: pure frontend, no API call, no quota.
           const result = await exportHtml(markdown);
           blob = result.blob;
           filename = generateFilename(markdown, 'html');
         } else {
-          // PDF/Word: call backend API
+          // PDF/Word: backend handles quota + history via JWT.
           const convertFn = format === 'pdf' ? convertToPdf : convertToWord;
-          const result = await convertFn(markdown);
+          const result = await convertFn(markdown, accessToken);
           blob = result.blob;
           filename = result.filename;
         }
 
         triggerDownload(blob, filename);
 
-        // ── DB writes (logged-in users only) ──
-        if (user) {
-          // 1. UPSERT daily_usage (PDF/Word only, not HTML)
-          // Write order: daily_usage first (quota), then history (nice-to-have) — 06 §5.1
-          if (format !== 'html') {
-            const today = new Date().toISOString().slice(0, 10);
-            const { data: existing } = await supabase
-              .from('daily_usage')
-              .select('pdf_word_count')
-              .eq('user_id', user.id)
-              .eq('usage_date', today)
-              .single();
-
-            if (existing) {
-              await supabase
-                .from('daily_usage')
-                .update({ pdf_word_count: existing.pdf_word_count + 1 })
-                .eq('user_id', user.id)
-                .eq('usage_date', today);
-            } else {
-              await supabase
-                .from('daily_usage')
-                .insert({ user_id: user.id, usage_date: today, pdf_word_count: 1 });
-            }
-          }
-
-          // 2. INSERT conversion_history
+        // HTML history: still client-written (no quota, see docs/06 §5.2).
+        if (format === 'html' && user) {
           await supabase.from('conversion_history').insert({
             user_id: user.id,
             format,
@@ -87,11 +65,12 @@ export function useConversion(format: ConvertFormat) {
             source_size_bytes: sourceSize,
             status: 'success',
           });
-        } else {
-          // Anonymous: increment localStorage (PDF/Word only)
-          if (format !== 'html') {
-            incrementAnonymousUsage();
-          }
+        }
+
+        // Anonymous PDF/Word: increment localStorage counter (UI display only;
+        // backend IP rate limit is authoritative).
+        if (!user && format !== 'html') {
+          incrementAnonymousUsage();
         }
 
         setStatus('success');
@@ -104,17 +83,6 @@ export function useConversion(format: ConvertFormat) {
           setErrorMessage(err.message);
         } else {
           setErrorMessage('An unexpected error occurred. Please try again.');
-        }
-
-        // Failed conversion: log to history but don't deduct usage (07 §11.1 D2)
-        if (user && format !== 'html') {
-          await supabase.from('conversion_history').insert({
-            user_id: user.id,
-            format,
-            filename: generateFilename(markdown, format),
-            source_size_bytes: sourceSize,
-            status: 'failed',
-          }).catch(() => {}); // Don't let history write failure block the error display
         }
       }
     },

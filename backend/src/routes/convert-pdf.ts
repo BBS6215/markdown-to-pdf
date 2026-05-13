@@ -1,9 +1,10 @@
 /**
  * PDF conversion route.
- * Source: 05-技术方案 §5.1 + §5.6 (API 响应规范)
+ * Source: 05-技术方案 §5.1 + §5.6, docs/09-服务端权威用量补丁.md
  *
  * POST /api/convert/pdf
  * Body: { markdown: string }
+ * Optional Authorization: Bearer <supabase access_token>
  * Success: 200 + application/pdf binary stream
  * Errors: 400/413/429/500/504
  */
@@ -11,6 +12,7 @@
 import { Router } from 'express';
 import { generatePdf } from '../services/pdf-generator.js';
 import { validateConvertRequest } from '../middleware/request-validator.js';
+import { consumeQuota, refundQuota, recordConversion } from '../services/quota.js';
 
 const router = Router();
 
@@ -18,17 +20,40 @@ const router = Router();
 const ROUTE_TIMEOUT_MS = 35_000;
 
 router.post('/pdf', validateConvertRequest, async (req, res) => {
-  // Set route-level timeout
   req.setTimeout(ROUTE_TIMEOUT_MS);
   res.setTimeout(ROUTE_TIMEOUT_MS);
 
-  try {
-    const { markdown } = req.body;
+  const { markdown } = req.body;
+  const user = req.user;
+  const sourceSize = Buffer.byteLength(markdown, 'utf8');
+  const filename = extractFilename(markdown, 'pdf');
 
+  // ── 1. Quota gate (logged-in users only; anonymous already passed IP limit) ──
+  if (user) {
+    const quota = await consumeQuota(user.id, 'pdf');
+    if (!quota.allowed) {
+      res.status(429).json({
+        error: 'RATE_LIMITED',
+        message: `Daily PDF/Word limit reached (${quota.count}/${quota.limit}). Resets at midnight UTC.`,
+      });
+      return;
+    }
+  }
+
+  // ── 2. Convert ──
+  try {
     const pdfBuffer = await generatePdf(markdown);
 
-    // Generate filename from first H1 or fallback to timestamp
-    const filename = extractFilename(markdown, 'pdf');
+    if (user) {
+      await recordConversion({
+        userId: user.id,
+        format: 'pdf',
+        filename,
+        fileSizeBytes: pdfBuffer.length,
+        sourceSizeBytes: sourceSize,
+        status: 'success',
+      });
+    }
 
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
@@ -36,6 +61,19 @@ router.post('/pdf', validateConvertRequest, async (req, res) => {
     res.send(pdfBuffer);
   } catch (error: any) {
     console.error('[convert-pdf] Error:', error.message);
+
+    // ── 3. Refund quota on failure (per docs/06 §5.1: failed conversions don't count) ──
+    if (user) {
+      await refundQuota(user.id, 'pdf');
+      await recordConversion({
+        userId: user.id,
+        format: 'pdf',
+        filename,
+        fileSizeBytes: null,
+        sourceSizeBytes: sourceSize,
+        status: 'failed',
+      });
+    }
 
     if (error.message?.includes('timed out')) {
       res.status(504).json({

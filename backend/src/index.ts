@@ -10,6 +10,7 @@ import healthRouter from './routes/health.js';
 import convertPdfRouter from './routes/convert-pdf.js';
 import convertWordRouter from './routes/convert-word.js';
 import { convertRateLimiter } from './middleware/rate-limiter.js';
+import { attachUser } from './middleware/auth.js';
 
 const app = express();
 
@@ -30,7 +31,12 @@ app.use(express.json({ limit: '500kb' }));
 
 app.use(healthRouter);
 
-// IP rate limiting on all convert routes (05 §6.2: 10 req/day/IP total)
+// Auth: parse bearer token if present; populate req.user. Always runs before
+// rate-limiter so the limiter can skip authenticated callers.
+app.use('/api/convert', attachUser);
+
+// IP rate limiting on convert routes for anonymous callers only.
+// Authenticated users are gated by per-user quota inside each route.
 app.use('/api/convert', convertRateLimiter);
 // Convert routes
 app.use('/api/convert', convertPdfRouter);

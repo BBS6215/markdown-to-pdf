@@ -10,6 +10,9 @@ importers:
 
   backend:
     dependencies:
+      '@supabase/supabase-js':
+        specifier: ^2.99.3
+        version: 2.99.3
       cors:
         specifier: ^2.8.5
         version: 2.8.6

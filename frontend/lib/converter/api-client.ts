@@ -12,22 +12,38 @@ interface ConvertResult {
 
 /**
  * Convert Markdown to PDF via backend API.
+ * @param accessToken Supabase access_token for logged-in users; null for anonymous.
  */
-export async function convertToPdf(markdown: string): Promise<ConvertResult> {
-  return callConvertApi('/api/convert/pdf', markdown);
+export async function convertToPdf(
+  markdown: string,
+  accessToken: string | null
+): Promise<ConvertResult> {
+  return callConvertApi('/api/convert/pdf', markdown, accessToken);
 }
 
 /**
  * Convert Markdown to Word via backend API.
  */
-export async function convertToWord(markdown: string): Promise<ConvertResult> {
-  return callConvertApi('/api/convert/word', markdown);
+export async function convertToWord(
+  markdown: string,
+  accessToken: string | null
+): Promise<ConvertResult> {
+  return callConvertApi('/api/convert/word', markdown, accessToken);
 }
 
-async function callConvertApi(path: string, markdown: string): Promise<ConvertResult> {
+async function callConvertApi(
+  path: string,
+  markdown: string,
+  accessToken: string | null
+): Promise<ConvertResult> {
+  const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+  if (accessToken) {
+    headers['Authorization'] = `Bearer ${accessToken}`;
+  }
+
   const response = await fetch(`${config.backendUrl}${path}`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers,
     body: JSON.stringify({ markdown }),
   });
 

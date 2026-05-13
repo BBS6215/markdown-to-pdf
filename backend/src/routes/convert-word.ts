@@ -1,9 +1,10 @@
 /**
  * Word conversion route.
- * Source: 05-技术方案 §5.2 + §5.6 (API 响应规范)
+ * Source: 05-技术方案 §5.2 + §5.6, docs/09-服务端权威用量补丁.md
  *
  * POST /api/convert/word
  * Body: { markdown: string }
+ * Optional Authorization: Bearer <supabase access_token>
  * Success: 200 + application/vnd.openxmlformats binary stream
  * Errors: 400/413/429/500/504
  */
@@ -12,29 +13,51 @@ import { Router } from 'express';
 import { generateWord } from '../services/word-generator.js';
 import { validateConvertRequest } from '../middleware/request-validator.js';
 import { extractFilename } from './convert-pdf.js';
+import { consumeQuota, refundQuota, recordConversion } from '../services/quota.js';
 
 const router = Router();
 
-/** Express route timeout: 35s (consistent with PDF route, 05 §11 风险 4) */
 const ROUTE_TIMEOUT_MS = 35_000;
 
 router.post('/word', validateConvertRequest, async (req, res) => {
-  // Set route-level timeout
   req.setTimeout(ROUTE_TIMEOUT_MS);
   res.setTimeout(ROUTE_TIMEOUT_MS);
 
+  const { markdown } = req.body;
+  const user = req.user;
+  const sourceSize = Buffer.byteLength(markdown, 'utf8');
+  const filename = extractFilename(markdown, 'word');
+
+  if (user) {
+    const quota = await consumeQuota(user.id, 'word');
+    if (!quota.allowed) {
+      res.status(429).json({
+        error: 'RATE_LIMITED',
+        message: `Daily PDF/Word limit reached (${quota.count}/${quota.limit}). Resets at midnight UTC.`,
+      });
+      return;
+    }
+  }
+
   try {
-    const { markdown } = req.body;
-
     const wordBuffer = await generateWord(markdown);
-    const filename = extractFilename(markdown, 'word');
 
-    // Log memory for pressure testing (07 §4 任务 1.14)
     const mem = process.memoryUsage();
     console.log(
       `[convert-word] Memory: RSS ${Math.round(mem.rss / 1024 / 1024)}MB, ` +
       `input ${markdown.length} bytes, output ${wordBuffer.length} bytes`
     );
+
+    if (user) {
+      await recordConversion({
+        userId: user.id,
+        format: 'word',
+        filename,
+        fileSizeBytes: wordBuffer.length,
+        sourceSizeBytes: sourceSize,
+        status: 'success',
+      });
+    }
 
     res.setHeader(
       'Content-Type',
@@ -45,6 +68,18 @@ router.post('/word', validateConvertRequest, async (req, res) => {
     res.send(wordBuffer);
   } catch (error: any) {
     console.error('[convert-word] Error:', error.message);
+
+    if (user) {
+      await refundQuota(user.id, 'word');
+      await recordConversion({
+        userId: user.id,
+        format: 'word',
+        filename,
+        fileSizeBytes: null,
+        sourceSizeBytes: sourceSize,
+        status: 'failed',
+      });
+    }
 
     if (error.message?.includes('timed out') || error.message?.includes('timeout')) {
       res.status(504).json({
