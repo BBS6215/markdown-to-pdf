@@ -107,6 +107,9 @@ importers:
       '@supabase/supabase-js':
         specifier: ^2.99.3
         version: 2.99.3
+      docx:
+        specifier: ^9.6.1
+        version: 9.6.1
       github-markdown-css:
         specifier: ^5.9.0
         version: 5.9.0
@@ -159,6 +162,9 @@ importers:
       '@tailwindcss/postcss':
         specifier: ^4.1.7
         version: 4.2.2
+      '@types/mdast':
+        specifier: ^4.0.4
+        version: 4.0.4
       '@types/node':
         specifier: ^22.15.0
         version: 22.19.15
