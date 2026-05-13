@@ -30,11 +30,23 @@ router.post('/pdf', validateConvertRequest, async (req, res) => {
 
   // ── 1. Quota gate (logged-in users only; anonymous already passed IP limit) ──
   if (user) {
-    const quota = await consumeQuota(user.id, 'pdf');
-    if (!quota.allowed) {
-      res.status(429).json({
-        error: 'RATE_LIMITED',
-        message: `Daily PDF/Word limit reached (${quota.count}/${quota.limit}). Resets at midnight UTC.`,
+    try {
+      const quota = await consumeQuota(user.id, 'pdf');
+      if (!quota.allowed) {
+        res.status(429).json({
+          error: 'RATE_LIMITED',
+          message: `Daily PDF/Word limit reached (${quota.count}/${quota.limit}). Resets at midnight UTC.`,
+        });
+        return;
+      }
+    } catch (err) {
+      // RPC missing, service_role key wrong, Supabase outage, etc.
+      // Return a structured JSON error instead of letting Express emit
+      // an HTML 500 page that the frontend cannot parse.
+      console.error('[convert-pdf] quota gate failed:', (err as Error).message);
+      res.status(503).json({
+        error: 'QUOTA_UNAVAILABLE',
+        message: 'Quota service is temporarily unavailable. Please try again shortly.',
       });
       return;
     }

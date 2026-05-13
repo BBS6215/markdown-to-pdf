@@ -27,7 +27,7 @@ export default function TermsPage() {
         <p>You are responsible for the content you convert. Do not use this service for illegal, harmful, or infringing content.</p>
 
         <h2 className="text-lg font-medium text-gray-900 mt-8">4. No Warranty</h2>
-        <p>This service is provided "as is" without warranties of any kind. We do not guarantee the accuracy of the conversion output or the availability of the service.</p>
+        <p>This service is provided &quot;as is&quot; without warranties of any kind. We do not guarantee the accuracy of the conversion output or the availability of the service.</p>
 
         <h2 className="text-lg font-medium text-gray-900 mt-8">5. Limitation of Liability</h2>
         <p>We are not liable for any damages arising from the use of this service, including data loss or conversion errors.</p>

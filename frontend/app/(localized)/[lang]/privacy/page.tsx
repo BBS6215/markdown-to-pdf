@@ -25,7 +25,7 @@ export default function PrivacyPage() {
         <p>HTML conversion is processed entirely in your browser. Your content never leaves your device for HTML conversions.</p>
 
         <h2 className="text-lg font-medium text-gray-900 mt-8">3. Data Storage</h2>
-        <p>We use Supabase for authentication and database storage. Your data is stored in Supabase's infrastructure. We do not store your Markdown content or generated PDF/Word files.</p>
+        <p>We use Supabase for authentication and database storage. Your data is stored in Supabase&apos;s infrastructure. We do not store your Markdown content or generated PDF/Word files.</p>
 
         <h2 className="text-lg font-medium text-gray-900 mt-8">4. Cookies</h2>
         <p>We use essential cookies for authentication. We do not use tracking cookies or third-party analytics.</p>

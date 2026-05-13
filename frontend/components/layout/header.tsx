@@ -11,7 +11,7 @@ import { useEffect, useState } from 'react';
 import { FileText, User, LogOut } from 'lucide-react';
 import { MobileNav } from './mobile-nav';
 import { getSupabaseBrowserClient } from '@/lib/supabase/client';
-import type { User as SupabaseUser } from '@supabase/supabase-js';
+import type { AuthChangeEvent, Session, User as SupabaseUser } from '@supabase/supabase-js';
 
 const NAV_ITEMS = [
   { href: '', label: 'PDF' },
@@ -29,9 +29,11 @@ export function Header() {
   useEffect(() => {
     supabase.auth.getUser().then(({ data }: { data: { user: SupabaseUser | null } }) => setUser(data.user));
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event: string, session: any) => {
-      setUser(session?.user ?? null);
-    });
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (_event: AuthChangeEvent, session: Session | null) => {
+        setUser(session?.user ?? null);
+      }
+    );
 
     return () => subscription.unsubscribe();
   }, [supabase]);

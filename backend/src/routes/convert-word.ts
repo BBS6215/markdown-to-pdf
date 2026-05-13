@@ -29,11 +29,20 @@ router.post('/word', validateConvertRequest, async (req, res) => {
   const filename = extractFilename(markdown, 'word');
 
   if (user) {
-    const quota = await consumeQuota(user.id, 'word');
-    if (!quota.allowed) {
-      res.status(429).json({
-        error: 'RATE_LIMITED',
-        message: `Daily PDF/Word limit reached (${quota.count}/${quota.limit}). Resets at midnight UTC.`,
+    try {
+      const quota = await consumeQuota(user.id, 'word');
+      if (!quota.allowed) {
+        res.status(429).json({
+          error: 'RATE_LIMITED',
+          message: `Daily PDF/Word limit reached (${quota.count}/${quota.limit}). Resets at midnight UTC.`,
+        });
+        return;
+      }
+    } catch (err) {
+      console.error('[convert-word] quota gate failed:', (err as Error).message);
+      res.status(503).json({
+        error: 'QUOTA_UNAVAILABLE',
+        message: 'Quota service is temporarily unavailable. Please try again shortly.',
       });
       return;
     }
