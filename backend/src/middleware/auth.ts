@@ -40,8 +40,19 @@ export async function attachUser(
   req.user = null;
 
   const header = req.headers.authorization;
-  if (!header || !header.startsWith('Bearer ')) {
+  // No header at all → anonymous flow.
+  if (!header) {
     return next();
+  }
+  // Header is present but not Bearer scheme → reject. Treating malformed
+  // headers as anonymous masked client bugs and let callers with broken
+  // auth code silently consume the anonymous IP quota.
+  if (!header.startsWith('Bearer ')) {
+    res.status(401).json({
+      error: 'INVALID_TOKEN',
+      message: 'Authorization header must use the Bearer scheme.',
+    });
+    return;
   }
 
   const token = header.slice('Bearer '.length).trim();
