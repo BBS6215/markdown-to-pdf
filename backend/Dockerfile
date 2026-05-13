@@ -33,7 +33,13 @@ RUN pnpm --filter @mdpdf/backend build
 #   * the workspace's own files (dist/, package.json, ...)
 # Replaces the previous "COPY backend/node_modules" approach, which broke
 # at runtime because the symlinks pointed at the missing root .pnpm store.
-RUN pnpm --filter @mdpdf/backend deploy --prod /app/deploy
+#
+# --legacy: required by pnpm 10's deploy. Without it, deploy expects every
+# workspace dependency to be marked `injected` in the manifest, and fails
+# with ERR_PNPM_DEPLOY_NONINJECTED_WORKSPACE. Our backend does not import
+# any internal workspaces, so legacy (flat copy) behavior is exactly what
+# we want.
+RUN pnpm --filter @mdpdf/backend deploy --prod --legacy /app/deploy
 
 # ── Stage 2: Production ────────────────────────────────────
 FROM node:22-slim

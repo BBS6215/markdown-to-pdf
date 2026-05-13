@@ -9,5 +9,7 @@ export const CONTENT_LIMITS = {
 } as const;
 
 export const USAGE_LIMITS = {
-  IP_DAILY: 50,
+  // Anonymous IP daily cap. Server-authoritative — localStorage on the
+  // frontend is only a UX hint and can be bypassed. Matches docs/06 §1.
+  IP_DAILY: 10,
 } as const;

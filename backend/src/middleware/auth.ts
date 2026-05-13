@@ -1,10 +1,16 @@
 /**
  * JWT auth middleware.
  *
- * - Reads Authorization: Bearer <access_token> from the request.
- * - If present, verifies the token with Supabase and attaches req.user.
- * - If absent or invalid, leaves req.user = null and lets the request through
- *   (anonymous flow handled downstream by IP rate limiter).
+ * Behavior:
+ *   - No Authorization header                 → req.user = null, continue (anonymous flow).
+ *   - Authorization present + token verifies  → req.user populated, continue.
+ *   - Authorization present + token invalid   → 401 (do not silently degrade).
+ *   - Authorization present + auth env missing → 503 (server misconfiguration).
+ *
+ * Silently downgrading invalid tokens to anonymous was the previous behavior;
+ * it masked deploys where SUPABASE_ANON_KEY was wrong, made expired tokens
+ * indistinguishable from logged-out, and let callers consume the anonymous
+ * IP quota while believing they were logged in.
  *
  * Source: docs/09-服务端权威用量补丁.md
  */
@@ -28,7 +34,7 @@ declare global {
 
 export async function attachUser(
   req: Request,
-  _res: Response,
+  res: Response,
   next: NextFunction
 ): Promise<void> {
   req.user = null;
@@ -39,18 +45,40 @@ export async function attachUser(
   }
 
   const token = header.slice('Bearer '.length).trim();
-  if (!token) return next();
-
-  try {
-    const client = getAuthClient();
-    const { data, error } = await client.auth.getUser(token);
-    if (!error && data?.user) {
-      req.user = { id: data.user.id, email: data.user.email ?? null };
-    }
-  } catch (err) {
-    // Treat verification failure as anonymous; do not block.
-    console.warn('[auth] token verify failed:', (err as Error).message);
+  if (!token) {
+    res.status(401).json({ error: 'INVALID_TOKEN', message: 'Empty bearer token.' });
+    return;
   }
 
-  next();
+  let client;
+  try {
+    client = getAuthClient();
+  } catch (err) {
+    console.error('[auth] auth client unavailable:', (err as Error).message);
+    res.status(503).json({
+      error: 'AUTH_UNAVAILABLE',
+      message: 'Authentication service is not configured.',
+    });
+    return;
+  }
+
+  try {
+    const { data, error } = await client.auth.getUser(token);
+    if (error || !data?.user) {
+      res.status(401).json({
+        error: 'INVALID_TOKEN',
+        message: 'Token is invalid or expired. Sign in again.',
+      });
+      return;
+    }
+    req.user = { id: data.user.id, email: data.user.email ?? null };
+    return next();
+  } catch (err) {
+    console.error('[auth] token verify exception:', (err as Error).message);
+    res.status(503).json({
+      error: 'AUTH_UNAVAILABLE',
+      message: 'Authentication service is temporarily unavailable.',
+    });
+    return;
+  }
 }

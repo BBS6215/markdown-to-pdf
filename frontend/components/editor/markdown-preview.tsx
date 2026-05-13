@@ -12,44 +12,9 @@
 import { useEffect, useState, useRef } from 'react';
 import { useDebounce } from '@/hooks/use-debounce';
 import { CONTENT_LIMITS } from '@/lib/types';
+import { renderMarkdownToSafeHtml } from '@/lib/markdown/render';
 
 import 'github-markdown-css/github-markdown-light.css';
-
-// Cached processor — created once, reused across renders
-let processorPromise: Promise<any> | null = null;
-
-async function getProcessor() {
-  if (!processorPromise) {
-    processorPromise = (async () => {
-      const { unified } = await import('unified');
-      const { default: remarkParse } = await import('remark-parse');
-      const { default: remarkGfm } = await import('remark-gfm');
-      const { default: remarkRehype } = await import('remark-rehype');
-      const { default: rehypeRaw } = await import('rehype-raw');
-      const { default: rehypeSanitize, defaultSchema } = await import('rehype-sanitize');
-      const { default: rehypeHighlight } = await import('rehype-highlight');
-      const { default: rehypeStringify } = await import('rehype-stringify');
-
-      const schema = {
-        ...defaultSchema,
-        tagNames: [
-          ...(defaultSchema.tagNames ?? []),
-          'details', 'summary', 'sub', 'sup', 'kbd', 'mark', 'ins', 'abbr',
-        ],
-      };
-
-      return unified()
-        .use(remarkParse)
-        .use(remarkGfm)
-        .use(remarkRehype, { allowDangerousHtml: true })
-        .use(rehypeRaw)
-        .use(rehypeSanitize, schema)
-        .use(rehypeHighlight, { detect: true })
-        .use(rehypeStringify);
-    })();
-  }
-  return processorPromise;
-}
 
 interface MarkdownPreviewProps {
   markdown: string;
@@ -78,11 +43,9 @@ export function MarkdownPreview({ markdown, className = '' }: MarkdownPreviewPro
         : debouncedMarkdown;
 
       try {
-        const processor = await getProcessor();
-        const result = await processor.process(contentToRender);
-
+        const rendered = await renderMarkdownToSafeHtml(contentToRender);
         if (!cancelled) {
-          setHtml(String(result));
+          setHtml(rendered);
           setTruncated(isTruncated);
         }
       } catch (err) {

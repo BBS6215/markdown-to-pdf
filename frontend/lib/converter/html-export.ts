@@ -1,30 +1,20 @@
 /**
  * Pure frontend HTML export — no backend API call.
- * Source: 05-技术方案 §3.2 ("不做 PDF/Word 生成" for frontend)
+ * Source: 05-技术方案 §3.2, docs/08-安全设计补丁.md
  *
- * HTML conversion is 100% client-side, zero cost, unlimited.
+ * Uses the same sanitized renderer as the live preview so raw <script>,
+ * onerror handlers, javascript: URLs etc. are stripped before being written
+ * to the downloaded file.
  */
+
+import { renderMarkdownToSafeHtml } from '@/lib/markdown/render';
 
 /**
- * Generate full HTML document from Markdown and trigger download.
+ * Generate a full HTML document from Markdown and return both the body
+ * fragment and a downloadable Blob.
  */
 export async function exportHtml(markdown: string): Promise<{ html: string; blob: Blob }> {
-  const { unified } = await import('unified');
-  const { default: remarkParse } = await import('remark-parse');
-  const { default: remarkGfm } = await import('remark-gfm');
-  const { default: remarkRehype } = await import('remark-rehype');
-  const { default: rehypeHighlight } = await import('rehype-highlight');
-  const { default: rehypeStringify } = await import('rehype-stringify');
-
-  const result = await unified()
-    .use(remarkParse)
-    .use(remarkGfm)
-    .use(remarkRehype, { allowDangerousHtml: true })
-    .use(rehypeHighlight, { detect: true })
-    .use(rehypeStringify, { allowDangerousHtml: true })
-    .process(markdown);
-
-  const bodyHtml = String(result);
+  const bodyHtml = await renderMarkdownToSafeHtml(markdown);
 
   const fullHtml = `<!DOCTYPE html>
 <html lang="en">
@@ -53,7 +43,7 @@ ${bodyHtml}
 }
 
 /**
- * Copy HTML source code to clipboard.
+ * Copy the sanitized HTML body fragment to the clipboard.
  */
 export async function copyHtmlToClipboard(markdown: string): Promise<string> {
   const { html } = await exportHtml(markdown);
