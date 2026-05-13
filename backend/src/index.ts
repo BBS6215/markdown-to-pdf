@@ -30,9 +30,11 @@ app.use(express.json({ limit: '500kb' }));
 
 app.use(healthRouter);
 
-// Convert routes with IP rate limiting (05 §6.2: 10 req/day/IP)
-app.use('/api/convert', convertRateLimiter, convertPdfRouter);
-app.use('/api/convert', convertRateLimiter, convertWordRouter);
+// IP rate limiting on all convert routes (05 §6.2: 10 req/day/IP total)
+app.use('/api/convert', convertRateLimiter);
+// Convert routes
+app.use('/api/convert', convertPdfRouter);
+app.use('/api/convert', convertWordRouter);
 
 // ─── Start Server ────────────────────────────────────────────
 

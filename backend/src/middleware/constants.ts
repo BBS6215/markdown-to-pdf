@@ -1,6 +1,7 @@
 /**
- * Backend constants (mirroring shared/types.ts values for backend use).
- * Avoids cross-workspace import issues during development.
+ * Backend constants — mirrors shared/types.ts values.
+ * Kept separate to avoid cross-workspace import issues with pnpm.
+ * IMPORTANT: If you change these, also update shared/types.ts and frontend/lib/types.ts.
  */
 
 export const CONTENT_LIMITS = {
@@ -8,5 +9,5 @@ export const CONTENT_LIMITS = {
 } as const;
 
 export const USAGE_LIMITS = {
-  IP_DAILY: 10,
+  IP_DAILY: 50,
 } as const;

@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "tsx watch src/index.ts",
-    "build": "tsc",
+    "build": "tsc && node -e \"require('fs').cpSync('src/styles','dist/styles',{recursive:true})\"",
     "start": "node dist/index.js",
     "typecheck": "tsc --noEmit"
   },
@@ -26,6 +26,8 @@
   "devDependencies": {
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.2",
+    "@types/express-serve-static-core": "^5.1.1",
+    "@types/mdast": "^4.0.4",
     "@types/node": "^22.15.0",
     "tsx": "^4.19.0",
     "typescript": "^5.7.0"

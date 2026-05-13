@@ -57,7 +57,7 @@ export const USAGE_LIMITS = {
   /** Logged-in users: PDF/Word conversions per day */
   LOGGED_IN_DAILY: 5,
   /** IP-based rate limit per day (backend, 05 §6.2) */
-  IP_DAILY: 10,
+  IP_DAILY: 50,
   /** HTML has no limit */
   HTML_UNLIMITED: true,
 } as const;

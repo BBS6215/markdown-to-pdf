@@ -167,9 +167,9 @@ function convertNode(node: Content): (Paragraph | Table)[] {
 
     case 'table': {
       if (!node.children || node.children.length === 0) return [];
-      const rows = node.children.map((row, rowIndex) => {
-        const cells = row.children.map(
-          (cell) =>
+      const rows = node.children.map((row: Content, rowIndex: number) => {
+        const cells = (row as any).children.map(
+          (cell: any) =>
             new TableCell({
               children: [
                 new Paragraph({
@@ -177,7 +177,7 @@ function convertNode(node: Content): (Paragraph | Table)[] {
                   alignment: AlignmentType.LEFT,
                 }),
               ],
-              width: { size: 100 / row.children.length, type: WidthType.PERCENTAGE },
+              width: { size: 100 / (row as any).children.length, type: WidthType.PERCENTAGE },
               shading: rowIndex === 0 ? { fill: 'F0F0F0' } : undefined,
             })
         );
