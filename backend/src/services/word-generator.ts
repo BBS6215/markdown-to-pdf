@@ -36,57 +36,85 @@ const HEADING_LEVELS: Record<number, (typeof HeadingLevel)[keyof typeof HeadingL
 };
 
 /**
- * Extract plain text from inline/phrasing nodes recursively.
+ * Inline style accumulator. We collect runs as plain objects first so styles
+ * can compose across nested nodes (e.g. **_mixed_** keeps both bold + italics),
+ * then convert to docx TextRun at the end. The previous implementation tried
+ * to re-read text out of an already-constructed TextRun via `(r as any).options.text`,
+ * which is undefined in current docx versions and erased the content of any
+ * bold/italics/strike span.
  */
-function extractText(node: PhrasingContent): TextRun[] {
+interface InlineRun {
+  text: string;
+  bold?: boolean;
+  italics?: boolean;
+  strike?: boolean;
+  code?: boolean;
+  linkUrl?: boolean; // marks the trailing "(url)" segment of a link
+}
+
+function collectInlineRuns(
+  node: PhrasingContent,
+  style: Omit<InlineRun, 'text'> = {}
+): InlineRun[] {
   switch (node.type) {
     case 'text':
-      return [new TextRun({ text: node.value })];
+      return [{ text: node.value, ...style }];
     case 'strong':
-      return (node.children as PhrasingContent[]).flatMap((child) => {
-        const runs = extractText(child);
-        return runs.map(
-          (r) => new TextRun({ text: (r as any).options?.text || '', bold: true })
-        );
-      });
+      return (node.children as PhrasingContent[]).flatMap((c) =>
+        collectInlineRuns(c, { ...style, bold: true })
+      );
     case 'emphasis':
-      return (node.children as PhrasingContent[]).flatMap((child) => {
-        const runs = extractText(child);
-        return runs.map(
-          (r) => new TextRun({ text: (r as any).options?.text || '', italics: true })
-        );
-      });
-    case 'inlineCode':
-      return [
-        new TextRun({
-          text: node.value,
-          font: { name: 'Courier New' },
-          size: 20, // 10pt
-        }),
-      ];
-    case 'link':
-      // Links rendered as underlined blue text with URL in parentheses
-      return [
-        ...((node.children as PhrasingContent[]).flatMap(extractText)),
-        new TextRun({ text: ` (${node.url})`, color: '2563EB', size: 18 }),
-      ];
+      return (node.children as PhrasingContent[]).flatMap((c) =>
+        collectInlineRuns(c, { ...style, italics: true })
+      );
     case 'delete':
-      return (node.children as PhrasingContent[]).flatMap((child) => {
-        const runs = extractText(child);
-        return runs.map(
-          (r) => new TextRun({ text: (r as any).options?.text || '', strike: true })
-        );
-      });
+      return (node.children as PhrasingContent[]).flatMap((c) =>
+        collectInlineRuns(c, { ...style, strike: true })
+      );
+    case 'inlineCode':
+      return [{ text: node.value, ...style, code: true }];
+    case 'link':
+      return [
+        ...(node.children as PhrasingContent[]).flatMap((c) =>
+          collectInlineRuns(c, style)
+        ),
+        { text: ` (${node.url})`, linkUrl: true },
+      ];
+    case 'break':
+      return [{ text: '\n', ...style }];
+    case 'image':
+      // docx package does not support inline images; surface the alt text.
+      return [{ text: node.alt || '[image]', ...style }];
     default:
-      // Graceful degradation: extract value if available
-      if ('value' in node && typeof node.value === 'string') {
-        return [new TextRun({ text: node.value })];
+      if ('value' in node && typeof (node as any).value === 'string') {
+        return [{ text: (node as any).value, ...style }];
       }
-      if ('children' in node && Array.isArray(node.children)) {
-        return (node.children as PhrasingContent[]).flatMap(extractText);
+      if ('children' in node && Array.isArray((node as any).children)) {
+        return ((node as any).children as PhrasingContent[]).flatMap((c) =>
+          collectInlineRuns(c, style)
+        );
       }
       return [];
   }
+}
+
+function toTextRun(run: InlineRun): TextRun {
+  return new TextRun({
+    text: run.text,
+    ...(run.bold && { bold: true }),
+    ...(run.italics && { italics: true }),
+    ...(run.strike && { strike: true }),
+    ...(run.code && { font: { name: 'Courier New' }, size: 20 }), // 10pt mono
+    ...(run.linkUrl && { color: '2563EB', size: 18 }),
+  });
+}
+
+/**
+ * Extract inline content from phrasing nodes recursively, preserving
+ * bold/italics/strike/code styling.
+ */
+function extractText(node: PhrasingContent): TextRun[] {
+  return collectInlineRuns(node).map(toTextRun);
 }
 
 /**
