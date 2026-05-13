@@ -8,17 +8,19 @@
 
 import { useState } from 'react';
 import { getSupabaseBrowserClient } from '@/lib/supabase/client';
+import { sanitizeRedirectPath } from '@/lib/auth/safe-redirect';
 
 export function GoogleOAuthButton({ redirectTo }: { redirectTo?: string }) {
   const [loading, setLoading] = useState(false);
 
   const handleClick = async () => {
     setLoading(true);
+    const safeRedirect = sanitizeRedirectPath(redirectTo);
     const supabase = getSupabaseBrowserClient();
     await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: `${window.location.origin}/auth/callback?next=${redirectTo || '/en'}`,
+        redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(safeRedirect)}`,
       },
     });
   };

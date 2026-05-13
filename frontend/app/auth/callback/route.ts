@@ -5,11 +5,15 @@
 
 import { NextResponse } from 'next/server';
 import { getSupabaseServerClient } from '@/lib/supabase/server';
+import { sanitizeRedirectPath } from '@/lib/auth/safe-redirect';
 
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get('code');
-  const next = searchParams.get('next') ?? '/en';
+  // Defense-in-depth: even though the redirect path was sanitized at the call
+  // site, never trust query params on the way out. //evil.com or scheme URIs
+  // get replaced with the locale root.
+  const next = sanitizeRedirectPath(searchParams.get('next'));
 
   if (code) {
     const supabase = await getSupabaseServerClient();

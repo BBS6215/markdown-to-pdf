@@ -8,6 +8,7 @@
 import { useState } from 'react';
 import { getSupabaseBrowserClient } from '@/lib/supabase/client';
 import { Button } from '@/components/ui/button';
+import { sanitizeRedirectPath } from '@/lib/auth/safe-redirect';
 
 type Mode = 'login' | 'signup';
 
@@ -27,12 +28,14 @@ export function LoginForm({ redirectTo }: { redirectTo?: string }) {
     setError(undefined);
     setSuccess(undefined);
 
+    const safeRedirect = sanitizeRedirectPath(redirectTo);
+
     if (mode === 'signup') {
       const { error } = await supabase.auth.signUp({
         email,
         password,
         options: {
-          emailRedirectTo: `${window.location.origin}/auth/callback?next=${redirectTo || '/en'}`,
+          emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(safeRedirect)}`,
         },
       });
       if (error) {
@@ -45,7 +48,7 @@ export function LoginForm({ redirectTo }: { redirectTo?: string }) {
       if (error) {
         setError(error.message);
       } else {
-        window.location.href = redirectTo || '/en';
+        window.location.href = safeRedirect;
       }
     }
 
