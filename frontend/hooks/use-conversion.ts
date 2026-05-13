@@ -55,16 +55,8 @@ export function useConversion(format: ConvertFormat) {
         // ── DB writes (logged-in users only) ──
         if (user) {
           // 1. UPSERT daily_usage (PDF/Word only, not HTML)
+          // Write order: daily_usage first (quota), then history (nice-to-have) — 06 §5.1
           if (format !== 'html') {
-            await supabase.rpc('increment_usage', {}).catch(() => {
-              // Fallback: direct UPSERT
-              return supabase.from('daily_usage').upsert(
-                { user_id: user.id, usage_date: new Date().toISOString().slice(0, 10), pdf_word_count: 1 },
-                { onConflict: 'user_id,usage_date' }
-              );
-            });
-
-            // Direct UPSERT as primary method
             const today = new Date().toISOString().slice(0, 10);
             const { data: existing } = await supabase
               .from('daily_usage')

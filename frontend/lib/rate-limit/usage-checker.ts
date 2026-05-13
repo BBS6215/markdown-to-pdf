@@ -49,6 +49,7 @@ export async function checkUsage(format: ConvertFormat): Promise<UsageStatus> {
   const { data } = await supabase
     .from('daily_usage')
     .select('pdf_word_count')
+    .eq('user_id', user.id)
     .eq('usage_date', new Date().toISOString().slice(0, 10))
     .single();
 

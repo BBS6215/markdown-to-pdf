@@ -16,11 +16,11 @@ interface SeoContentSectionProps {
   lang: string;
   content: {
     howToTitle: string;
-    howToSteps: string[];
+    howToSteps: readonly string[];
     whyTitle: string;
     whyContent: string;
-    features: Array<{ title: string; desc: string }>;
-    faq: Array<{ q: string; a: string }>;
+    features: ReadonlyArray<{ title: string; desc: string }>;
+    faq: ReadonlyArray<{ q: string; a: string }>;
   };
 }
 

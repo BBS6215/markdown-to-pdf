@@ -16,7 +16,7 @@ export interface GuideData {
 export const GUIDES: GuideData[] = [
   {
     slug: 'markdown-new-line',
-    title: 'Markdown New Line — How to Add Line Breaks',
+    title: 'Markdown New Line — How to Add Line Breaks (with Examples)',
     description: 'Learn how to create new lines and line breaks in Markdown with interactive examples.',
     readTime: 4,
     content: `## The Problem
@@ -185,7 +185,7 @@ Experiment with block quotes in the editor below:`,
   },
   {
     slug: 'markdown-cheat-sheet',
-    title: 'Markdown Cheat Sheet — Complete Syntax Reference',
+    title: 'Markdown Cheat Sheet — Complete Syntax Reference 2026',
     description: 'Complete Markdown syntax reference with examples for headings, links, images, tables, code, and more.',
     readTime: 6,
     content: `## Headings

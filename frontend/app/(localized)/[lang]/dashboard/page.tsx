@@ -6,7 +6,13 @@
 
 import { redirect } from 'next/navigation';
 import { getSupabaseServerClient } from '@/lib/supabase/server';
+import { getPageMetadata } from '@/lib/seo/metadata';
 import { DashboardClient } from './dashboard-client';
+
+export async function generateMetadata({ params }: { params: Promise<{ lang: string }> }) {
+  const { lang } = await params;
+  return getPageMetadata(lang, 'dashboard');
+}
 
 export default async function DashboardPage({
   params,

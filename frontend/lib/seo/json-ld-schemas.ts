@@ -15,7 +15,7 @@ export function softwareApplicationSchema() {
   };
 }
 
-export function faqSchema(items: Array<{ q: string; a: string }>) {
+export function faqSchema(items: ReadonlyArray<{ q: string; a: string }>) {
   return {
     '@context': 'https://schema.org',
     '@type': 'FAQPage',

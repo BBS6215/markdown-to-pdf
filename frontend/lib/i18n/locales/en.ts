@@ -217,5 +217,18 @@ This is **Markdown** — the same format used by ChatGPT, Claude, and other AI t
 `,
 } as const;
 
-export type Translations = typeof en;
+/** Recursively widen literal types to string/number/boolean for locale compatibility */
+type Widen<T> = T extends string
+  ? string
+  : T extends number
+  ? number
+  : T extends boolean
+  ? boolean
+  : T extends readonly (infer U)[]
+  ? readonly Widen<U>[]
+  : T extends object
+  ? { [K in keyof T]: Widen<T[K]> }
+  : T;
+
+export type Translations = Widen<typeof en>;
 export default en;

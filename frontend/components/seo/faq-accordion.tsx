@@ -7,7 +7,7 @@
 import { useState } from 'react';
 import { ChevronDown } from 'lucide-react';
 
-export function FaqAccordion({ items }: { items: Array<{ q: string; a: string }> }) {
+export function FaqAccordion({ items }: { items: ReadonlyArray<{ q: string; a: string }> }) {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
   return (

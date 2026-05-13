@@ -19,13 +19,13 @@ interface PageMeta {
 
 const META: Record<string, Record<PageKey, PageMeta>> = {
   en: {
-    home: { title: 'Markdown (.md) to PDF Converter — Free Online Tool', description: 'Convert Markdown or AI-generated text to professional PDF files for free. Paste from ChatGPT, Claude, or any AI tool and download instantly.', path: '/en' },
+    home: { title: 'Markdown (.md) to PDF Converter — Free Online Tool', description: 'Free online Markdown to PDF converter. Paste from ChatGPT, Claude, or any AI tool and download instantly — no signup required.', path: '/en' },
     toWord: { title: 'Markdown (.md) to Word Converter — Free Online Tool', description: 'Convert Markdown to Word (.docx) documents for free. Perfect for AI outputs from ChatGPT and Claude.', path: '/en/to-word' },
     toHtml: { title: 'Markdown (.md) to HTML Converter — Free Online Tool', description: 'Convert Markdown to clean HTML in your browser. 100% client-side, your data never leaves your device.', path: '/en/to-html' },
     guides: { title: 'Markdown Guides — Learn Markdown Syntax', description: 'Interactive Markdown guides with live editors. Learn newlines, quotes, and all Markdown syntax.', path: '/en/guides' },
-    guideNewLine: { title: 'Markdown New Line — How to Add Line Breaks in Markdown', description: 'Learn how to create new lines and line breaks in Markdown. Interactive examples and common mistakes.', path: '/en/guides/markdown-new-line' },
+    guideNewLine: { title: 'Markdown New Line — How to Add Line Breaks (with Examples)', description: 'Learn how to create new lines and line breaks in Markdown. Interactive examples and common mistakes.', path: '/en/guides/markdown-new-line' },
     guideQuote: { title: 'Markdown Quote — How to Create Block Quotes in Markdown', description: 'Learn how to create block quotes and nested quotes in Markdown with interactive examples.', path: '/en/guides/markdown-quote' },
-    guideCheatSheet: { title: 'Markdown Cheat Sheet — Complete Syntax Reference', description: 'Complete Markdown syntax reference with examples. Headings, links, images, tables, code blocks, and more.', path: '/en/guides/markdown-cheat-sheet' },
+    guideCheatSheet: { title: 'Markdown Cheat Sheet — Complete Syntax Reference 2026', description: 'Complete Markdown syntax reference with examples. Headings, links, images, tables, code blocks, and more.', path: '/en/guides/markdown-cheat-sheet' },
     pricing: { title: 'Pricing — Markdown to PDF', description: 'Markdown to PDF is free. 2 conversions/day without account, 5/day with free account. HTML always unlimited.', path: '/en/pricing' },
     privacy: { title: 'Privacy Policy — Markdown to PDF', description: 'Privacy policy for markdown-to-pdf.app.', path: '/en/privacy' },
     terms: { title: 'Terms of Service — Markdown to PDF', description: 'Terms of service for markdown-to-pdf.app.', path: '/en/terms' },
@@ -37,9 +37,9 @@ const META: Record<string, Record<PageKey, PageMeta>> = {
     toWord: { title: '在线 Markdown (.md) 转 Word — 免费工具', description: '免费将 Markdown 转为 Word (.docx) 文档。', path: '/zh/to-word' },
     toHtml: { title: '在线 Markdown (.md) 转 HTML — 免费工具', description: '在浏览器中将 Markdown 转为 HTML，数据不离开设备。', path: '/zh/to-html' },
     guides: { title: 'Markdown 指南 — 学习 Markdown 语法', description: '交互式 Markdown 指南，含实时编辑器。', path: '/zh/guides' },
-    guideNewLine: { title: 'Markdown 换行 — 如何在 Markdown 中换行', description: '学习如何在 Markdown 中创建换行。', path: '/zh/guides/markdown-new-line' },
+    guideNewLine: { title: 'Markdown 换行 — 如何添加换行（附示例）', description: '学习如何在 Markdown 中创建换行。', path: '/zh/guides/markdown-new-line' },
     guideQuote: { title: 'Markdown 引用 — 如何创建引用块', description: '学习如何在 Markdown 中创建引用。', path: '/zh/guides/markdown-quote' },
-    guideCheatSheet: { title: 'Markdown 速查表 — 完整语法参考', description: '完整的 Markdown 语法参考。', path: '/zh/guides/markdown-cheat-sheet' },
+    guideCheatSheet: { title: 'Markdown 速查表 — 完整语法参考 2026', description: '完整的 Markdown 语法参考。', path: '/zh/guides/markdown-cheat-sheet' },
     pricing: { title: '定价 — Markdown 转 PDF', description: 'Markdown 转 PDF 免费使用。', path: '/zh/pricing' },
     privacy: { title: '隐私政策 — Markdown 转 PDF', description: 'markdown-to-pdf.app 隐私政策。', path: '/zh/privacy' },
     terms: { title: '服务条款 — Markdown 转 PDF', description: 'markdown-to-pdf.app 服务条款。', path: '/zh/terms' },

@@ -2,7 +2,7 @@
  * Features grid for SEO content area.
  */
 
-export function FeaturesGrid({ features }: { features: Array<{ title: string; desc: string }> }) {
+export function FeaturesGrid({ features }: { features: ReadonlyArray<{ title: string; desc: string }> }) {
   return (
     <div>
       <h2 className="text-xl font-semibold text-gray-800 mb-6">Features</h2>

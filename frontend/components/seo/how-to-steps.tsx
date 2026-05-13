@@ -2,7 +2,7 @@
  * How-to steps component for SEO content area.
  */
 
-export function HowToSteps({ title, steps }: { title: string; steps: string[] }) {
+export function HowToSteps({ title, steps }: { title: string; steps: readonly string[] }) {
   return (
     <div>
       <h2 className="text-xl font-semibold text-gray-800 mb-6">{title}</h2>
