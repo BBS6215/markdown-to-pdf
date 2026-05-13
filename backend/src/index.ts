@@ -14,6 +14,11 @@ import { attachUser } from './middleware/auth.js';
 
 const app = express();
 
+// Trust proxy chain — required for rate limiter to see the real client IP.
+// Defaults to 'loopback' so spoofed X-Forwarded-For headers from the public
+// internet are ignored. Set TRUST_PROXY=1 (or higher) on Render/Vercel/Cloudflare.
+app.set('trust proxy', config.trustProxy);
+
 // ─── Middleware ───────────────────────────────────────────────
 
 // CORS: only allow requests from the frontend origin (05 §2.2)

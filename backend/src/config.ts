@@ -13,6 +13,19 @@ export const config = {
   /** Node environment */
   nodeEnv: process.env.NODE_ENV || 'development',
 
+  /**
+   * Express `trust proxy` setting — controls which X-Forwarded-* headers are honored.
+   * Set to the number of proxies in front of the app (e.g. 1 for Render/Vercel/Cloudflare),
+   * or a named value like 'loopback' / 'uniquelocal'. Numeric strings are parsed.
+   * NEVER set to true/'all' on a public deployment — that lets clients spoof their IP.
+   */
+  trustProxy: ((): string | number => {
+    const raw = process.env.TRUST_PROXY;
+    if (raw === undefined || raw === '') return 'loopback';
+    const n = Number(raw);
+    return Number.isFinite(n) && n >= 0 ? n : raw;
+  })(),
+
   /** Puppeteer executable path (set in Dockerfile for production; undefined = use bundled Chrome in dev) */
   puppeteerExecutablePath:
     process.env.PUPPETEER_EXECUTABLE_PATH || undefined,

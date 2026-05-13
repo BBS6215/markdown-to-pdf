@@ -1,10 +1,11 @@
 /**
- * IP-based rate limiting middleware.
- * Source: 05-技术方案 §6.2 (匿名用户用量追踪)
+ * IP-based rate limiting middleware (anonymous callers only).
+ * Source: 05-技术方案 §6.2, docs/09-服务端权威用量补丁.md
  *
- * - Same IP: max 10 PDF+Word requests per day (24h sliding window)
- * - Exceeding returns 429 with JSON error body
- * - Only applied to /api/convert routes (not /health)
+ * IP resolution relies on Express `app.set('trust proxy', ...)` configured
+ * in index.ts. Do NOT reintroduce a custom keyGenerator that reads
+ * X-Forwarded-For directly — that lets any caller spoof its IP and bypass
+ * the limit. See https://express-rate-limit.mintlify.app/guides/troubleshooting-proxy-issues
  */
 
 import rateLimit from 'express-rate-limit';
@@ -19,14 +20,8 @@ export const convertRateLimiter = rateLimit({
     error: 'RATE_LIMITED',
     message: 'Daily limit exceeded. Try again tomorrow.',
   },
-  // Skip authenticated users — they are gated by per-user quota instead.
+  // Authenticated callers are gated by per-user quota (services/quota.ts).
   skip: (req) => Boolean(req.user),
-  keyGenerator: (req) => {
-    // Use X-Forwarded-For if behind proxy (Render), otherwise remoteAddress
-    return (
-      (req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim() ||
-      req.ip ||
-      'unknown'
-    );
-  },
+  // Default keyGenerator uses req.ip, which is the trusted client IP once
+  // trust proxy is configured correctly.
 });
