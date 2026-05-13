@@ -1,28 +1,34 @@
 import type { Metadata } from 'next';
-import { Inter, JetBrains_Mono } from 'next/font/google';
+import localFont from 'next/font/local';
 import './globals.css';
 
 /**
  * Root layout — font loading + globals.css.
  * Source: 04-UI规范 §3.1 (Inter 400/500/600/700, JetBrains Mono 400/700)
  *
- * Font loading via next/font ensures automatic optimization:
- * - woff2 format, ≤120KB total
- * - font-display: swap (avoid FOIT)
+ * Fonts are loaded from `./fonts/` so the build is reproducible offline
+ * (no fonts.gstatic.com fetch at build time). Both files are variable
+ * fonts: a single woff2 covers every weight via the `wght` axis. Source
+ * files come from @fontsource-variable/{inter,jetbrains-mono} — see
+ * `app/fonts/README.md` for how to refresh them.
+ *
+ * Chinese / CJK pages fall back to the OS font stack (PingFang, Microsoft
+ * YaHei, Noto Sans CJK). Including a full CJK web font would add 15+ MB
+ * to the repo, which is not worth it for the i18n surface area.
  */
 
-const inter = Inter({
-  subsets: ['latin'],
-  weight: ['400', '500', '600', '700'],
+const inter = localFont({
+  src: './fonts/inter-variable.woff2',
   variable: '--font-inter',
   display: 'swap',
+  weight: '100 900',
 });
 
-const jetbrainsMono = JetBrains_Mono({
-  subsets: ['latin'],
-  weight: ['400', '700'],
+const jetbrainsMono = localFont({
+  src: './fonts/jetbrains-mono-variable.woff2',
   variable: '--font-jetbrains-mono',
   display: 'swap',
+  weight: '100 800',
 });
 
 export const metadata: Metadata = {

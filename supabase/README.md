@@ -29,7 +29,7 @@ supabase db push
 ```
 
 The 2026-03-23 trio establishes the tables and the trigger function. The
-2026-05-13 pair hardens security and moves quota enforcement to the
-backend. On a fresh project all five must be applied in order; the
-security_hardening migration is idempotent (its rls_auto_enable REVOKEs
-are guarded by IF EXISTS).
+2026-05-13 trio hardens security, moves quota enforcement to the backend,
+and tightens the conversion_history INSERT policy to HTML-only. On a
+fresh project all six must be applied in order; security_hardening is
+idempotent (its rls_auto_enable REVOKEs are guarded by IF EXISTS).
