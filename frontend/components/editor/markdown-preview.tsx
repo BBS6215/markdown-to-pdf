@@ -25,15 +25,27 @@ async function getProcessor() {
       const { default: remarkParse } = await import('remark-parse');
       const { default: remarkGfm } = await import('remark-gfm');
       const { default: remarkRehype } = await import('remark-rehype');
+      const { default: rehypeRaw } = await import('rehype-raw');
+      const { default: rehypeSanitize, defaultSchema } = await import('rehype-sanitize');
       const { default: rehypeHighlight } = await import('rehype-highlight');
       const { default: rehypeStringify } = await import('rehype-stringify');
+
+      const schema = {
+        ...defaultSchema,
+        tagNames: [
+          ...(defaultSchema.tagNames ?? []),
+          'details', 'summary', 'sub', 'sup', 'kbd', 'mark', 'ins', 'abbr',
+        ],
+      };
 
       return unified()
         .use(remarkParse)
         .use(remarkGfm)
         .use(remarkRehype, { allowDangerousHtml: true })
+        .use(rehypeRaw)
+        .use(rehypeSanitize, schema)
         .use(rehypeHighlight, { detect: true })
-        .use(rehypeStringify, { allowDangerousHtml: true });
+        .use(rehypeStringify);
     })();
   }
   return processorPromise;

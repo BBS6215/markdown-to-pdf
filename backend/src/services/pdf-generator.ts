@@ -65,7 +65,20 @@ export async function generatePdf(markdown: string): Promise<Buffer> {
   const page = await browser.newPage();
 
   try {
-    await page.setContent(fullHtml, { waitUntil: 'networkidle0' });
+    // Sandbox: no JS execution, no external network. The HTML is fully self-contained
+    // (inline CSS, no external assets) so the renderer cannot be used as an SSRF probe.
+    await page.setJavaScriptEnabled(false);
+    await page.setRequestInterception(true);
+    page.on('request', (req) => {
+      const url = req.url();
+      if (url.startsWith('data:') || url === 'about:blank') {
+        req.continue();
+      } else {
+        req.abort();
+      }
+    });
+
+    await page.setContent(fullHtml, { waitUntil: 'load' });
 
     // Log memory usage for Phase 1 pressure testing (07 §4 任务 1.14)
     const memBefore = process.memoryUsage();

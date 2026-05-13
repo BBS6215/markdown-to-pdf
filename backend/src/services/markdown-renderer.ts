@@ -10,15 +10,27 @@ import { unified } from 'unified';
 import remarkParse from 'remark-parse';
 import remarkGfm from 'remark-gfm';
 import remarkRehype from 'remark-rehype';
+import rehypeRaw from 'rehype-raw';
+import rehypeSanitize, { defaultSchema } from 'rehype-sanitize';
 import rehypeHighlight from 'rehype-highlight';
 import rehypeStringify from 'rehype-stringify';
+
+const schema = {
+  ...defaultSchema,
+  tagNames: [
+    ...(defaultSchema.tagNames ?? []),
+    'details', 'summary', 'sub', 'sup', 'kbd', 'mark', 'ins', 'abbr',
+  ],
+};
 
 const processor = unified()
   .use(remarkParse)
   .use(remarkGfm) // GitHub Flavored Markdown: tables, strikethrough, task lists
   .use(remarkRehype, { allowDangerousHtml: true })
+  .use(rehypeRaw)
+  .use(rehypeSanitize, schema)
   .use(rehypeHighlight, { detect: true }) // Code block syntax highlighting
-  .use(rehypeStringify, { allowDangerousHtml: true });
+  .use(rehypeStringify);
 
 /**
  * Convert Markdown string to HTML string.
