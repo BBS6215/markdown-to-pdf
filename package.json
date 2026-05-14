@@ -4,9 +4,9 @@
   "private": true,
   "description": "Markdown to PDF/Word/HTML converter - Online tool",
   "scripts": {
-    "dev": "pnpm run --parallel dev:frontend dev:backend",
-    "dev:frontend": "pnpm --filter frontend dev",
-    "dev:backend": "pnpm --filter backend dev",
+    "dev": "pnpm --filter @mdpdf/frontend dev",
+    "dev:frontend": "pnpm --filter @mdpdf/frontend dev",
+    "dev:backend": "pnpm --filter @mdpdf/backend dev",
     "build": "pnpm -r build",
     "typecheck": "pnpm -r typecheck",
     "lint": "pnpm -r lint"
