@@ -61,6 +61,9 @@ export function MarkdownPreview({ markdown, className = '' }: MarkdownPreviewPro
     <div className={`flex flex-col ${className}`}>
       <div className="bg-gray-50 border-b border-gray-200 px-4 py-2">
         <span className="text-sm font-medium text-gray-700">Live Preview</span>
+        <span className="block text-xs text-gray-400 mt-0.5">
+          Renders as your file will look
+        </span>
       </div>
 
       <div
