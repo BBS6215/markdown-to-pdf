@@ -106,7 +106,7 @@ export function ToolPage({ format }: ToolPageProps) {
 
           {/* Editor + Preview */}
           <FileDropzone onFileContent={handleFileContent}>
-            <div className={`${isMobile ? '' : 'grid grid-cols-[1fr_2fr]'} border-b border-gray-200`}>
+            <div className={`${isMobile ? '' : 'grid grid-cols-[minmax(460px,1fr)_minmax(0,2fr)]'} border-b border-gray-200`}>
               <div
                 className={`${!isMobile ? 'border-r border-gray-200' : ''} ${
                   isMobile && mobileTab !== 'edit' ? 'hidden' : ''

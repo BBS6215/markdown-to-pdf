@@ -76,7 +76,7 @@ export function MarkdownEditor({ value, onChange, className = '' }: MarkdownEdit
   return (
     <div className={`relative ${className}`}>
       {/* Panel header */}
-      <div className="bg-gray-50 border-b border-gray-200 px-4 py-2">
+      <div className="bg-gray-50 border-b border-gray-200 px-4 py-2 min-h-[72px] flex flex-col justify-center">
         <span className="text-sm font-medium text-gray-700">Markdown Input</span>
         <span className="block text-xs text-gray-400 mt-0.5">
           Paste from ChatGPT, Claude, or any text editor
