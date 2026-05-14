@@ -9,7 +9,7 @@
  * F6 fix: Processor instance cached at module level (not re-created per render).
  */
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import { useDebounce } from '@/hooks/use-debounce';
 import { CONTENT_LIMITS } from '@/lib/types';
 import { renderMarkdownToSafeHtml } from '@/lib/markdown/render';

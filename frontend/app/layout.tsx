@@ -34,6 +34,9 @@ const jetbrainsMono = localFont({
 export const metadata: Metadata = {
   title: 'Markdown to PDF',
   description: 'Convert Markdown to PDF, Word, and HTML — free online tool',
+  icons: {
+    icon: '/icon.svg',
+  },
 };
 
 export default function RootLayout({
