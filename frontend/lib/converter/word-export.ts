@@ -11,9 +11,10 @@
  *   - A central `paragraphStyles` definition with 微软雅黑 (Microsoft YaHei)
  *     as the base font, so Chinese text renders cleanly in Word/WPS without
  *     falling back to Calibri.
- *   - Numbered lists go through a `numbering.config` reference so 1. 2. 3.
- *     actually renders as ordered numbers (the previous implementation
- *     erroneously rendered every list as a bullet list).
+ *   - Numbered lists are rendered with explicit "1. " prefixes, matching
+ *     ABeiTools. This is less semantic than Word numbering, but it reliably
+ *     restarts each independent Markdown list in Word/WPS and avoids shared
+ *     numbering state across separate lists.
  *
  * The inline-style accumulator (collectInlineRuns -> toTextRun) preserves
  * bold / italics / strike / code across nested spans.
@@ -31,7 +32,6 @@ import {
   WidthType,
   BorderStyle,
   AlignmentType,
-  LevelFormat,
 } from 'docx';
 import type { Root, Content, PhrasingContent, List as MdList } from 'mdast';
 import { unified } from 'unified';
@@ -281,27 +281,43 @@ function convertNode(node: Content): (Paragraph | Table)[] {
 /**
  * Convert a Markdown list (ordered or unordered) into docx paragraphs.
  *
- * Ordered lists must use the `numbering.config` reference declared on the
- * Document below, otherwise Word renders them as bullet points (the bug the
- * previous implementation shipped). Unordered lists use docx's built-in
- * bullet style.
+ * Ordered lists intentionally use plain text prefixes instead of docx's
+ * `numbering.config`. Reusing one numbering reference across separate
+ * Markdown lists can make the second list continue from the previous one
+ * in Word/WPS. ABeiTools avoids that by writing "1. " directly, which is
+ * the behavior we want for this frontend-first converter.
  */
 function convertList(node: MdList): Paragraph[] {
   const isOrdered = node.ordered === true;
+  let orderedIndex = node.start ?? 1;
   const items: Paragraph[] = [];
+
   for (const item of node.children) {
     if (item.type !== 'listItem') continue;
+    let isFirstParagraphInItem = true;
+
     for (const child of item.children) {
       if (child.type !== 'paragraph') continue;
+      const children = (child.children as PhrasingContent[]).flatMap(extractText);
+
       items.push(
         new Paragraph({
-          children: (child.children as PhrasingContent[]).flatMap(extractText),
+          children:
+            isOrdered && isFirstParagraphInItem
+              ? [new TextRun({ text: `${orderedIndex}. ` }), ...children]
+              : children,
           ...(isOrdered
-            ? { numbering: { reference: 'ordered-list', level: 0 } }
+            ? {}
             : { bullet: { level: 0 } }),
           spacing: { after: 80 },
         })
       );
+
+      isFirstParagraphInItem = false;
+    }
+
+    if (isOrdered) {
+      orderedIndex += 1;
     }
   }
   return items;
@@ -328,21 +344,6 @@ export async function exportWord(markdown: string): Promise<{ blob: Blob; filena
 
   const doc = new Document({
     styles: createDocumentStyles(),
-    numbering: {
-      config: [
-        {
-          reference: 'ordered-list',
-          levels: [
-            {
-              level: 0,
-              format: LevelFormat.DECIMAL,
-              text: '%1.',
-              alignment: AlignmentType.LEFT,
-            },
-          ],
-        },
-      ],
-    },
     sections: [
       {
         children: docElements,
