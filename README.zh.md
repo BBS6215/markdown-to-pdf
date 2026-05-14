@@ -1,0 +1,111 @@
+# Markdown to PDF
+
+> Markdown 在线转 PDF / Word / HTML 工具站，全部在浏览器本地完成。
+> 线上：[markdown-to-pdf.app](https://markdown-to-pdf.app)
+>
+> [English README](./README.md)
+
+## 项目定位
+
+粘贴 Markdown（或拖入 `.md` 文件）→ 实时预览 → 一键导出：
+
+- **PDF** — 通过浏览器原生打印引擎（`window.print()` + 隐藏 iframe）
+- **Word** — 通过 [`docx`](https://www.npmjs.com/package/docx) 包 `Packer.toBlob()`，基础字体微软雅黑，中文 / 英文都能干净渲染
+- **HTML** — Sanitize 之后写入剪贴板，方便粘贴到 Notion / 飞书 / 邮件
+
+目标用户是被 ChatGPT / Claude / Gemini 塞了一堆 Markdown 的海外用户，需要一个能转成可分发文档的工具。
+
+## 当前架构（一句话版）
+
+**纯前端管道，无 backend**。所有格式转换在用户浏览器本地完成。
+
+```
+Next.js (Vercel)  ──►  unified (remark + rehype-sanitize)  ──►  PDF / Word / HTML
+                                       │
+                                       └──►  Supabase  (Auth + 历史记录)
+```
+
+- 月运行成本 **$0**（仅域名年费）
+- 无配额、无限流
+- 架构变迁记录详见 [`docs/10-前端化架构补丁.md`](./docs/10-前端化架构补丁.md)（项目最初设计了 Render + Puppeteer 后端，那条路径 `backend/` 代码保留作冷备，未部署）
+
+## 技术栈
+
+| 层 | 选型 |
+|---|---|
+| 框架 | Next.js 16（App Router + React 19） |
+| 语言 | TypeScript 5.7+ |
+| 样式 | Tailwind CSS 4 |
+| 编辑器 | CodeMirror 6 |
+| Markdown | `unified` + `remark-gfm` + `rehype-sanitize` |
+| Word | `docx` 9.x |
+| Auth + DB | Supabase |
+| 部署 | Vercel |
+| 包管理 | pnpm 10（workspaces） |
+| Node | 22.x |
+
+## 快速开始
+
+```bash
+# 1. 安装依赖
+pnpm install
+
+# 2. 复制环境变量模板
+cp frontend/.env.example frontend/.env.local
+#    填入 NEXT_PUBLIC_SUPABASE_URL 和 NEXT_PUBLIC_SUPABASE_ANON_KEY
+#    （在哪找见 frontend/.env.example 的注释）
+
+# 3. 跑开发服（仅前端）
+pnpm dev
+# → http://localhost:3000
+
+# 4. 类型检查 + lint
+pnpm typecheck
+pnpm lint
+
+# 5. 生产构建
+pnpm build
+```
+
+## 仓库结构
+
+```
+markdown-to-pdf-app/
+├── frontend/            # Next.js 应用（部署到 Vercel）
+│   ├── app/             # App Router 页面（i18n: /en, /zh）
+│   ├── components/      # UI 组件
+│   ├── lib/
+│   │   ├── converter/   # 三种格式的浏览器端导出器
+│   │   ├── markdown/    # unified 渲染管道
+│   │   └── seo/         # metadata、sitemap 工具
+│   └── ...
+├── backend/             # Express + Puppeteer，未部署（冷备）
+├── shared/              # 跨包共享类型
+├── supabase/            # SQL 迁移
+└── docs/                # 设计 + 架构文档（中文，见下表索引）
+```
+
+## 文档索引
+
+| 编号 | 文档 | 状态 |
+|---|---|---|
+| 01 | [项目主线文档](./docs/01-项目主线文档.md) | ✅ 有效 |
+| 02 | [SEO 策略与搜索需求](./docs/02-SEO策略与搜索需求设计说明.md) | ✅ 有效 |
+| 03 | [产品结构文档](./docs/03-产品结构文档.md) | ✅ 有效 |
+| 03-1 | [交互与体验补充](./docs/03-1-交互与体验补充说明.md) | ✅ 有效 |
+| 04 | [UI 设计与视觉规范](./docs/04-UI设计与视觉规范建议.md) | ✅ 有效 |
+| 05 | [技术方案文档](./docs/05-技术方案文档.md) | ⚠️ 部分被 10 覆盖 |
+| 06 | [数据库设计说明](./docs/06-数据库设计说明.md) | ⚠️ 配额流被 10 覆盖 |
+| 07 | [开发方案与实施步骤](./docs/07-开发方案与实施步骤说明.md) | ⚠️ 部署节被 DEPLOY.md 覆盖 |
+| 08 | [安全设计补丁](./docs/08-安全设计补丁.md) | ⚠️ §3 生效，§4-5 失效 |
+| 09 | [服务端权威用量补丁](./docs/09-服务端权威用量补丁.md) | ❌ 整体失效 |
+| **10** | **[前端化架构补丁](./docs/10-前端化架构补丁.md)** | ✅ **当前架构权威** |
+| ★ | **[DEPLOY.md](./docs/DEPLOY.md)** | ✅ **生产部署 runbook** |
+
+## 部署
+
+见 [`docs/DEPLOY.md`](./docs/DEPLOY.md) —— 涵盖 Vercel 项目创建、Supabase Auth URL 配置、DNS 解析、9 项上线烟雾测试。
+
+## License
+
+MIT —— 见 [LICENSE](./LICENSE)。
