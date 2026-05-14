@@ -15,7 +15,7 @@ export default function TermsPage() {
     <div className="max-w-2xl mx-auto px-4 py-12">
       <h1 className="text-3xl font-semibold text-gray-900 mb-6">Terms of Service</h1>
       <div className="prose prose-gray max-w-none text-sm text-gray-600 space-y-4 leading-7">
-        <p><strong>Last updated:</strong> March 2026</p>
+        <p><strong>Last updated:</strong> May 2026</p>
 
         <h2 className="text-lg font-medium text-gray-900 mt-8">1. Service Description</h2>
         <p>Markdown to PDF is a free online tool that converts Markdown text to PDF, Word, and HTML formats.</p>

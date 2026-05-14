@@ -78,23 +78,32 @@ export function useConversion(format: ConvertFormat) {
 
       // Best-effort history write. Never blocks or fails the conversion.
       // Runs only after the user-visible action has already succeeded.
-      void (async () => {
-        try {
-          const supabase = getSupabaseBrowserClient();
-          const { data: { user } } = await supabase.auth.getUser();
-          if (!user) return;
-          await supabase.from('conversion_history').insert({
-            user_id: user.id,
-            format,
-            filename,
-            file_size_bytes: blob ? blob.size : null,
-            source_size_bytes: sourceSize,
-            status: 'success',
-          });
-        } catch (err) {
-          console.warn('[history] insert failed (non-fatal):', (err as Error).message);
-        }
-      })();
+      //
+      // PDF is intentionally skipped: it goes through the browser's print
+      // dialog, and the page has no way to tell whether the user picked
+      // "Save as PDF" or cancelled. Recording every PDF click as a
+      // successful conversion would pollute the Dashboard with phantom
+      // rows. HTML and Word actually emit a Blob and trigger a download,
+      // so those are recorded.
+      if (format !== 'pdf') {
+        void (async () => {
+          try {
+            const supabase = getSupabaseBrowserClient();
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) return;
+            await supabase.from('conversion_history').insert({
+              user_id: user.id,
+              format,
+              filename,
+              file_size_bytes: blob ? blob.size : null,
+              source_size_bytes: sourceSize,
+              status: 'success',
+            });
+          } catch (err) {
+            console.warn('[history] insert failed (non-fatal):', (err as Error).message);
+          }
+        })();
+      }
     },
     [format]
   );

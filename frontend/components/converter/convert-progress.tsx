@@ -31,9 +31,16 @@ export function ConvertProgress({ status, format, errorMessage, onRetry }: Conve
   }
 
   if (status === 'success') {
+    // PDF goes through the browser print dialog instead of a direct
+    // download, so the success message must reflect that — the user still
+    // has to pick "Save as PDF" in the dialog to actually get the file.
+    const message =
+      format === 'pdf'
+        ? 'Print dialog opened. Choose "Save as PDF".'
+        : 'Downloaded!';
     return (
       <div className="text-sm text-green-600 font-medium">
-        Downloaded!
+        {message}
       </div>
     );
   }

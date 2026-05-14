@@ -44,7 +44,7 @@ const META: Record<string, Record<PageKey, PageMeta>> = {
     privacy: { title: '隐私政策 — Markdown 转 PDF', description: 'markdown-to-pdf.app 隐私政策。', path: '/zh/privacy' },
     terms: { title: '服务条款 — Markdown 转 PDF', description: 'markdown-to-pdf.app 服务条款。', path: '/zh/terms' },
     login: { title: '登录 — Markdown 转 PDF', description: '登录或注册。', path: '/zh/auth/login', noindex: true },
-    dashboard: { title: '控制台 — Markdown 转 PDF', description: '查看转换历史和用量。', path: '/zh/dashboard', noindex: true },
+    dashboard: { title: '控制台 — Markdown 转 PDF', description: '查看转换历史。', path: '/zh/dashboard', noindex: true },
   },
 };
 
