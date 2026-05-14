@@ -20,7 +20,7 @@
  */
 
 import { useState, useCallback } from 'react';
-import type { ConvertFormat, ConversionStatus } from '@/lib/types';
+import type { ConvertFormat, ConversionStatus, ConversionAction } from '@/lib/types';
 import { exportHtml, copyHtmlToClipboard } from '@/lib/converter/html-export';
 import { generateFilename } from '@/lib/converter/filename-generator';
 import { triggerDownload } from '@/components/converter/download-trigger';
@@ -32,6 +32,7 @@ import { getSupabaseBrowserClient } from '@/lib/supabase/client';
 
 export function useConversion(format: ConvertFormat) {
   const [status, setStatus] = useState<ConversionStatus>('idle');
+  const [lastAction, setLastAction] = useState<ConversionAction>(null);
   const [errorMessage, setErrorMessage] = useState<string>();
 
   const convert = useCallback(
@@ -39,6 +40,7 @@ export function useConversion(format: ConvertFormat) {
       if (!markdown.trim()) return;
 
       setStatus('loading');
+      setLastAction(format === 'pdf' ? 'print' : 'download');
       setErrorMessage(undefined);
 
       const sourceSize = new Blob([markdown]).size;
@@ -110,6 +112,7 @@ export function useConversion(format: ConvertFormat) {
 
   const copyHtml = useCallback(async (markdown: string) => {
     try {
+      setLastAction('copy');
       await copyHtmlToClipboard(markdown);
       setStatus('success');
       setTimeout(() => setStatus('idle'), 2000);
@@ -124,5 +127,5 @@ export function useConversion(format: ConvertFormat) {
     setErrorMessage(undefined);
   }, []);
 
-  return { status, errorMessage, convert, copyHtml, retry };
+  return { status, lastAction, errorMessage, convert, copyHtml, retry };
 }

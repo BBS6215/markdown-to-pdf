@@ -32,7 +32,7 @@ type MobileTab = 'edit' | 'preview';
 
 export function ToolPage({ format }: ToolPageProps) {
   const { content, updateContent, getContent, isInitialized } = useEditorContent();
-  const { status, errorMessage, convert, copyHtml, retry } = useConversion(format);
+  const { status, lastAction, errorMessage, convert, copyHtml, retry } = useConversion(format);
   const isMobile = useMobileDetect();
   const [mobileTab, setMobileTab] = useState<MobileTab>('edit');
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -125,6 +125,7 @@ export function ToolPage({ format }: ToolPageProps) {
           <EditorToolbar
             format={format}
             status={status}
+            lastAction={lastAction}
             errorMessage={errorMessage}
             onConvert={handleConvert}
             onCopyHtml={handleCopyHtml}

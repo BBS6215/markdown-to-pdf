@@ -44,6 +44,13 @@ export const FORMAT_CONFIG: Record<
 /** Conversion state */
 export type ConversionStatus = 'idle' | 'loading' | 'success' | 'error';
 
+/**
+ * What the user just triggered. Lets the success-state UI pick a message
+ * that matches what actually happened (downloaded a file vs. copied to
+ * clipboard vs. opened the print dialog).
+ */
+export type ConversionAction = 'download' | 'copy' | 'print' | null;
+
 /** Usage limits (mirrored from shared) */
 export const USAGE_LIMITS = {
   ANONYMOUS_DAILY: 2,

@@ -6,17 +6,18 @@
  */
 
 import { Spinner } from '@/components/ui/spinner';
-import type { ConvertFormat, ConversionStatus } from '@/lib/types';
+import type { ConvertFormat, ConversionStatus, ConversionAction } from '@/lib/types';
 import { FORMAT_CONFIG } from '@/lib/types';
 
 interface ConvertProgressProps {
   status: ConversionStatus;
   format: ConvertFormat;
+  lastAction?: ConversionAction;
   errorMessage?: string;
   onRetry?: () => void;
 }
 
-export function ConvertProgress({ status, format, errorMessage, onRetry }: ConvertProgressProps) {
+export function ConvertProgress({ status, format, lastAction, errorMessage, onRetry }: ConvertProgressProps) {
   if (status === 'idle') return null;
 
   const formatLabel = FORMAT_CONFIG[format].label;
@@ -31,13 +32,19 @@ export function ConvertProgress({ status, format, errorMessage, onRetry }: Conve
   }
 
   if (status === 'success') {
-    // PDF goes through the browser print dialog instead of a direct
-    // download, so the success message must reflect that — the user still
-    // has to pick "Save as PDF" in the dialog to actually get the file.
-    const message =
-      format === 'pdf'
-        ? 'Print dialog opened. Choose "Save as PDF".'
-        : 'Downloaded!';
+    // Pick the success line based on what the user actually just did.
+    // Single 'success' status is shared by three different actions:
+    //   - copy   -> "Copied!"   (Copy HTML button)
+    //   - print  -> "Print dialog opened. Choose 'Save as PDF'."
+    //   - download (default) -> "Downloaded!"
+    let message: string;
+    if (lastAction === 'copy') {
+      message = 'Copied!';
+    } else if (lastAction === 'print') {
+      message = 'Print dialog opened. Choose "Save as PDF".';
+    } else {
+      message = 'Downloaded!';
+    }
     return (
       <div className="text-sm text-green-600 font-medium">
         {message}

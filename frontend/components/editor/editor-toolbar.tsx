@@ -10,7 +10,7 @@
  * remaining/limit/canConvert/isLoggedIn props from git history.
  */
 
-import type { ConvertFormat, ConversionStatus } from '@/lib/types';
+import type { ConvertFormat, ConversionStatus, ConversionAction } from '@/lib/types';
 import { ConvertButton } from '@/components/converter/convert-button';
 import { ConvertProgress } from '@/components/converter/convert-progress';
 import { Upload } from 'lucide-react';
@@ -18,6 +18,7 @@ import { Upload } from 'lucide-react';
 interface EditorToolbarProps {
   format: ConvertFormat;
   status: ConversionStatus;
+  lastAction?: ConversionAction;
   errorMessage?: string;
   onConvert: () => void;
   onCopyHtml?: () => void;
@@ -28,6 +29,7 @@ interface EditorToolbarProps {
 export function EditorToolbar({
   format,
   status,
+  lastAction,
   errorMessage,
   onConvert,
   onCopyHtml,
@@ -51,6 +53,7 @@ export function EditorToolbar({
           <ConvertProgress
             status={status}
             format={format}
+            lastAction={lastAction}
             errorMessage={errorMessage}
             onRetry={onRetry}
           />
