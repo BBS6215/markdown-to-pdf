@@ -13,7 +13,7 @@
 部署前确认全部完成：
 
 - [ ] **Vercel 账号** 已用 GitHub OAuth 登录
-- [ ] GitHub 仓库 `markdown-to-pdf-app` 已推送至 `origin/main`（commit `2dba4d7` 或更新）
+- [ ] GitHub 仓库 `markdown-to-pdf-app` 已推送至 `origin/main`（以最新 `main` 为准）
 - [ ] **Supabase 项目** 已创建，记录下：
   - `Project URL`（形如 `https://xxxx.supabase.co`）
   - `anon public key`（Settings → API → Project API keys → `anon` `public`）
@@ -35,9 +35,9 @@
    | Project Name | `markdown-to-pdf` |
    | Framework Preset | **Next.js** |
    | **Root Directory** | **`frontend`** ⚠️ 必须改，默认是仓库根 |
-   | Build Command | `next build`（默认，不改） |
+   | Build Command | `pnpm build`（在 `frontend` 目录执行） |
    | Output Directory | `.next`（默认，不改） |
-   | Install Command | `pnpm install`（Vercel 自动检测 pnpm-lock.yaml） |
+   | Install Command | `cd .. && pnpm install --frozen-lockfile`（使用仓库根目录的 `pnpm-lock.yaml` / workspace） |
    | Node.js Version | **22.x**（根 `package.json` 的 `engines.node` 要求） |
 
 4. **暂不点 Deploy**——先配 C 节环境变量。
@@ -123,9 +123,9 @@ Vercel 自动通过 Let's Encrypt 签发，无需操作。域名 DNS 验证通�
 - [ ] **F1** `https://markdown-to-pdf.app` 首屏 200 OK，H1 文案正确
 - [ ] **F2** `https://www.markdown-to-pdf.app` 301 → apex
 - [ ] **F3** `/zh` 路径切换中文，`/en` 切换英文，header LanguageSwitcher 工作
-- [ ] **F4** 工具页 `/pdf` 输入简单 Markdown → 点击 "Convert to PDF" → 浏览器打印对话框弹出 → 选 "Save as PDF" → 文件名形如 `[首行标题].pdf`
-- [ ] **F5** 工具页 `/word` 输入含中文 + 加粗 + 有序列表的 Markdown → 下载 `.docx` → 用 Word / WPS 打开，确认中文不是 Calibri 字体、有序列表 `1. 2. 3.` 正确（不是 bullet）、加粗保留
-- [ ] **F6** 工具页 `/html` 输入 Markdown → 点击 "Copy HTML" → 粘贴到 Notion / 飞书文档，HTML 渲染正确
+- [ ] **F4** 工具页 `/en` 输入简单 Markdown → 点击 "Convert to PDF" → 浏览器打印对话框弹出 → 选 "Save as PDF"
+- [ ] **F5** 工具页 `/en/to-word` 输入含中文 + 加粗 + 有序列表的 Markdown → 下载 `.docx` → 用 Word / WPS 打开，确认中文不是 Calibri 字体、有序列表 `1. 2. 3.` 正确（不是 bullet）、加粗保留
+- [ ] **F6** 工具页 `/en/to-html` 输入 Markdown → 点击 "Copy HTML" → 粘贴到 Notion / 飞书文档，HTML 渲染正确
 - [ ] **F7** Supabase Auth：用 Google OAuth 登录 → 跳转回首页，cookie 写入正确
 - [ ] **F8** 登录后 Dashboard `/dashboard` 看到刚才的转换记录（HTML / Word，PDF 不写历史是正常）
 - [ ] **F9** F12 → Network 面板没有 4xx/5xx 异常请求；Console 没有红色 error
@@ -140,7 +140,7 @@ Vercel 自动通过 Let's Encrypt 签发，无需操作。域名 DNS 验证通�
 
 ### G.2 Vercel build 失败：pnpm workspace 解析问题
 
-原因：pnpm 找不到 workspace 根。在 Vercel 项目 Settings → General → Build & Development Settings → Install Command 改为 `cd .. && pnpm install --frozen-lockfile`。
+原因：pnpm 找不到 workspace 根。确认 B 节的 Install Command 是 `cd .. && pnpm install --frozen-lockfile`，不要改回单纯的 `pnpm install`。
 
 ### G.3 部署成功但访问 404
 

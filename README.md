@@ -33,7 +33,7 @@ Next.js (Vercel)  ──►  unified (remark + rehype-sanitize)  ──►  PDF 
 
 | Layer | Choice |
 |---|---|
-| Framework | Next.js 16 (App Router, React 19) |
+| Framework | Next.js 15 (App Router, React 19) |
 | Language | TypeScript 5.7+ |
 | Styling | Tailwind CSS 4 |
 | Editor | CodeMirror 6 |

@@ -33,7 +33,7 @@ Next.js (Vercel)  ──►  unified (remark + rehype-sanitize)  ──►  PDF 
 
 | 层 | 选型 |
 |---|---|
-| 框架 | Next.js 16（App Router + React 19） |
+| 框架 | Next.js 15（App Router + React 19） |
 | 语言 | TypeScript 5.7+ |
 | 样式 | Tailwind CSS 4 |
 | 编辑器 | CodeMirror 6 |
