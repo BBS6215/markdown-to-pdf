@@ -26,11 +26,11 @@ const META: Record<string, Record<PageKey, PageMeta>> = {
     guideNewLine: { title: 'Markdown New Line — How to Add Line Breaks (with Examples)', description: 'Learn how to create new lines and line breaks in Markdown. Interactive examples and common mistakes.', path: '/en/guides/markdown-new-line' },
     guideQuote: { title: 'Markdown Quote — How to Create Block Quotes in Markdown', description: 'Learn how to create block quotes and nested quotes in Markdown with interactive examples.', path: '/en/guides/markdown-quote' },
     guideCheatSheet: { title: 'Markdown Cheat Sheet — Complete Syntax Reference 2026', description: 'Complete Markdown syntax reference with examples. Headings, links, images, tables, code blocks, and more.', path: '/en/guides/markdown-cheat-sheet' },
-    pricing: { title: 'Pricing — Markdown to PDF', description: 'Markdown to PDF is free. 2 conversions/day without account, 5/day with free account. HTML always unlimited.', path: '/en/pricing' },
+    pricing: { title: 'Pricing — Markdown to PDF', description: 'Markdown to PDF is free and unlimited. PDF, Word, and HTML conversion all run entirely in your browser.', path: '/en/pricing' },
     privacy: { title: 'Privacy Policy — Markdown to PDF', description: 'Privacy policy for markdown-to-pdf.app.', path: '/en/privacy' },
     terms: { title: 'Terms of Service — Markdown to PDF', description: 'Terms of service for markdown-to-pdf.app.', path: '/en/terms' },
     login: { title: 'Login — Markdown to PDF', description: 'Log in or sign up for Markdown to PDF.', path: '/en/auth/login', noindex: true },
-    dashboard: { title: 'Dashboard — Markdown to PDF', description: 'View your conversion history and daily usage.', path: '/en/dashboard', noindex: true },
+    dashboard: { title: 'Dashboard — Markdown to PDF', description: 'View your conversion history.', path: '/en/dashboard', noindex: true },
   },
   zh: {
     home: { title: '在线 Markdown (.md) 转 PDF — 免费工具', description: '免费将 Markdown 或 AI 生成文本转换为专业 PDF。支持 ChatGPT、Claude 等 AI 工具输出。', path: '/zh' },

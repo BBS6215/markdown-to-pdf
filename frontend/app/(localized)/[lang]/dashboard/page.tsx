@@ -1,7 +1,11 @@
 /**
- * Dashboard — conversion history + usage stats.
+ * Dashboard — conversion history.
  * Source: 03-产品结构 §4.7, 06-数据库设计 §5.3
  * noindex page (05 §9.1)
+ *
+ * The frontend-only pipeline removed daily quota gating, so this page no
+ * longer reads daily_usage. Conversion history is still shown so users can
+ * see what they've recently exported.
  */
 
 import { redirect } from 'next/navigation';
@@ -27,24 +31,14 @@ export default async function DashboardPage({
     redirect(`/${lang}/auth/login?redirect=/${lang}/dashboard`);
   }
 
-  // Fetch data server-side
-  const [historyResult, usageResult] = await Promise.all([
-    supabase
-      .from('conversion_history')
-      .select('id, format, filename, file_size_bytes, status, created_at')
-      .eq('user_id', user.id)
-      .order('created_at', { ascending: false })
-      .limit(50),
-    supabase
-      .from('daily_usage')
-      .select('pdf_word_count')
-      .eq('user_id', user.id)
-      .eq('usage_date', new Date().toISOString().slice(0, 10))
-      .single(),
-  ]);
+  const historyResult = await supabase
+    .from('conversion_history')
+    .select('id, format, filename, file_size_bytes, status, created_at')
+    .eq('user_id', user.id)
+    .order('created_at', { ascending: false })
+    .limit(50);
 
   const history = historyResult.data || [];
-  const todayUsed = usageResult.data?.pdf_word_count || 0;
 
-  return <DashboardClient history={history} todayUsed={todayUsed} />;
+  return <DashboardClient history={history} />;
 }

@@ -1,18 +1,17 @@
 'use client';
 
 /**
- * Comprehensive usage check — determines if user can convert.
- * Source: 03-产品结构 §4.6, 06-数据库设计 §5
+ * Usage status helper.
  *
- * Rules:
- * - HTML: always allowed (no limit)
- * - Anonymous PDF/Word: 2/day (localStorage)
- * - Logged-in PDF/Word: 5/day (DB daily_usage)
+ * The frontend-only pipeline (HTML/PDF/Word all run in the browser) has no
+ * server-side quota to enforce, so this function now always reports that
+ * the user can convert. The interface is kept intact so that re-enabling a
+ * backend renderer later only requires changing this file.
+ *
+ * Source: docs/03 §4.6 (post frontend-only refactor)
  */
 
 import type { ConvertFormat } from '@/lib/types';
-import { USAGE_LIMITS } from '@/lib/types';
-import { getAnonymousUsageCount } from './client-tracker';
 import { getSupabaseBrowserClient } from '@/lib/supabase/client';
 
 export interface UsageStatus {
@@ -24,43 +23,23 @@ export interface UsageStatus {
 }
 
 export async function checkUsage(format: ConvertFormat): Promise<UsageStatus> {
-  // HTML is always unlimited
-  if (format === 'html') {
-    return { canConvert: true, remaining: Infinity, limit: Infinity, isLoggedIn: false, isHtml: true };
+  const isHtml = format === 'html';
+
+  // Auth lookup is best-effort: a Supabase outage must not block conversions.
+  let isLoggedIn = false;
+  try {
+    const supabase = getSupabaseBrowserClient();
+    const { data } = await supabase.auth.getUser();
+    isLoggedIn = !!data?.user;
+  } catch {
+    // Treat as anonymous; UI keeps working.
   }
-
-  const supabase = getSupabaseBrowserClient();
-  const { data: { user } } = await supabase.auth.getUser();
-
-  if (!user) {
-    // Anonymous user — check localStorage
-    const used = getAnonymousUsageCount();
-    const limit = USAGE_LIMITS.ANONYMOUS_DAILY;
-    return {
-      canConvert: used < limit,
-      remaining: Math.max(0, limit - used),
-      limit,
-      isLoggedIn: false,
-      isHtml: false,
-    };
-  }
-
-  // Logged-in user — check DB
-  const { data } = await supabase
-    .from('daily_usage')
-    .select('pdf_word_count')
-    .eq('user_id', user.id)
-    .eq('usage_date', new Date().toISOString().slice(0, 10))
-    .single();
-
-  const used = data?.pdf_word_count || 0;
-  const limit = USAGE_LIMITS.LOGGED_IN_DAILY;
 
   return {
-    canConvert: used < limit,
-    remaining: Math.max(0, limit - used),
-    limit,
-    isLoggedIn: true,
-    isHtml: false,
+    canConvert: true,
+    remaining: Infinity,
+    limit: Infinity,
+    isLoggedIn,
+    isHtml,
   };
 }

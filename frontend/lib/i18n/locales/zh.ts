@@ -52,16 +52,16 @@ const zh: Translations = {
     failed: '生成 {format} 失败。',
     retry: '重试',
     timeout: '转换超时，请尝试缩短内容。',
-    remaining: '今日剩余 {count}/{limit} 次',
-    signUpPrompt: '注册即可每天免费转换 5 次，无需信用卡。',
-    signUpButton: '注册以继续转换',
-    limitReached: '今日额度已用完，明天再来吧。',
-    htmlFree: 'HTML 转换始终免费且无限制。',
+    remaining: '',
+    signUpPrompt: '注册免费账号即可保存转换历史，无需信用卡。',
+    signUpButton: '注册',
+    limitReached: '',
+    htmlFree: '所有转换均免费且无限制，全部在您的浏览器中完成。',
   },
 
   auth: {
     welcome: '欢迎',
-    signUpSubtitle: '注册即可每天免费转换 5 次，无需信用卡。',
+    signUpSubtitle: '注册免费账号即可保存转换历史，无需信用卡。',
     email: '邮箱',
     password: '密码',
     loginButton: '登录',
@@ -76,12 +76,12 @@ const zh: Translations = {
 
   dashboard: {
     title: '控制台',
-    todayUsage: '今日用量',
-    remaining: '剩余 {count}/{limit} 次',
-    resetNote: 'PDF 和 Word 转换次数每日 UTC 午夜重置。HTML 转换始终免费。',
+    todayUsage: '',
+    remaining: '',
+    resetNote: '',
     historyTitle: '转换历史',
     historyEmpty: '暂无转换记录。试试转换一些 Markdown 吧！',
-    privacyNote: '转换历史仅供参考。为保护您的隐私，文件不会存储在我们的服务器上。',
+    privacyNote: '历史仅保存文件名和时间戳，您的实际内容不会到达我们的服务器。',
   },
 
   seo: {
@@ -96,15 +96,15 @@ const zh: Translations = {
       whyTitle: '为什么要将 Markdown 转为 PDF？',
       whyContent: 'PDF 是通用的文档分享格式。无论是提交 AI 生成的报告、分享会议记录还是归档文档，将 Markdown 转为 PDF 可确保内容在所有设备和平台上呈现一致的专业外观。',
       features: [
-        { title: '即时转换', desc: '几秒内将 Markdown 转为 PDF，前 2 次无需注册。' },
+        { title: '即时转换', desc: '几秒内将 Markdown 转为 PDF，无需注册、无需上传、无需等待。' },
         { title: 'AI 友好', desc: '直接粘贴 ChatGPT、Claude、Gemini 或任何 AI 工具的输出。' },
         { title: '专业排版', desc: '干净的 GitHub 风格，标题、表格、代码块和图片都正确显示。' },
-        { title: '免费使用', desc: '无账号每天 2 次免费转换，注册后每天 5 次。' },
+        { title: '免费无限', desc: '无每日额度。无付费墙。转换完全在您的浏览器中完成。' },
       ],
       faq: [
-        { q: '这个工具是免费的吗？', a: '是的！无需账号每天可免费转换 2 次 PDF，注册免费账号后每天 5 次。HTML 转换始终无限制。' },
+        { q: '这个工具是免费的吗？', a: '是的，完全免费且无限制，无需注册账号。注册免费账号仅用于保存转换历史。' },
         { q: '什么是 Markdown？我需要学它吗？', a: 'Markdown 是一种简单的文本格式语言——就是你在 ChatGPT 或 Claude 输出中看到的那些 #、** 和 - 符号。你不需要学它，直接粘贴文本就能转换。' },
-        { q: '我的数据安全吗？', a: 'Markdown 内容仅在生成 PDF 时发送到服务器，我们不会存储您的内容或生成的文件。' },
+        { q: '我的数据安全吗？', a: '安全。PDF 生成完全在您的浏览器中通过原生打印引擎完成，您的 Markdown 内容从不发送到我们的服务器，文件始终留在您的设备上。' },
         { q: '支持哪些 Markdown 功能？', a: '支持 GitHub Flavored Markdown (GFM)，包括标题、加粗、斜体、链接、图片、代码高亮、表格、任务列表和引用。' },
         { q: '可以转换长文档吗？', a: '可以，支持最大 500KB 的文档。超长文档可能需要多几秒生成时间。' },
       ],
@@ -118,7 +118,7 @@ const zh: Translations = {
         { title: '真正的 .docx 格式', desc: '生成在 Microsoft Word、Google Docs 和 LibreOffice 中完美打开的 Word 文档。' },
         { title: '保留格式', desc: '标题、列表、表格、加粗、斜体和代码块都会保留。' },
         { title: 'AI 输出就绪', desc: '完美适合将 ChatGPT 或 Claude 的回复转为可编辑的 Word 文档。' },
-        { title: '快速免费', desc: '无需注册每天 2 次免费，注册后每天 5 次。' },
+        { title: '免费无限', desc: '无每日额度。转换完全在您的浏览器中完成，内容始终留在您的设备上。' },
       ],
       faq: [
         { q: 'Word 输出可以编辑吗？', a: '可以！生成的 .docx 文件可在 Microsoft Word、Google Docs 或任何支持 Word 格式的应用中完全编辑。' },
@@ -140,7 +140,7 @@ const zh: Translations = {
         { title: '干净输出', desc: '语义化 HTML，标题层级正确，列表、表格和代码块完整。' },
       ],
       faq: [
-        { q: '数据会发送到服务器吗？', a: '不会！HTML 转换完全在浏览器中完成，内容不会离开您的设备。' },
+        { q: '数据会发送到服务器吗？', a: '不会！与 PDF 和 Word 一样，HTML 转换完全在浏览器中完成，内容不会离开您的设备。' },
         { q: '有转换限制吗？', a: '没有！HTML 转换完全无限制，即使没有账号也可以。' },
         { q: '"复制 HTML"按钮是做什么的？', a: '它会将 HTML 源代码复制到剪贴板，您可以粘贴到网站编辑器、邮件模板或任何接受 HTML 的工具中。' },
         { q: '包含 CSS 样式吗？', a: '下载的 .html 文件包含基础内联 CSS。复制的 HTML 源代码不含样式，您可以添加自己的 CSS。' },
@@ -164,17 +164,18 @@ const zh: Translations = {
 
   pricing: {
     title: '定价',
-    subtitle: 'Markdown to PDF 免费使用。',
+    subtitle: 'Markdown to PDF 完全免费，且完全在您的浏览器中运行。',
     free: {
       title: '免费',
       price: '$0',
       features: [
-        '每天 2 次 PDF/Word 转换（无需账号）',
-        '每天 5 次 PDF/Word 转换（免费账号）',
+        '无限 PDF 转换（无需注册）',
+        '无限 Word (.docx) 转换',
         '无限 HTML 转换',
+        '100% 浏览器端运行——您的内容永不离开设备',
         '实时预览',
         '文件上传支持',
-        '转换历史（需注册）',
+        '转换历史（需要免费账号）',
       ],
     },
   },

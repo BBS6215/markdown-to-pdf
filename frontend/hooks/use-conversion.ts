@@ -13,6 +13,10 @@
  * They are unused while we ship the zero-cost flavor of the site, and can be
  * re-enabled by switching this hook back to the API-client path once a
  * server is provisioned (see docs/09).
+ *
+ * Resilience contract: the conversion (download / print) must succeed even
+ * if Supabase is unreachable. The auth lookup and history insert are
+ * best-effort, wrapped so they cannot break the user-visible action.
  */
 
 import { useState, useCallback } from 'react';
@@ -31,20 +35,18 @@ export function useConversion(format: ConvertFormat) {
   const [errorMessage, setErrorMessage] = useState<string>();
 
   const convert = useCallback(
-    async (markdown: string, onUsageChange?: () => void) => {
+    async (markdown: string) => {
       if (!markdown.trim()) return;
 
       setStatus('loading');
       setErrorMessage(undefined);
 
-      const supabase = getSupabaseBrowserClient();
-      const { data: { user } } = await supabase.auth.getUser();
       const sourceSize = new Blob([markdown]).size;
 
-      try {
-        let blob: Blob | null = null;
-        let filename: string;
+      let blob: Blob | null = null;
+      let filename: string;
 
+      try {
         if (format === 'html') {
           const result = await exportHtml(markdown);
           blob = result.blob;
@@ -64,9 +66,23 @@ export function useConversion(format: ConvertFormat) {
           filename = result.filename;
         }
 
-        // History (logged-in only). HTML/Word: file_size = blob.size; PDF: null
-        // since we don't generate the file ourselves.
-        if (user) {
+        setStatus('success');
+        setTimeout(() => setStatus('idle'), 3000);
+      } catch (err) {
+        setStatus('error');
+        setErrorMessage(
+          err instanceof Error ? err.message : 'An unexpected error occurred. Please try again.'
+        );
+        return;
+      }
+
+      // Best-effort history write. Never blocks or fails the conversion.
+      // Runs only after the user-visible action has already succeeded.
+      void (async () => {
+        try {
+          const supabase = getSupabaseBrowserClient();
+          const { data: { user } } = await supabase.auth.getUser();
+          if (!user) return;
           await supabase.from('conversion_history').insert({
             user_id: user.id,
             format,
@@ -75,17 +91,10 @@ export function useConversion(format: ConvertFormat) {
             source_size_bytes: sourceSize,
             status: 'success',
           });
+        } catch (err) {
+          console.warn('[history] insert failed (non-fatal):', (err as Error).message);
         }
-
-        setStatus('success');
-        onUsageChange?.();
-        setTimeout(() => setStatus('idle'), 3000);
-      } catch (err) {
-        setStatus('error');
-        setErrorMessage(
-          err instanceof Error ? err.message : 'An unexpected error occurred. Please try again.'
-        );
-      }
+      })();
     },
     [format]
   );

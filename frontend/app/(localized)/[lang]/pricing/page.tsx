@@ -12,14 +12,15 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
 }
 
 const FEATURES = [
-  '2 PDF/Word conversions per day (no account)',
-  '5 PDF/Word conversions per day (with free account)',
+  'Unlimited PDF conversions (no account needed)',
+  'Unlimited Word (.docx) conversions',
   'Unlimited HTML conversions',
+  'Runs 100% in your browser — your content never leaves your device',
   'Real-time Markdown preview',
   'File upload support (.md files)',
-  'Conversion history (with account)',
+  'Conversion history (with free account)',
   'GitHub Flavored Markdown support',
-  'CJK language support in PDFs',
+  'CJK language support (uses your OS fonts)',
 ];
 
 export default async function PricingPage() {
@@ -27,7 +28,7 @@ export default async function PricingPage() {
     <div className="max-w-2xl mx-auto px-4 py-12 text-center">
       <h1 className="text-3xl font-semibold text-gray-900 mb-2">Pricing</h1>
       <p className="text-base text-gray-500 mb-8">
-        Markdown to PDF is free to use.
+        Markdown to PDF is free to use — and runs entirely in your browser.
       </p>
 
       <div className="bg-white border border-gray-200 rounded-xl p-8 text-left">

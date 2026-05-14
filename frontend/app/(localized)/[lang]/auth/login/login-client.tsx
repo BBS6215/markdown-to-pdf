@@ -20,7 +20,7 @@ export function LoginClient() {
           Welcome
         </h1>
         <p className="text-sm text-gray-500 text-center mb-6">
-          Sign up for 5 free conversions per day — no credit card needed.
+          Sign up to save your conversion history — no credit card needed.
         </p>
 
         {error && (

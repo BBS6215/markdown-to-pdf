@@ -1,9 +1,13 @@
 'use client';
 
 /**
- * Editor toolbar — Upload + Convert + usage info + status feedback.
+ * Editor toolbar — Upload + Convert + status feedback.
  * Source: 05-技术方案 §4.1, 04-UI规范 §2.1 (sticky 操作栏)
- * Updated: Phase 3 — shows remaining conversions + rate limit state
+ *
+ * The frontend-only pipeline has no per-day quota, so this component no
+ * longer renders a remaining-conversions counter or a "sign up for more"
+ * prompt. If a backend renderer is re-enabled later, restore the
+ * remaining/limit/canConvert/isLoggedIn props from git history.
  */
 
 import type { ConvertFormat, ConversionStatus } from '@/lib/types';
@@ -19,11 +23,6 @@ interface EditorToolbarProps {
   onCopyHtml?: () => void;
   onUpload: () => void;
   onRetry: () => void;
-  remaining?: number;
-  limit?: number;
-  canConvert?: boolean;
-  isHtml?: boolean;
-  isLoggedIn?: boolean;
 }
 
 export function EditorToolbar({
@@ -34,11 +33,6 @@ export function EditorToolbar({
   onCopyHtml,
   onUpload,
   onRetry,
-  remaining = Infinity,
-  limit = Infinity,
-  canConvert = true,
-  isHtml = false,
-  isLoggedIn = false,
 }: EditorToolbarProps) {
   return (
     <div className="sticky bottom-0 z-10 bg-white border-t border-gray-200 px-4 py-3">
@@ -52,7 +46,7 @@ export function EditorToolbar({
           <span className="hidden sm:inline">Upload .md</span>
         </button>
 
-        {/* Center: Progress + Usage info */}
+        {/* Center: Progress */}
         <div className="flex items-center gap-3">
           <ConvertProgress
             status={status}
@@ -60,13 +54,6 @@ export function EditorToolbar({
             errorMessage={errorMessage}
             onRetry={onRetry}
           />
-
-          {/* Usage counter (not shown for HTML) */}
-          {!isHtml && status === 'idle' && remaining < Infinity && (
-            <span className={`text-xs ${remaining === 0 ? 'text-red-500' : 'text-gray-400'}`}>
-              {remaining} of {limit} remaining today
-            </span>
-          )}
         </div>
 
         {/* Right: Convert button */}
@@ -75,16 +62,9 @@ export function EditorToolbar({
           status={status}
           onClick={onConvert}
           onCopyHtml={onCopyHtml}
-          disabled={status === 'loading' || (!canConvert && !isHtml)}
+          disabled={status === 'loading'}
         />
       </div>
-
-      {/* Inline sign-up prompt when anonymous user hits limit */}
-      {!canConvert && !isHtml && !isLoggedIn && status === 'idle' && (
-        <p className="mt-2 text-sm text-gray-500 text-center">
-          Sign up for 5 free conversions per day — no credit card needed.
-        </p>
-      )}
     </div>
   );
 }

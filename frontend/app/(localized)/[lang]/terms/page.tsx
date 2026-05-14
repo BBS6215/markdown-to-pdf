@@ -21,7 +21,7 @@ export default function TermsPage() {
         <p>Markdown to PDF is a free online tool that converts Markdown text to PDF, Word, and HTML formats.</p>
 
         <h2 className="text-lg font-medium text-gray-900 mt-8">2. Usage Limits</h2>
-        <p>Free accounts are limited to 5 PDF/Word conversions per day. Anonymous users are limited to 2 conversions per day. HTML conversions are unlimited. We reserve the right to modify these limits.</p>
+        <p>Conversion is unlimited and runs entirely in your browser, so there is no per-user or per-IP cap for ordinary use. We reserve the right to throttle or block automated abuse, and to introduce limits in the future if we re-enable any server-side rendering.</p>
 
         <h2 className="text-lg font-medium text-gray-900 mt-8">3. Content Responsibility</h2>
         <p>You are responsible for the content you convert. Do not use this service for illegal, harmful, or infringing content.</p>

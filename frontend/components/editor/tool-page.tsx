@@ -13,11 +13,9 @@ import { MarkdownEditor } from '@/components/editor/markdown-editor';
 import { MarkdownPreview } from '@/components/editor/markdown-preview';
 import { FileDropzone } from '@/components/editor/file-dropzone';
 import { EditorToolbar } from '@/components/editor/editor-toolbar';
-import { RateLimitModal } from '@/components/auth/rate-limit-modal';
 import { SeoContentSection } from '@/components/seo/seo-content-section';
 import { useEditorContent } from '@/hooks/use-editor-content';
 import { useConversion } from '@/hooks/use-conversion';
-import { useRateLimit } from '@/hooks/use-rate-limit';
 import { useMobileDetect } from '@/hooks/use-mobile-detect';
 import { usePathname } from 'next/navigation';
 import en from '@/lib/i18n/locales/en';
@@ -35,10 +33,8 @@ type MobileTab = 'edit' | 'preview';
 export function ToolPage({ format }: ToolPageProps) {
   const { content, updateContent, getContent, isInitialized } = useEditorContent();
   const { status, errorMessage, convert, copyHtml, retry } = useConversion(format);
-  const rateLimit = useRateLimit(format);
   const isMobile = useMobileDetect();
   const [mobileTab, setMobileTab] = useState<MobileTab>('edit');
-  const [showRateLimitModal, setShowRateLimitModal] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const pathname = usePathname();
@@ -49,11 +45,9 @@ export function ToolPage({ format }: ToolPageProps) {
   const seoContent = t.seo[format];
 
   const handleConvert = () => {
-    if (!rateLimit.canConvert && !rateLimit.isHtml) {
-      setShowRateLimitModal(true);
-      return;
-    }
-    convert(content, () => rateLimit.refresh());
+    // No quota gate — all formats run in the browser, conversions are free
+    // and unlimited. See docs/03 §4.6.
+    convert(content);
   };
 
   const handleCopyHtml = format === 'html' ? () => copyHtml(content) : undefined;
@@ -126,7 +120,8 @@ export function ToolPage({ format }: ToolPageProps) {
             </div>
           </FileDropzone>
 
-          {/* Toolbar with usage info */}
+          {/* Toolbar — no quota props: conversion is unlimited in the
+              frontend-only pipeline, so EditorToolbar's defaults apply. */}
           <EditorToolbar
             format={format}
             status={status}
@@ -135,11 +130,6 @@ export function ToolPage({ format }: ToolPageProps) {
             onCopyHtml={handleCopyHtml}
             onUpload={handleUpload}
             onRetry={retry}
-            remaining={rateLimit.remaining}
-            limit={rateLimit.limit}
-            canConvert={rateLimit.canConvert}
-            isHtml={rateLimit.isHtml}
-            isLoggedIn={rateLimit.isLoggedIn}
           />
 
           {/* Hidden file input */}
@@ -159,13 +149,6 @@ export function ToolPage({ format }: ToolPageProps) {
               }
               e.target.value = '';
             }}
-          />
-
-          {/* Rate limit modal (fallback) */}
-          <RateLimitModal
-            open={showRateLimitModal}
-            onClose={() => setShowRateLimitModal(false)}
-            isLoggedIn={rateLimit.isLoggedIn}
           />
         </>
       )}
