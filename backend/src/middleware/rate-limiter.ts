@@ -8,7 +8,7 @@
  * the limit. See https://express-rate-limit.mintlify.app/guides/troubleshooting-proxy-issues
  */
 
-import rateLimit from 'express-rate-limit';
+import { rateLimit } from 'express-rate-limit';
 import { USAGE_LIMITS } from './constants.js';
 
 export const convertRateLimiter = rateLimit({

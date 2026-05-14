@@ -35,9 +35,9 @@
    | Project Name | `markdown-to-pdf` |
    | Framework Preset | **Next.js** |
    | **Root Directory** | **`frontend`** ⚠️ 必须改，默认是仓库根 |
-   | Build Command | `pnpm build`（在 `frontend` 目录执行） |
+   | Build Command | `pnpm build`（在 `frontend` 目录执行；也可直接使用 `frontend/vercel.json`） |
    | Output Directory | `.next`（默认，不改） |
-   | Install Command | `cd .. && pnpm install --frozen-lockfile`（使用仓库根目录的 `pnpm-lock.yaml` / workspace） |
+   | Install Command | `cd .. && pnpm install --frozen-lockfile --filter @mdpdf/frontend...`（只安装前端及其依赖，避免下载 backend Puppeteer） |
    | Node.js Version | **22.x**（根 `package.json` 的 `engines.node` 要求） |
 
 4. **暂不点 Deploy**——先配 C 节环境变量。
@@ -138,9 +138,17 @@ Vercel 自动通过 Let's Encrypt 签发，无需操作。域名 DNS 验证通�
 
 原因：Root Directory 设错了。检查 B 节是否设为 `frontend`。
 
+### G.1.1 Vercel build 跑到了 `@mdpdf/backend`
+
+现象：日志里出现 `> @mdpdf/backend@... build /vercel/path0/backend` 或 Puppeteer/Express build 错误。
+
+原因：Vercel Project 的 **Root Directory 被设成了 `backend`**，这与当前前端化架构不符。
+
+修复：Vercel Dashboard → Project Settings → General → Root Directory 改为 **`frontend`**，然后 Redeploy。当前仓库的 `frontend/vercel.json` 已锁定前端安装和构建命令。
+
 ### G.2 Vercel build 失败：pnpm workspace 解析问题
 
-原因：pnpm 找不到 workspace 根。确认 B 节的 Install Command 是 `cd .. && pnpm install --frozen-lockfile`，不要改回单纯的 `pnpm install`。
+原因：pnpm 找不到 workspace 根。确认 B 节的 Install Command 是 `cd .. && pnpm install --frozen-lockfile --filter @mdpdf/frontend...`，不要改回单纯的 `pnpm install`。
 
 ### G.3 部署成功但访问 404
 
