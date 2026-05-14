@@ -10,6 +10,7 @@ import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { FileText, User, LogOut } from 'lucide-react';
 import { MobileNav } from './mobile-nav';
+import { LanguageSwitcher } from './language-switcher';
 import { getSupabaseBrowserClient } from '@/lib/supabase/client';
 import type { AuthChangeEvent, Session, User as SupabaseUser } from '@supabase/supabase-js';
 
@@ -73,6 +74,8 @@ export function Header() {
               </Link>
             );
           })}
+
+          <LanguageSwitcher className="ml-2" />
 
           {user ? (
             <div className="flex items-center gap-1 ml-2">

@@ -4,7 +4,7 @@ export function Footer({ lang = 'en' }: { lang?: string }) {
   return (
     <footer className="border-t border-gray-200 bg-gray-50 mt-auto">
       <div className="max-w-7xl mx-auto px-4 py-8">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-sm">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-8 text-sm">
           {/* Tools */}
           <div>
             <h4 className="font-medium text-gray-900 mb-3">Tools</h4>
@@ -30,14 +30,6 @@ export function Footer({ lang = 'en' }: { lang?: string }) {
               <li><Link href={`/${lang}/privacy`} className="hover:text-gray-700">Privacy Policy</Link></li>
               <li><Link href={`/${lang}/terms`} className="hover:text-gray-700">Terms of Service</Link></li>
               <li><Link href={`/${lang}/pricing`} className="hover:text-gray-700">Pricing</Link></li>
-            </ul>
-          </div>
-          {/* Language */}
-          <div>
-            <h4 className="font-medium text-gray-900 mb-3">Language</h4>
-            <ul className="space-y-2 text-gray-500">
-              <li><Link href="/en" className="hover:text-gray-700">English</Link></li>
-              <li><Link href="/zh" className="hover:text-gray-700">中文</Link></li>
             </ul>
           </div>
         </div>
