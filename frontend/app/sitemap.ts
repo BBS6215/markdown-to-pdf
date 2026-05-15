@@ -1,11 +1,20 @@
 /**
- * Dynamic sitemap — 15 pages × 2 languages = 30 URLs.
+ * Dynamic sitemap.
  * Source: 05-技术方案 §9.3
  *
  * Added 2026-05-15: 5 deeper guide pages (table / image / code-block /
- * link / list). They target high-KD keywords mainly for AdSense audit
- * content depth, so priority is the same 0.7 used for the original
- * guide pages.
+ * link / list) for AdSense audit content depth.
+ *
+ * Excluded from sitemap: the entire /zh/guides tree (both the index and
+ * the 8 detail pages). Their body content is still 100% English while
+ * the metadata is in Chinese — listing them as indexable would tell
+ * Search Console and AdSense to crawl pages whose language declaration
+ * mismatches the body. The zh routes still exist for direct navigation;
+ * they just do not appear in the sitemap and are noindex (see
+ * lib/seo/metadata.ts). Lift this exclusion once /zh/guides/* is
+ * actually translated.
+ *
+ * Effective count: 15 EN entries + (15 - 9 excluded) ZH entries = 21 URLs.
  */
 
 import type { MetadataRoute } from 'next';
@@ -33,24 +42,23 @@ const PAGES = [
 export default function sitemap(): MetadataRoute.Sitemap {
   const entries: MetadataRoute.Sitemap = [];
 
+  // Helper: every page under /guides (index + details) is English-only
+  // for now (see header comment for why). Centralised so the rule is
+  // checked once and used both for the sitemap skip and for the
+  // hreflang declaration on the corresponding EN entries.
+  const isZhExcluded = (path: string) =>
+    path === '/guides' || path.startsWith('/guides/');
+
   for (const page of PAGES) {
     for (const lang of ['en', 'zh']) {
-      // /zh/guides/<slug> pages still serve the English body
-      // verbatim until the content is translated. Excluding them
-      // from the sitemap keeps Search Console and AdSense from
-      // crawling pages whose Chinese title disagrees with the
-      // English body. The hreflang `languages` map below also
-      // skips the zh variant for the same pages so we do not
-      // advertise a Chinese alternate that does not really exist.
-      if (lang === 'zh' && page.path.startsWith('/guides/') && page.path !== '/guides') {
+      if (lang === 'zh' && isZhExcluded(page.path)) {
         continue;
       }
 
       const alternates: Record<string, string> = {
         en: `${BASE_URL}/en${page.path}`,
       };
-      // Only declare a zh alternate when /zh/<path> is actually indexable.
-      if (!(page.path.startsWith('/guides/') && page.path !== '/guides')) {
+      if (!isZhExcluded(page.path)) {
         alternates.zh = `${BASE_URL}/zh${page.path}`;
       }
 

@@ -4,7 +4,7 @@
  */
 
 import { notFound } from 'next/navigation';
-import { getGuideBySlug, getRelatedGuides, GUIDES } from '@/lib/guides/content';
+import { getGuideBySlug, getRelatedGuides, guidesIndexHref, GUIDES } from '@/lib/guides/content';
 import { getPageMetadata } from '@/lib/seo/metadata';
 import { Breadcrumbs } from '@/components/layout/breadcrumbs';
 import { MiniEditor } from '@/components/editor/mini-editor';
@@ -62,7 +62,7 @@ export default async function GuidePage({ params }: { params: Promise<{ lang: st
       <Breadcrumbs
         lang={lang}
         items={[
-          { label: 'Guides', href: `/${lang}/guides` },
+          { label: 'Guides', href: guidesIndexHref(lang) },
           { label: guide.title.split(' — ')[0] },
         ]}
       />

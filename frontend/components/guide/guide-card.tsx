@@ -5,12 +5,12 @@
 
 import Link from 'next/link';
 import { Clock } from 'lucide-react';
-import type { GuideData } from '@/lib/guides/content';
+import { guideHref, type GuideData } from '@/lib/guides/content';
 
 export function GuideCard({ guide, lang = 'en' }: { guide: GuideData; lang?: string }) {
   return (
     <Link
-      href={`/${lang}/guides/${guide.slug}`}
+      href={guideHref(lang, guide.slug)}
       className="bg-white border border-gray-200 rounded-xl p-6 hover:border-gray-300 hover:shadow-sm transition-all duration-150"
     >
       <h2 className="text-lg font-medium text-gray-900 mb-2">{guide.title}</h2>

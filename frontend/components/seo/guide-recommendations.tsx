@@ -12,6 +12,7 @@
  */
 
 import Link from 'next/link';
+import { guideHref } from '@/lib/guides/content';
 
 const GUIDES = [
   { slug: 'markdown-table', title: 'Markdown Table', desc: 'Tables, column alignment, and how they render in PDF and Word.' },
@@ -27,7 +28,7 @@ export function GuideRecommendations({ lang }: { lang: string }) {
         {GUIDES.map((guide) => (
           <Link
             key={guide.slug}
-            href={`/${lang}/guides/${guide.slug}`}
+            href={guideHref(lang, guide.slug)}
             className="bg-white border border-gray-200 rounded-xl p-4 hover:border-gray-300 hover:shadow-sm transition-all duration-150"
           >
             <h3 className="text-sm font-medium text-gray-900 mb-1">{guide.title}</h3>

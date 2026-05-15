@@ -866,6 +866,29 @@ export function getGuideBySlug(slug: string): GuideData | undefined {
   return GUIDES.find((g) => g.slug === slug);
 }
 
+/**
+ * Languages whose guide content has been translated. When a UI surface
+ * (footer, recommendation cards, guide index) wants to link to a guide,
+ * it should call guideHref(lang, slug) instead of constructing the URL
+ * directly — that way visitors on `/zh/*` never get pushed into a
+ * noindex `/zh/guides/<slug>` page whose body is still in English.
+ *
+ * Add 'zh' to this set when /zh/guides/* is properly translated; the
+ * noindex flag in lib/seo/metadata.ts also needs to be lifted at the
+ * same time so search engines can pick the pages back up.
+ */
+export const GUIDE_TRANSLATED_LANGS = new Set(['en']);
+
+export function guideHref(lang: string, slug: string): string {
+  const targetLang = GUIDE_TRANSLATED_LANGS.has(lang) ? lang : 'en';
+  return `/${targetLang}/guides/${slug}`;
+}
+
+export function guidesIndexHref(lang: string): string {
+  const targetLang = GUIDE_TRANSLATED_LANGS.has(lang) ? lang : 'en';
+  return `/${targetLang}/guides`;
+}
+
 export function getRelatedGuides(currentSlug: string): GuideData[] {
   const current = getGuideBySlug(currentSlug);
   if (!current) return [];

@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { Menu, X } from 'lucide-react';
 import { LanguageSwitcher } from './language-switcher';
+import { guidesIndexHref } from '@/lib/guides/content';
 
 const NAV_ITEMS = [
   { href: '', label: 'Convert to PDF' },
@@ -26,16 +27,23 @@ export function MobileNav({ lang }: { lang: string }) {
         <div className="absolute top-14 left-0 right-0 bg-white border-b border-gray-200 shadow-lg z-50">
           <nav className="flex flex-col p-4 gap-1">
             <LanguageSwitcher variant="menu" onNavigate={() => setOpen(false)} />
-            {NAV_ITEMS.map((item) => (
-              <Link
-                key={item.href}
-                href={`/${lang}${item.href}`}
-                onClick={() => setOpen(false)}
-                className="px-3 py-2.5 text-sm text-gray-700 hover:bg-gray-50 rounded-md"
-              >
-                {item.label}
-              </Link>
-            ))}
+            {NAV_ITEMS.map((item) => {
+              // /guides has no zh translation yet — link to /en/guides
+              // from zh pages so we do not push users into a noindex
+              // page whose Chinese title disagrees with its English body.
+              const fullHref =
+                item.href === '/guides' ? guidesIndexHref(lang) : `/${lang}${item.href}`;
+              return (
+                <Link
+                  key={item.href}
+                  href={fullHref}
+                  onClick={() => setOpen(false)}
+                  className="px-3 py-2.5 text-sm text-gray-700 hover:bg-gray-50 rounded-md"
+                >
+                  {item.label}
+                </Link>
+              );
+            })}
           </nav>
         </div>
       )}

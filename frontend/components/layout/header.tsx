@@ -12,6 +12,7 @@ import { FileText, User, LogOut } from 'lucide-react';
 import { MobileNav } from './mobile-nav';
 import { LanguageSwitcher } from './language-switcher';
 import { getSupabaseBrowserClient } from '@/lib/supabase/client';
+import { guidesIndexHref } from '@/lib/guides/content';
 import type { AuthChangeEvent, Session, User as SupabaseUser } from '@supabase/supabase-js';
 
 const NAV_ITEMS = [
@@ -54,7 +55,11 @@ export function Header() {
 
         <nav className="hidden md:flex items-center gap-1">
           {NAV_ITEMS.map((item) => {
-            const fullHref = `/${lang}${item.href}`;
+            // /guides has no zh translation yet — link it to /en/guides
+            // from zh pages too, otherwise the nav drops users into a
+            // noindex "Chinese title, English body" mismatch page.
+            const fullHref =
+              item.href === '/guides' ? guidesIndexHref(lang) : `/${lang}${item.href}`;
             const isActive =
               item.href === ''
                 ? pathname === `/${lang}` || pathname === `/${lang}/`

@@ -58,7 +58,7 @@ const META: Record<string, Record<PageKey, PageMeta>> = {
     home: { title: '在线 Markdown (.md) 转 PDF — 免费工具', description: '免费将 Markdown 或 AI 生成文本转换为专业 PDF。支持 ChatGPT、Claude 等 AI 工具输出。', path: '/zh' },
     toWord: { title: '在线 Markdown (.md) 转 Word — 免费工具', description: '免费将 Markdown 转为 Word (.docx) 文档。', path: '/zh/to-word' },
     toHtml: { title: '在线 Markdown (.md) 转 HTML — 免费工具', description: '在浏览器中将 Markdown 转为 HTML，数据不离开设备。', path: '/zh/to-html' },
-    guides: { title: 'Markdown 指南 — 学习 Markdown 语法', description: '交互式 Markdown 指南，含实时编辑器。', path: '/zh/guides' },
+    guides: { title: 'Markdown 指南 — 学习 Markdown 语法', description: '交互式 Markdown 指南，含实时编辑器。', path: '/zh/guides', noindex: true },
     // All 8 zh guide detail pages are flagged noindex until the actual
     // guide content is translated. The route still resolves so users
     // who land on /zh/guides/<slug> can read the English body, but
@@ -83,19 +83,28 @@ const META: Record<string, Record<PageKey, PageMeta>> = {
 
 export function getPageMetadata(lang: string, page: PageKey): Metadata {
   const m = META[lang]?.[page] || META.en[page];
-  const otherLang = lang === 'zh' ? 'en' : 'zh';
-  const otherMeta = META[otherLang][page];
+
+  // hreflang must only point at variants that the search engine is
+  // actually allowed to index. A variant that is itself noindex (e.g.
+  // every /zh/guides/* page during the audit prep period) should not
+  // be advertised here — otherwise we tell Google "the zh alternate
+  // for this page lives at <url>" while that <url> tells Google
+  // "do not index me", which is a contradictory signal.
+  const languages: Record<string, string> = {};
+  if (!META.en[page].noindex) {
+    languages.en = `${SITE_URL}${META.en[page].path}`;
+    languages['x-default'] = `${SITE_URL}${META.en[page].path}`;
+  }
+  if (!META.zh[page].noindex) {
+    languages.zh = `${SITE_URL}${META.zh[page].path}`;
+  }
 
   return {
     title: m.title,
     description: m.description,
     alternates: {
       canonical: `${SITE_URL}${m.path}`,
-      languages: {
-        en: `${SITE_URL}${META.en[page].path}`,
-        zh: `${SITE_URL}${META.zh[page].path}`,
-        'x-default': `${SITE_URL}${META.en[page].path}`,
-      },
+      languages,
     },
     openGraph: {
       title: m.title,
