@@ -8,7 +8,24 @@ import type { Metadata } from 'next';
 
 const SITE_URL = 'https://markdown-to-pdf.app';
 
-type PageKey = 'home' | 'toWord' | 'toHtml' | 'guides' | 'guideNewLine' | 'guideQuote' | 'guideCheatSheet' | 'pricing' | 'privacy' | 'terms' | 'login' | 'dashboard';
+type PageKey =
+  | 'home'
+  | 'toWord'
+  | 'toHtml'
+  | 'guides'
+  | 'guideNewLine'
+  | 'guideQuote'
+  | 'guideCheatSheet'
+  | 'guideTable'
+  | 'guideImage'
+  | 'guideCodeBlock'
+  | 'guideLink'
+  | 'guideList'
+  | 'pricing'
+  | 'privacy'
+  | 'terms'
+  | 'login'
+  | 'dashboard';
 
 interface PageMeta {
   title: string;
@@ -26,6 +43,11 @@ const META: Record<string, Record<PageKey, PageMeta>> = {
     guideNewLine: { title: 'Markdown New Line — How to Add Line Breaks (with Examples)', description: 'Learn how to create new lines and line breaks in Markdown. Interactive examples and common mistakes.', path: '/en/guides/markdown-new-line' },
     guideQuote: { title: 'Markdown Quote — How to Create Block Quotes in Markdown', description: 'Learn how to create block quotes and nested quotes in Markdown with interactive examples.', path: '/en/guides/markdown-quote' },
     guideCheatSheet: { title: 'Markdown Cheat Sheet — Complete Syntax Reference 2026', description: 'Complete Markdown syntax reference with examples. Headings, links, images, tables, code blocks, and more.', path: '/en/guides/markdown-cheat-sheet' },
+    guideTable: { title: 'Markdown Table — Syntax, Alignment, and PDF/Word Rendering', description: 'Learn Markdown table syntax with column alignment, multi-line content, and tips for clean PDF and Word export.', path: '/en/guides/markdown-table' },
+    guideImage: { title: 'Markdown Image — Syntax, Alt Text, and PDF/Word Output', description: 'Embed images in Markdown with alt text, titles, and reference syntax — plus how they render when exported to PDF or Word.', path: '/en/guides/markdown-image' },
+    guideCodeBlock: { title: 'Markdown Code Block — Fenced, Indented, and Inline Code', description: 'Master Markdown code blocks: fenced blocks with language hints, indented blocks, inline code, and PDF rendering tips.', path: '/en/guides/markdown-code-block' },
+    guideLink: { title: 'Markdown Link — Inline, Reference, and Autolink Syntax', description: 'Every way to write links in Markdown: inline, reference, autolink, anchor, and email — plus how they render in PDF.', path: '/en/guides/markdown-link' },
+    guideList: { title: 'Markdown List — Ordered, Unordered, Nested, and Task Lists', description: 'Write Markdown lists: bullets, numbered lists, nested lists, and task lists — with notes on how each renders in PDF and Word.', path: '/en/guides/markdown-list' },
     pricing: { title: 'Pricing — Markdown to PDF', description: 'Markdown to PDF is free and unlimited. PDF, Word, and HTML conversion all run entirely in your browser.', path: '/en/pricing' },
     privacy: { title: 'Privacy Policy — Markdown to PDF', description: 'Privacy policy for markdown-to-pdf.app.', path: '/en/privacy' },
     terms: { title: 'Terms of Service — Markdown to PDF', description: 'Terms of service for markdown-to-pdf.app.', path: '/en/terms' },
@@ -40,6 +62,11 @@ const META: Record<string, Record<PageKey, PageMeta>> = {
     guideNewLine: { title: 'Markdown 换行 — 如何添加换行（附示例）', description: '学习如何在 Markdown 中创建换行。', path: '/zh/guides/markdown-new-line' },
     guideQuote: { title: 'Markdown 引用 — 如何创建引用块', description: '学习如何在 Markdown 中创建引用。', path: '/zh/guides/markdown-quote' },
     guideCheatSheet: { title: 'Markdown 速查表 — 完整语法参考 2026', description: '完整的 Markdown 语法参考。', path: '/zh/guides/markdown-cheat-sheet' },
+    guideTable: { title: 'Markdown 表格 — 语法、对齐与 PDF/Word 渲染', description: 'Markdown 表格语法、列对齐方式，以及导出 PDF 和 Word 时的渲染说明。', path: '/zh/guides/markdown-table' },
+    guideImage: { title: 'Markdown 图片 — 语法、alt 文本与 PDF/Word 输出', description: 'Markdown 图片插入方式：alt 文本、标题、引用式语法，以及在 PDF / Word 输出中的表现。', path: '/zh/guides/markdown-image' },
+    guideCodeBlock: { title: 'Markdown 代码块 — 围栏式、缩进式与行内代码', description: 'Markdown 代码块的全部语法：围栏式、语言提示、缩进式、行内代码，以及 PDF 渲染细节。', path: '/zh/guides/markdown-code-block' },
+    guideLink: { title: 'Markdown 链接 — 行内、引用与 autolink 语法', description: 'Markdown 中所有写链接的方式：行内、引用、autolink、锚点和邮箱，以及在 PDF 中的渲染表现。', path: '/zh/guides/markdown-link' },
+    guideList: { title: 'Markdown 列表 — 有序、无序、嵌套与任务列表', description: 'Markdown 列表写法：项目符号、有序编号、嵌套、任务列表，以及在 PDF 和 Word 中的渲染说明。', path: '/zh/guides/markdown-list' },
     pricing: { title: '定价 — Markdown 转 PDF', description: 'Markdown 转 PDF 免费使用。', path: '/zh/pricing' },
     privacy: { title: '隐私政策 — Markdown 转 PDF', description: 'markdown-to-pdf.app 隐私政策。', path: '/zh/privacy' },
     terms: { title: '服务条款 — Markdown 转 PDF', description: 'markdown-to-pdf.app 服务条款。', path: '/zh/terms' },

@@ -15,10 +15,25 @@ import { JsonLd } from '@/components/seo/json-ld';
 import { articleSchema, faqSchema } from '@/lib/seo/json-ld-schemas';
 import { MarkdownPreview } from '@/components/editor/markdown-preview';
 
-const SLUG_TO_PAGE_KEY: Record<string, 'guideNewLine' | 'guideQuote' | 'guideCheatSheet'> = {
+const SLUG_TO_PAGE_KEY: Record<
+  string,
+  | 'guideNewLine'
+  | 'guideQuote'
+  | 'guideCheatSheet'
+  | 'guideTable'
+  | 'guideImage'
+  | 'guideCodeBlock'
+  | 'guideLink'
+  | 'guideList'
+> = {
   'markdown-new-line': 'guideNewLine',
   'markdown-quote': 'guideQuote',
   'markdown-cheat-sheet': 'guideCheatSheet',
+  'markdown-table': 'guideTable',
+  'markdown-image': 'guideImage',
+  'markdown-code-block': 'guideCodeBlock',
+  'markdown-link': 'guideLink',
+  'markdown-list': 'guideList',
 };
 
 export function generateStaticParams() {

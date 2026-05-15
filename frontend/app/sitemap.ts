@@ -1,6 +1,11 @@
 /**
- * Dynamic sitemap — 10 pages × 2 languages = 20 URLs.
+ * Dynamic sitemap — 15 pages × 2 languages = 30 URLs.
  * Source: 05-技术方案 §9.3
+ *
+ * Added 2026-05-15: 5 deeper guide pages (table / image / code-block /
+ * link / list). They target high-KD keywords mainly for AdSense audit
+ * content depth, so priority is the same 0.7 used for the original
+ * guide pages.
  */
 
 import type { MetadataRoute } from 'next';
@@ -15,6 +20,11 @@ const PAGES = [
   { path: '/guides/markdown-new-line', changeFrequency: 'monthly' as const, priority: 0.7 },
   { path: '/guides/markdown-quote', changeFrequency: 'monthly' as const, priority: 0.7 },
   { path: '/guides/markdown-cheat-sheet', changeFrequency: 'monthly' as const, priority: 0.7 },
+  { path: '/guides/markdown-table', changeFrequency: 'monthly' as const, priority: 0.7 },
+  { path: '/guides/markdown-image', changeFrequency: 'monthly' as const, priority: 0.7 },
+  { path: '/guides/markdown-code-block', changeFrequency: 'monthly' as const, priority: 0.7 },
+  { path: '/guides/markdown-link', changeFrequency: 'monthly' as const, priority: 0.7 },
+  { path: '/guides/markdown-list', changeFrequency: 'monthly' as const, priority: 0.7 },
   { path: '/pricing', changeFrequency: 'monthly' as const, priority: 0.3 },
   { path: '/privacy', changeFrequency: 'yearly' as const, priority: 0.1 },
   { path: '/terms', changeFrequency: 'yearly' as const, priority: 0.1 },
