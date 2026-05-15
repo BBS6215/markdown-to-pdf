@@ -22,6 +22,15 @@ const NAV_ITEMS = [
   { href: '/guides', label: 'Guides' },
 ];
 
+const ZH_NAV_LABELS: Record<string, string> = {
+  PDF: 'PDF',
+  Word: 'Word',
+  HTML: 'HTML',
+  Guides: '指南',
+  Dashboard: '控制台',
+  Login: '登录',
+};
+
 export function Header() {
   const pathname = usePathname();
   const lang = pathname.startsWith('/zh') ? 'zh' : 'en';
@@ -55,9 +64,6 @@ export function Header() {
 
         <nav className="hidden md:flex items-center gap-1">
           {NAV_ITEMS.map((item) => {
-            // /guides has no zh translation yet — link it to /en/guides
-            // from zh pages too, otherwise the nav drops users into a
-            // noindex "Chinese title, English body" mismatch page.
             const fullHref =
               item.href === '/guides' ? guidesIndexHref(lang) : `/${lang}${item.href}`;
             const isActive =
@@ -75,7 +81,7 @@ export function Header() {
                     : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
                 }`}
               >
-                {item.label}
+                {lang === 'zh' ? ZH_NAV_LABELS[item.label] : item.label}
               </Link>
             );
           })}
@@ -89,7 +95,7 @@ export function Header() {
                 className="px-3 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md flex items-center gap-1.5"
               >
                 <User size={16} />
-                Dashboard
+                {lang === 'zh' ? ZH_NAV_LABELS.Dashboard : 'Dashboard'}
               </Link>
               <button
                 onClick={handleLogout}
@@ -104,7 +110,7 @@ export function Header() {
               href={`/${lang}/auth/login`}
               className="ml-2 px-3 py-2 text-sm text-gray-600 hover:text-gray-900"
             >
-              Login
+              {lang === 'zh' ? ZH_NAV_LABELS.Login : 'Login'}
             </Link>
           )}
         </nav>

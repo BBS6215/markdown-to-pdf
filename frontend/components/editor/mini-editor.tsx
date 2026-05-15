@@ -15,22 +15,33 @@ interface MiniEditorProps {
 
 export function MiniEditor({ defaultContent = '', lang = 'en' }: MiniEditorProps) {
   const [content, setContent] = useState(defaultContent);
+  const copy = lang === 'zh'
+    ? {
+        title: '自己试试看',
+        placeholder: '在这里输入 Markdown...',
+        preview: '预览',
+      }
+    : {
+        title: 'Try it yourself',
+        placeholder: 'Type Markdown here...',
+        preview: 'Preview',
+      };
 
   return (
     <div className="border border-gray-200 rounded-lg overflow-hidden my-6">
       <div className="bg-gray-50 border-b border-gray-200 px-4 py-2">
-        <span className="text-sm font-medium text-gray-700">Try it yourself</span>
+        <span className="text-sm font-medium text-gray-700">{copy.title}</span>
       </div>
       <div className="grid grid-cols-2 divide-x divide-gray-200" style={{ height: '200px' }}>
         <textarea
           value={content}
           onChange={(e) => setContent(e.target.value)}
           className="w-full h-full p-3 bg-gray-50 text-sm font-mono text-gray-900 resize-none outline-none"
-          placeholder="Type Markdown here..."
+          placeholder={copy.placeholder}
         />
         <div className="overflow-auto">
           <div className="bg-gray-50 border-b border-gray-200 px-3 py-1">
-            <span className="text-xs text-gray-500">Preview</span>
+            <span className="text-xs text-gray-500">{copy.preview}</span>
           </div>
           <MarkdownPreview markdown={content} className="text-sm" />
         </div>

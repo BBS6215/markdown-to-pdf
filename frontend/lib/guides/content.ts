@@ -13,6 +13,8 @@
  * behavior, not generic Markdown reference material.
  */
 
+import { ZH_GUIDES } from './content-zh';
+
 export interface GuideData {
   slug: string;
   title: string;
@@ -862,37 +864,34 @@ Try converting a real task list or step-by-step guide on the home page. Compare 
   },
 ];
 
-export function getGuideBySlug(slug: string): GuideData | undefined {
-  return GUIDES.find((g) => g.slug === slug);
+export const GUIDE_TRANSLATED_LANGS = new Set(['en', 'zh']);
+
+function normalizeGuideLang(lang: string): 'en' | 'zh' {
+  return GUIDE_TRANSLATED_LANGS.has(lang) && lang === 'zh' ? 'zh' : 'en';
 }
 
-/**
- * Languages whose guide content has been translated. When a UI surface
- * (footer, recommendation cards, guide index) wants to link to a guide,
- * it should call guideHref(lang, slug) instead of constructing the URL
- * directly — that way visitors on `/zh/*` never get pushed into a
- * noindex `/zh/guides/<slug>` page whose body is still in English.
- *
- * Add 'zh' to this set when /zh/guides/* is properly translated; the
- * noindex flag in lib/seo/metadata.ts also needs to be lifted at the
- * same time so search engines can pick the pages back up.
- */
-export const GUIDE_TRANSLATED_LANGS = new Set(['en']);
+export function getGuides(lang = 'en'): GuideData[] {
+  return normalizeGuideLang(lang) === 'zh' ? ZH_GUIDES : GUIDES;
+}
+
+export function getGuideBySlug(slug: string, lang = 'en'): GuideData | undefined {
+  return getGuides(lang).find((g) => g.slug === slug) || GUIDES.find((g) => g.slug === slug);
+}
 
 export function guideHref(lang: string, slug: string): string {
-  const targetLang = GUIDE_TRANSLATED_LANGS.has(lang) ? lang : 'en';
+  const targetLang = normalizeGuideLang(lang);
   return `/${targetLang}/guides/${slug}`;
 }
 
 export function guidesIndexHref(lang: string): string {
-  const targetLang = GUIDE_TRANSLATED_LANGS.has(lang) ? lang : 'en';
+  const targetLang = normalizeGuideLang(lang);
   return `/${targetLang}/guides`;
 }
 
-export function getRelatedGuides(currentSlug: string): GuideData[] {
-  const current = getGuideBySlug(currentSlug);
+export function getRelatedGuides(currentSlug: string, lang = 'en'): GuideData[] {
+  const current = getGuideBySlug(currentSlug, lang);
   if (!current) return [];
   return current.relatedSlugs
-    .map((s) => getGuideBySlug(s))
+    .map((s) => getGuideBySlug(s, lang))
     .filter((g): g is GuideData => !!g);
 }

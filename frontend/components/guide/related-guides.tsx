@@ -9,9 +9,12 @@ import { guideHref, type GuideData } from '@/lib/guides/content';
 export function RelatedGuides({ guides, lang = 'en' }: { guides: GuideData[]; lang?: string }) {
   if (guides.length === 0) return null;
 
+  const heading = lang === 'zh' ? '相关指南' : 'Related Guides';
+  const readTime = (minutes: number) => lang === 'zh' ? `${minutes} 分钟阅读` : `${minutes} min read`;
+
   return (
     <div className="mt-12">
-      <h2 className="text-xl font-semibold text-gray-800 mb-6">Related Guides</h2>
+      <h2 className="text-xl font-semibold text-gray-800 mb-6">{heading}</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {guides.map((guide) => (
           <Link
@@ -23,7 +26,7 @@ export function RelatedGuides({ guides, lang = 'en' }: { guides: GuideData[]; la
             <p className="text-sm text-gray-500 mb-2 line-clamp-2">{guide.description}</p>
             <span className="flex items-center gap-1 text-xs text-gray-400">
               <Clock size={12} />
-              {guide.readTime} min read
+              {readTime(guide.readTime)}
             </span>
           </Link>
         ))}

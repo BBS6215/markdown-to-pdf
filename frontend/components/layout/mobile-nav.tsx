@@ -14,6 +14,14 @@ const NAV_ITEMS = [
   { href: '/auth/login', label: 'Login' },
 ];
 
+const ZH_NAV_LABELS: Record<string, string> = {
+  'Convert to PDF': '转 PDF',
+  'Convert to Word': '转 Word',
+  'Convert to HTML': '转 HTML',
+  Guides: '指南',
+  Login: '登录',
+};
+
 export function MobileNav({ lang }: { lang: string }) {
   const [open, setOpen] = useState(false);
 
@@ -28,9 +36,6 @@ export function MobileNav({ lang }: { lang: string }) {
           <nav className="flex flex-col p-4 gap-1">
             <LanguageSwitcher variant="menu" onNavigate={() => setOpen(false)} />
             {NAV_ITEMS.map((item) => {
-              // /guides has no zh translation yet — link to /en/guides
-              // from zh pages so we do not push users into a noindex
-              // page whose Chinese title disagrees with its English body.
               const fullHref =
                 item.href === '/guides' ? guidesIndexHref(lang) : `/${lang}${item.href}`;
               return (
@@ -40,7 +45,7 @@ export function MobileNav({ lang }: { lang: string }) {
                   onClick={() => setOpen(false)}
                   className="px-3 py-2.5 text-sm text-gray-700 hover:bg-gray-50 rounded-md"
                 >
-                  {item.label}
+                  {lang === 'zh' ? ZH_NAV_LABELS[item.label] : item.label}
                 </Link>
               );
             })}

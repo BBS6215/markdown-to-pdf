@@ -52,17 +52,28 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
 
 export default async function GuidePage({ params }: { params: Promise<{ lang: string; slug: string }> }) {
   const { lang, slug } = await params;
-  const guide = getGuideBySlug(slug);
+  const guide = getGuideBySlug(slug, lang);
   if (!guide) notFound();
 
-  const related = getRelatedGuides(slug);
+  const related = getRelatedGuides(slug, lang);
+  const copy = lang === 'zh'
+    ? {
+        guidesLabel: '指南',
+        playground: '# 在这里试试\n\n修改这段文字，右侧预览会实时更新。\n\n- 第一项\n- 第二项\n\n> 示例引用',
+        cta: '将你的 Markdown 转为 PDF、Word 或 HTML →',
+      }
+    : {
+        guidesLabel: 'Guides',
+        playground: '# Try it here\n\nEdit this text to see the preview update in real-time.\n\n- Item 1\n- Item 2\n\n> A sample quote',
+        cta: 'Convert your Markdown to PDF, Word, or HTML →',
+      };
 
   return (
     <article className="max-w-3xl mx-auto px-4 py-8">
       <Breadcrumbs
         lang={lang}
         items={[
-          { label: 'Guides', href: guidesIndexHref(lang) },
+          { label: copy.guidesLabel, href: guidesIndexHref(lang) },
           { label: guide.title.split(' — ')[0] },
         ]}
       />
@@ -80,7 +91,7 @@ export default async function GuidePage({ params }: { params: Promise<{ lang: st
 
       {/* Mini editor — interactive playground */}
       <MiniEditor
-        defaultContent={`# Try it here\n\nEdit this text to see the preview update in real-time.\n\n- Item 1\n- Item 2\n\n> A sample quote`}
+        defaultContent={copy.playground}
         lang={lang}
       />
 
@@ -92,7 +103,7 @@ export default async function GuidePage({ params }: { params: Promise<{ lang: st
       )}
 
       {/* CTA — end of article */}
-      <CtaBanner lang={lang} label="Convert your Markdown to PDF, Word, or HTML →" />
+      <CtaBanner lang={lang} label={copy.cta} />
 
       {/* Related guides */}
       <RelatedGuides guides={related} lang={lang} />

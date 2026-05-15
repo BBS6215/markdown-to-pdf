@@ -5,16 +5,10 @@
  * Added 2026-05-15: 5 deeper guide pages (table / image / code-block /
  * link / list) for AdSense audit content depth.
  *
- * Excluded from sitemap: the entire /zh/guides tree (both the index and
- * the 8 detail pages). Their body content is still 100% English while
- * the metadata is in Chinese — listing them as indexable would tell
- * Search Console and AdSense to crawl pages whose language declaration
- * mismatches the body. The zh routes still exist for direct navigation;
- * they just do not appear in the sitemap and are noindex (see
- * lib/seo/metadata.ts). Lift this exclusion once /zh/guides/* is
- * actually translated.
+ * The guide tree is now translated in both EN and ZH, so sitemap
+ * includes every public page for both languages.
  *
- * Effective count: 15 EN entries + (15 - 9 excluded) ZH entries = 21 URLs.
+ * Effective count: 15 pages × 2 languages = 30 URLs.
  */
 
 import type { MetadataRoute } from 'next';
@@ -42,25 +36,12 @@ const PAGES = [
 export default function sitemap(): MetadataRoute.Sitemap {
   const entries: MetadataRoute.Sitemap = [];
 
-  // Helper: every page under /guides (index + details) is English-only
-  // for now (see header comment for why). Centralised so the rule is
-  // checked once and used both for the sitemap skip and for the
-  // hreflang declaration on the corresponding EN entries.
-  const isZhExcluded = (path: string) =>
-    path === '/guides' || path.startsWith('/guides/');
-
   for (const page of PAGES) {
     for (const lang of ['en', 'zh']) {
-      if (lang === 'zh' && isZhExcluded(page.path)) {
-        continue;
-      }
-
       const alternates: Record<string, string> = {
         en: `${BASE_URL}/en${page.path}`,
+        zh: `${BASE_URL}/zh${page.path}`,
       };
-      if (!isZhExcluded(page.path)) {
-        alternates.zh = `${BASE_URL}/zh${page.path}`;
-      }
 
       entries.push({
         url: `${BASE_URL}/${lang}${page.path}`,

@@ -8,6 +8,8 @@ import { Clock } from 'lucide-react';
 import { guideHref, type GuideData } from '@/lib/guides/content';
 
 export function GuideCard({ guide, lang = 'en' }: { guide: GuideData; lang?: string }) {
+  const readTimeLabel = lang === 'zh' ? `${guide.readTime} 分钟阅读` : `${guide.readTime} min read`;
+
   return (
     <Link
       href={guideHref(lang, guide.slug)}
@@ -17,7 +19,7 @@ export function GuideCard({ guide, lang = 'en' }: { guide: GuideData; lang?: str
       <p className="text-sm text-gray-500 mb-3 line-clamp-2">{guide.description}</p>
       <span className="flex items-center gap-1 text-xs text-gray-400">
         <Clock size={12} />
-        {guide.readTime} min read
+        {readTimeLabel}
       </span>
     </Link>
   );

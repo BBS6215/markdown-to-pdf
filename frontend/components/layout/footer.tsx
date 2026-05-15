@@ -1,46 +1,85 @@
 import Link from 'next/link';
-import { guideHref } from '@/lib/guides/content';
+import { getGuideBySlug, guideHref } from '@/lib/guides/content';
+
+const GUIDE_SLUGS = [
+  'markdown-cheat-sheet',
+  'markdown-table',
+  'markdown-image',
+  'markdown-code-block',
+  'markdown-link',
+  'markdown-list',
+  'markdown-new-line',
+  'markdown-quote',
+];
 
 export function Footer({ lang = 'en' }: { lang?: string }) {
+  const copy = lang === 'zh'
+    ? {
+        tools: '工具',
+        guides: '指南',
+        legal: '法律',
+        pdf: 'Markdown 转 PDF',
+        word: 'Markdown 转 Word',
+        html: 'Markdown 转 HTML',
+        privacy: '隐私政策',
+        terms: '服务条款',
+        pricing: '定价',
+        rights: '保留所有权利。',
+      }
+    : {
+        tools: 'Tools',
+        guides: 'Guides',
+        legal: 'Legal',
+        pdf: 'Markdown to PDF',
+        word: 'Markdown to Word',
+        html: 'Markdown to HTML',
+        privacy: 'Privacy Policy',
+        terms: 'Terms of Service',
+        pricing: 'Pricing',
+        rights: 'All rights reserved.',
+      };
+
   return (
     <footer className="border-t border-gray-200 bg-gray-50 mt-auto">
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="grid grid-cols-2 md:grid-cols-3 gap-8 text-sm">
           {/* Tools */}
           <div>
-            <h4 className="font-medium text-gray-900 mb-3">Tools</h4>
+            <h4 className="font-medium text-gray-900 mb-3">{copy.tools}</h4>
             <ul className="space-y-2 text-gray-500">
-              <li><Link href={`/${lang}`} className="hover:text-gray-700">Markdown to PDF</Link></li>
-              <li><Link href={`/${lang}/to-word`} className="hover:text-gray-700">Markdown to Word</Link></li>
-              <li><Link href={`/${lang}/to-html`} className="hover:text-gray-700">Markdown to HTML</Link></li>
+              <li><Link href={`/${lang}`} className="hover:text-gray-700">{copy.pdf}</Link></li>
+              <li><Link href={`/${lang}/to-word`} className="hover:text-gray-700">{copy.word}</Link></li>
+              <li><Link href={`/${lang}/to-html`} className="hover:text-gray-700">{copy.html}</Link></li>
             </ul>
           </div>
           {/* Guides */}
           <div>
-            <h4 className="font-medium text-gray-900 mb-3">Guides</h4>
+            <h4 className="font-medium text-gray-900 mb-3">{copy.guides}</h4>
             <ul className="space-y-2 text-gray-500">
-              <li><Link href={guideHref(lang, 'markdown-cheat-sheet')} className="hover:text-gray-700">Cheat Sheet</Link></li>
-              <li><Link href={guideHref(lang, 'markdown-table')} className="hover:text-gray-700">Markdown Table</Link></li>
-              <li><Link href={guideHref(lang, 'markdown-image')} className="hover:text-gray-700">Markdown Image</Link></li>
-              <li><Link href={guideHref(lang, 'markdown-code-block')} className="hover:text-gray-700">Markdown Code Block</Link></li>
-              <li><Link href={guideHref(lang, 'markdown-link')} className="hover:text-gray-700">Markdown Link</Link></li>
-              <li><Link href={guideHref(lang, 'markdown-list')} className="hover:text-gray-700">Markdown List</Link></li>
-              <li><Link href={guideHref(lang, 'markdown-new-line')} className="hover:text-gray-700">Markdown New Line</Link></li>
-              <li><Link href={guideHref(lang, 'markdown-quote')} className="hover:text-gray-700">Markdown Quote</Link></li>
+              {GUIDE_SLUGS.map((slug) => {
+                const guide = getGuideBySlug(slug, lang);
+                return (
+                  <li key={slug}>
+                    <Link href={guideHref(lang, slug)} className="hover:text-gray-700">
+                      {guide?.title.split(' — ')[0] ?? slug}
+                    </Link>
+                  </li>
+                );
+              })}
             </ul>
           </div>
           {/* Legal */}
           <div>
-            <h4 className="font-medium text-gray-900 mb-3">Legal</h4>
+            <h4 className="font-medium text-gray-900 mb-3">{copy.legal}</h4>
             <ul className="space-y-2 text-gray-500">
-              <li><Link href={`/${lang}/privacy`} className="hover:text-gray-700">Privacy Policy</Link></li>
-              <li><Link href={`/${lang}/terms`} className="hover:text-gray-700">Terms of Service</Link></li>
-              <li><Link href={`/${lang}/pricing`} className="hover:text-gray-700">Pricing</Link></li>
+              <li><Link href={`/${lang}/privacy`} className="hover:text-gray-700">{copy.privacy}</Link></li>
+              <li><Link href={`/${lang}/terms`} className="hover:text-gray-700">{copy.terms}</Link></li>
+              <li><Link href={`/${lang}/pricing`} className="hover:text-gray-700">{copy.pricing}</Link></li>
             </ul>
           </div>
         </div>
         <div className="mt-8 pt-6 border-t border-gray-200 text-center text-xs text-gray-400">
-          &copy; {new Date().getFullYear()} Markdown to PDF. All rights reserved.
+          &copy; {new Date().getFullYear()} Markdown to PDF. {copy.rights}
         </div>
       </div>
     </footer>

@@ -12,9 +12,11 @@ interface BreadcrumbsProps {
 }
 
 export function Breadcrumbs({ lang, items }: BreadcrumbsProps) {
+  const homeLabel = lang === 'zh' ? '首页' : 'Home';
+
   return (
     <nav className="flex items-center gap-1 text-sm text-gray-500 mb-4">
-      <Link href={`/${lang}`} className="hover:text-gray-700">Home</Link>
+      <Link href={`/${lang}`} className="hover:text-gray-700">{homeLabel}</Link>
       {items.map((item, i) => (
         <span key={i} className="flex items-center gap-1">
           <ChevronRight size={14} className="text-gray-400" />
