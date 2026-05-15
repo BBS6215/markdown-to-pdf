@@ -9,10 +9,11 @@ import { useState } from 'react';
 import { getSupabaseBrowserClient } from '@/lib/supabase/client';
 import { Button } from '@/components/ui/button';
 import { sanitizeRedirectPath } from '@/lib/auth/safe-redirect';
+import { getTranslations } from '@/lib/i18n/get-translations';
 
 type Mode = 'login' | 'signup';
 
-export function LoginForm({ redirectTo }: { redirectTo?: string }) {
+export function LoginForm({ redirectTo, lang = 'en' }: { redirectTo?: string; lang?: string }) {
   const [mode, setMode] = useState<Mode>('login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -21,6 +22,7 @@ export function LoginForm({ redirectTo }: { redirectTo?: string }) {
   const [success, setSuccess] = useState<string>();
 
   const supabase = getSupabaseBrowserClient();
+  const t = getTranslations(lang);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -41,7 +43,7 @@ export function LoginForm({ redirectTo }: { redirectTo?: string }) {
       if (error) {
         setError(error.message);
       } else {
-        setSuccess('Check your email to confirm your account.');
+        setSuccess(t.auth.checkEmail);
       }
     } else {
       const { error } = await supabase.auth.signInWithPassword({ email, password });
@@ -59,7 +61,7 @@ export function LoginForm({ redirectTo }: { redirectTo?: string }) {
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
         <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-          Email
+          {t.auth.email}
         </label>
         <input
           id="email"
@@ -74,7 +76,7 @@ export function LoginForm({ redirectTo }: { redirectTo?: string }) {
 
       <div>
         <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-          Password
+          {t.auth.password}
         </label>
         <input
           id="password"
@@ -84,7 +86,7 @@ export function LoginForm({ redirectTo }: { redirectTo?: string }) {
           required
           minLength={6}
           className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-base outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
-          placeholder={mode === 'signup' ? 'At least 6 characters' : 'Your password'}
+          placeholder={mode === 'signup' ? t.auth.passwordSignupPlaceholder : t.auth.passwordLoginPlaceholder}
         />
       </div>
 
@@ -92,22 +94,22 @@ export function LoginForm({ redirectTo }: { redirectTo?: string }) {
       {success && <p className="text-sm text-green-600">{success}</p>}
 
       <Button type="submit" variant="primary" size="lg" loading={loading} className="w-full">
-        {mode === 'login' ? 'Log in' : 'Sign up'}
+        {mode === 'login' ? t.auth.loginButton : t.auth.signupButton}
       </Button>
 
       <p className="text-center text-sm text-gray-500">
         {mode === 'login' ? (
           <>
-            Don&apos;t have an account?{' '}
+            {t.auth.noAccount}{' '}
             <button type="button" onClick={() => setMode('signup')} className="text-blue-600 hover:underline">
-              Sign up
+              {t.auth.signupButton}
             </button>
           </>
         ) : (
           <>
-            Already have an account?{' '}
+            {t.auth.hasAccount}{' '}
             <button type="button" onClick={() => setMode('login')} className="text-blue-600 hover:underline">
-              Log in
+              {t.auth.loginButton}
             </button>
           </>
         )}

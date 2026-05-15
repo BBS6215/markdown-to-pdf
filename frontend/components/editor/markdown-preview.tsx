@@ -13,18 +13,21 @@ import { useEffect, useState } from 'react';
 import { useDebounce } from '@/hooks/use-debounce';
 import { CONTENT_LIMITS } from '@/lib/types';
 import { renderMarkdownToSafeHtml } from '@/lib/markdown/render';
+import { getTranslations } from '@/lib/i18n/get-translations';
 
 import 'github-markdown-css/github-markdown-light.css';
 
 interface MarkdownPreviewProps {
   markdown: string;
   className?: string;
+  lang?: string;
 }
 
-export function MarkdownPreview({ markdown, className = '' }: MarkdownPreviewProps) {
+export function MarkdownPreview({ markdown, className = '', lang = 'en' }: MarkdownPreviewProps) {
   const [html, setHtml] = useState('');
   const [truncated, setTruncated] = useState(false);
   const debouncedMarkdown = useDebounce(markdown, 300);
+  const t = getTranslations(lang);
 
   useEffect(() => {
     let cancelled = false;
@@ -60,9 +63,9 @@ export function MarkdownPreview({ markdown, className = '' }: MarkdownPreviewPro
   return (
     <div className={`flex flex-col ${className}`}>
       <div className="bg-gray-50 border-b border-gray-200 px-4 py-2 min-h-[72px] flex flex-col justify-center">
-        <span className="text-sm font-medium text-gray-700">Live Preview</span>
+        <span className="text-sm font-medium text-gray-700">{t.editor.previewTitle}</span>
         <span className="block text-xs text-gray-400 mt-0.5">
-          Renders as your file will look
+          {t.editor.previewSubtitle}
         </span>
       </div>
 
@@ -74,7 +77,9 @@ export function MarkdownPreview({ markdown, className = '' }: MarkdownPreviewPro
 
       {truncated && (
         <div className="px-4 py-2 bg-yellow-50 border-t border-yellow-200 text-xs text-yellow-700">
-          Content truncated in preview. Full content will be included in the conversion.
+          {lang === 'zh'
+            ? '预览内容已截断，转换时仍会包含完整内容。'
+            : 'Content truncated in preview. Full content will be included in the conversion.'}
         </div>
       )}
     </div>

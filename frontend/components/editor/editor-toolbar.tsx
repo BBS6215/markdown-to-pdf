@@ -24,6 +24,7 @@ interface EditorToolbarProps {
   onCopyHtml?: () => void;
   onUpload: () => void;
   onRetry: () => void;
+  lang?: string;
 }
 
 export function EditorToolbar({
@@ -35,7 +36,10 @@ export function EditorToolbar({
   onCopyHtml,
   onUpload,
   onRetry,
+  lang = 'en',
 }: EditorToolbarProps) {
+  const uploadLabel = lang === 'zh' ? '上传 .md' : 'Upload .md';
+
   return (
     <div className="sticky bottom-0 z-10 bg-white border-t border-gray-200 px-4 py-3">
       <div className="flex items-center justify-between gap-3">
@@ -45,7 +49,7 @@ export function EditorToolbar({
           className="inline-flex items-center gap-1.5 px-4 py-2 text-sm border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
         >
           <Upload size={16} />
-          <span className="hidden sm:inline">Upload .md</span>
+          <span className="hidden sm:inline">{uploadLabel}</span>
         </button>
 
         {/* Center: Progress */}
@@ -56,6 +60,7 @@ export function EditorToolbar({
             lastAction={lastAction}
             errorMessage={errorMessage}
             onRetry={onRetry}
+            lang={lang}
           />
         </div>
 
@@ -66,6 +71,7 @@ export function EditorToolbar({
           onClick={onConvert}
           onCopyHtml={onCopyHtml}
           disabled={status === 'loading'}
+          lang={lang}
         />
       </div>
     </div>

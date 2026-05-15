@@ -8,15 +8,18 @@
 import { useState, useRef, useCallback } from 'react';
 import { Upload } from 'lucide-react';
 import { decodeFileBuffer } from '@/lib/editor/encoding-detector';
+import { getTranslations } from '@/lib/i18n/get-translations';
 
 interface FileDropzoneProps {
   onFileContent: (content: string) => void;
   children: React.ReactNode;
+  lang?: string;
 }
 
-export function FileDropzone({ onFileContent, children }: FileDropzoneProps) {
+export function FileDropzone({ onFileContent, children, lang = 'en' }: FileDropzoneProps) {
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const t = getTranslations(lang);
 
   const handleFile = useCallback(
     async (file: File) => {
@@ -66,7 +69,7 @@ export function FileDropzone({ onFileContent, children }: FileDropzoneProps) {
         <div className="absolute inset-0 flex items-center justify-center bg-blue-50/80 border-2 border-dashed border-blue-400 rounded-lg z-10 pointer-events-none">
           <div className="text-center">
             <Upload className="mx-auto text-blue-500 mb-2" size={32} />
-            <p className="text-sm font-medium text-blue-600">Drop .md file here</p>
+            <p className="text-sm font-medium text-blue-600">{t.editor.dropHint}</p>
           </div>
         </div>
       )}
@@ -90,14 +93,16 @@ export function FileDropzone({ onFileContent, children }: FileDropzoneProps) {
 /**
  * Upload button to trigger file input.
  */
-export function UploadButton({ onClick }: { onClick: () => void }) {
+export function UploadButton({ onClick, lang = 'en' }: { onClick: () => void; lang?: string }) {
+  const t = getTranslations(lang);
+
   return (
     <button
       onClick={onClick}
       className="inline-flex items-center gap-1.5 px-4 py-2 text-sm border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
     >
       <Upload size={16} />
-      <span className="hidden sm:inline">Upload .md</span>
+      <span className="hidden sm:inline">{t.editor.uploadButton}</span>
     </button>
   );
 }

@@ -83,7 +83,7 @@ export default async function GuidePage({ params }: { params: Promise<{ lang: st
 
       {/* Guide content rendered as Markdown */}
       <div className="prose-custom">
-        <MarkdownPreview markdown={guide.content} />
+        <MarkdownPreview markdown={guide.content} lang={lang} />
       </div>
 
       {/* CTA — mid-article */}
@@ -98,7 +98,7 @@ export default async function GuidePage({ params }: { params: Promise<{ lang: st
       {/* FAQ */}
       {guide.faq.length > 0 && (
         <div className="mt-12">
-          <FaqAccordion items={guide.faq} />
+          <FaqAccordion items={guide.faq} lang={lang} />
         </div>
       )}
 

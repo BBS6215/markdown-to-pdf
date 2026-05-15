@@ -12,30 +12,32 @@ import { useEffect, useRef, useState } from 'react';
 import { EditorView } from '@codemirror/view';
 import { EditorState } from '@codemirror/state';
 import { createExtensions } from '@/lib/editor/cm6-extensions';
-
-const PLACEHOLDER = 'Paste your Markdown or AI text here — supports text from ChatGPT, Claude, Notion, or any .md file';
+import { getTranslations } from '@/lib/i18n/get-translations';
 
 interface MarkdownEditorProps {
   value: string;
   onChange: (value: string) => void;
   className?: string;
+  lang?: string;
 }
 
-export function MarkdownEditor({ value, onChange, className = '' }: MarkdownEditorProps) {
+export function MarkdownEditor({ value, onChange, className = '', lang = 'en' }: MarkdownEditorProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const viewRef = useRef<EditorView | null>(null);
+  const initialValueRef = useRef(value);
   const [cmLoaded, setCmLoaded] = useState(false);
   const onChangeRef = useRef(onChange);
   onChangeRef.current = onChange;
+  const t = getTranslations(lang);
 
   // Initialize CodeMirror
   useEffect(() => {
     if (!containerRef.current) return;
 
-    const extensions = createExtensions({ placeholder: PLACEHOLDER });
+    const extensions = createExtensions({ placeholder: t.editor.placeholder });
 
     const state = EditorState.create({
-      doc: value,
+      doc: initialValueRef.current,
       extensions: [
         ...extensions,
         EditorView.updateListener.of((update) => {
@@ -58,8 +60,7 @@ export function MarkdownEditor({ value, onChange, className = '' }: MarkdownEdit
       view.destroy();
       viewRef.current = null;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // Only init once
+  }, [t.editor.placeholder]);
 
   // Sync external value changes into CM (e.g., file upload, sessionStorage restore)
   useEffect(() => {
@@ -77,9 +78,9 @@ export function MarkdownEditor({ value, onChange, className = '' }: MarkdownEdit
     <div className={`relative ${className}`}>
       {/* Panel header */}
       <div className="bg-gray-50 border-b border-gray-200 px-4 py-2 min-h-[72px] flex flex-col justify-center">
-        <span className="text-sm font-medium text-gray-700">Markdown Input</span>
+        <span className="text-sm font-medium text-gray-700">{t.editor.inputTitle}</span>
         <span className="block text-xs text-gray-400 mt-0.5">
-          Paste from ChatGPT, Claude, or any text editor
+          {t.editor.inputSubtitle}
         </span>
       </div>
 
@@ -88,7 +89,7 @@ export function MarkdownEditor({ value, onChange, className = '' }: MarkdownEdit
         <textarea
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          placeholder={PLACEHOLDER}
+          placeholder={t.editor.placeholder}
           className="w-full min-h-[400px] p-4 bg-gray-50 text-gray-900 text-sm font-mono resize-none outline-none"
         />
       )}

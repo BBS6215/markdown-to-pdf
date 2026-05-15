@@ -7,6 +7,7 @@
  */
 
 import { FileText, FileIcon, Globe, AlertCircle } from 'lucide-react';
+import { getTranslations } from '@/lib/i18n/get-translations';
 
 interface HistoryRecord {
   id: string;
@@ -30,22 +31,25 @@ function formatBytes(bytes: number | null): string {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
-function formatTime(isoString: string): string {
+function formatTime(isoString: string, lang: string): string {
   const date = new Date(isoString);
   const now = new Date();
   const isToday = date.toDateString() === now.toDateString();
+  const locale = lang === 'zh' ? 'zh-CN' : 'en-US';
 
   if (isToday) {
-    return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+    return date.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' });
   }
-  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+  return date.toLocaleDateString(locale, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
 }
 
-export function HistoryList({ records }: { records: HistoryRecord[] }) {
+export function HistoryList({ records, lang = 'en' }: { records: HistoryRecord[]; lang?: string }) {
+  const t = getTranslations(lang);
+
   if (records.length === 0) {
     return (
       <div className="text-center py-12 text-gray-400 text-sm">
-        No conversions yet. Try converting some Markdown!
+        {t.dashboard.historyEmpty}
       </div>
     );
   }
@@ -54,7 +58,7 @@ export function HistoryList({ records }: { records: HistoryRecord[] }) {
     <div>
       {/* Privacy notice */}
       <p className="text-sm text-gray-400 mb-4">
-        Conversion history is for your reference only. Files are not stored on our servers for your privacy.
+        {t.dashboard.privacyNote}
       </p>
 
       <div className="space-y-0">
@@ -89,7 +93,7 @@ export function HistoryList({ records }: { records: HistoryRecord[] }) {
 
               {/* Time */}
               <span className="text-xs text-gray-400 w-24 text-right">
-                {formatTime(record.created_at)}
+                {formatTime(record.created_at, lang)}
               </span>
             </div>
           );

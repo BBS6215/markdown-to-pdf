@@ -43,7 +43,7 @@ export function MiniEditor({ defaultContent = '', lang = 'en' }: MiniEditorProps
           <div className="bg-gray-50 border-b border-gray-200 px-3 py-1">
             <span className="text-xs text-gray-500">{copy.preview}</span>
           </div>
-          <MarkdownPreview markdown={content} className="text-sm" />
+          <MarkdownPreview markdown={content} className="text-sm" lang={lang} />
         </div>
       </div>
     </div>

@@ -65,7 +65,7 @@ export const ZH_GUIDES: GuideData[] = [
       '',
       '- **PDF** 使用浏览器打印引擎。空行会变成段落间距，`<br>` 会变成同段落内的换行。',
       '- **Word** 会把段落拆成 Word 段落。适合正式文档的写法仍然是“空一行”。',
-      '- 如果你从 AI 工具复制内容，建议先在右侧 Live Preview 看段落是否符合预期，再导出。',
+      '- 如果你从 AI 工具复制内容，建议先在右侧实时预览看段落是否符合预期，再导出。',
       '',
       '## 常见错误',
       '',
@@ -76,7 +76,7 @@ export const ZH_GUIDES: GuideData[] = [
     faq: [
       { q: '为什么 Markdown 里单次 Enter 不一定换行？', a: '这是 Markdown 的设计。它允许你在源码里手动折行，而不影响最终段落显示。真正的新段落需要空一行。' },
       { q: 'PDF 导出时空行会保留吗？', a: '会。空行会被渲染成段落间距；如果你需要同段落内换行，请使用 <br>。' },
-      { q: '从 ChatGPT 复制来的内容需要手动整理吗？', a: '通常不需要，但建议检查 Live Preview。AI 输出有时会混用单换行和空行，预览能最快发现问题。' },
+      { q: '从 ChatGPT 复制来的内容需要手动整理吗？', a: '通常不需要，但建议检查实时预览。AI 输出有时会混用单换行和空行，预览能最快发现问题。' },
     ],
     relatedSlugs: ['markdown-quote', 'markdown-cheat-sheet'],
   },
@@ -271,7 +271,7 @@ export const ZH_GUIDES: GuideData[] = [
       '',
       '- PDF 更接近网页预览，适合分享和归档。',
       '- Word 更适合后续编辑，表格、链接、加粗和斜体都会尽量保留。',
-      '- 如果你的内容来自 AI，先看 Live Preview，再选择 PDF 或 Word。',
+      '- 如果你的内容来自 AI，先看实时预览，再选择 PDF 或 Word。',
     ].join('\n'),
     faq: [
       { q: '本工具支持 GitHub Flavored Markdown 吗？', a: '支持。表格、任务列表、删除线和自动链接都属于 GFM，本工具默认启用。' },

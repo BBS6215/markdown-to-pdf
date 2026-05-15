@@ -8,6 +8,7 @@
 import { Spinner } from '@/components/ui/spinner';
 import type { ConvertFormat, ConversionStatus, ConversionAction } from '@/lib/types';
 import { FORMAT_CONFIG } from '@/lib/types';
+import { getTranslations } from '@/lib/i18n/get-translations';
 
 interface ConvertProgressProps {
   status: ConversionStatus;
@@ -15,18 +16,20 @@ interface ConvertProgressProps {
   lastAction?: ConversionAction;
   errorMessage?: string;
   onRetry?: () => void;
+  lang?: string;
 }
 
-export function ConvertProgress({ status, format, lastAction, errorMessage, onRetry }: ConvertProgressProps) {
+export function ConvertProgress({ status, format, lastAction, errorMessage, onRetry, lang = 'en' }: ConvertProgressProps) {
   if (status === 'idle') return null;
 
   const formatLabel = FORMAT_CONFIG[format].label;
+  const t = getTranslations(lang);
 
   if (status === 'loading') {
     return (
       <div className="flex items-center gap-2 text-sm text-gray-600">
         <Spinner size="sm" />
-        <span>Generating your {formatLabel}...</span>
+        <span>{t.conversion.generating.replace('{format}', formatLabel)}</span>
       </div>
     );
   }
@@ -39,11 +42,11 @@ export function ConvertProgress({ status, format, lastAction, errorMessage, onRe
     //   - download (default) -> "Downloaded!"
     let message: string;
     if (lastAction === 'copy') {
-      message = 'Copied!';
+      message = t.conversion.copied;
     } else if (lastAction === 'print') {
-      message = 'Print dialog opened. Choose "Save as PDF".';
+      message = t.conversion.printOpened;
     } else {
-      message = 'Downloaded!';
+      message = t.conversion.downloaded;
     }
     return (
       <div className="text-sm text-green-600 font-medium">
@@ -55,13 +58,13 @@ export function ConvertProgress({ status, format, lastAction, errorMessage, onRe
   if (status === 'error') {
     return (
       <div className="flex items-center gap-2 text-sm text-red-600">
-        <span>{errorMessage || `Failed to generate ${formatLabel}.`}</span>
+        <span>{errorMessage || t.conversion.failed.replace('{format}', formatLabel)}</span>
         {onRetry && (
           <button
             onClick={onRetry}
             className="underline hover:no-underline font-medium"
           >
-            Retry
+            {t.conversion.retry}
           </button>
         )}
       </div>

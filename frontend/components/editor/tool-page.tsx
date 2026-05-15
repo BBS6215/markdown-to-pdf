@@ -7,7 +7,6 @@
 
 import { useState, useRef } from 'react';
 import type { ConvertFormat } from '@/lib/types';
-import { FORMAT_CONFIG } from '@/lib/types';
 import { FormatSwitcher } from '@/components/layout/format-switcher';
 import { MarkdownEditor } from '@/components/editor/markdown-editor';
 import { MarkdownPreview } from '@/components/editor/markdown-preview';
@@ -18,11 +17,7 @@ import { useEditorContent } from '@/hooks/use-editor-content';
 import { useConversion } from '@/hooks/use-conversion';
 import { useMobileDetect } from '@/hooks/use-mobile-detect';
 import { usePathname } from 'next/navigation';
-import en from '@/lib/i18n/locales/en';
-import zh from '@/lib/i18n/locales/zh';
-import type { Translations } from '@/lib/i18n/locales/en';
-
-const TRANSLATIONS: Record<string, Translations> = { en, zh };
+import { getTranslations } from '@/lib/i18n/get-translations';
 
 interface ToolPageProps {
   format: ConvertFormat;
@@ -39,8 +34,7 @@ export function ToolPage({ format }: ToolPageProps) {
 
   const pathname = usePathname();
   const lang = pathname.startsWith('/zh') ? 'zh' : 'en';
-  const t = TRANSLATIONS[lang] || TRANSLATIONS.en;
-  const config = FORMAT_CONFIG[format];
+  const t = getTranslations(lang);
   const toolText = t.tool[format];
   const seoContent = t.seo[format];
 
@@ -74,7 +68,7 @@ export function ToolPage({ format }: ToolPageProps) {
       {/* Editor area — wait for sessionStorage initialization */}
       {!isInitialized ? (
         <div className="flex items-center justify-center h-96">
-          <div className="text-gray-400 text-sm">Loading editor...</div>
+          <div className="text-gray-400 text-sm">{t.editor.loading}</div>
         </div>
       ) : (
         <>
@@ -89,7 +83,7 @@ export function ToolPage({ format }: ToolPageProps) {
                     : 'text-gray-500 border-transparent'
                 }`}
               >
-                Edit
+                {t.editor.editTab}
               </button>
               <button
                 onClick={() => setMobileTab('preview')}
@@ -99,23 +93,23 @@ export function ToolPage({ format }: ToolPageProps) {
                     : 'text-gray-500 border-transparent'
                 }`}
               >
-                Preview
+                {t.editor.previewTab}
               </button>
             </div>
           )}
 
           {/* Editor + Preview */}
-          <FileDropzone onFileContent={handleFileContent}>
+          <FileDropzone onFileContent={handleFileContent} lang={lang}>
             <div className={`${isMobile ? '' : 'grid grid-cols-[minmax(460px,1fr)_minmax(0,2fr)]'} border-b border-gray-200`}>
               <div
                 className={`${!isMobile ? 'border-r border-gray-200' : ''} ${
                   isMobile && mobileTab !== 'edit' ? 'hidden' : ''
                 }`}
               >
-                <MarkdownEditor value={content} onChange={updateContent} />
+                <MarkdownEditor value={content} onChange={updateContent} lang={lang} />
               </div>
               <div className={`${isMobile && mobileTab !== 'preview' ? 'hidden' : ''}`}>
-                <MarkdownPreview markdown={content} />
+                <MarkdownPreview markdown={content} lang={lang} />
               </div>
             </div>
           </FileDropzone>
@@ -131,6 +125,7 @@ export function ToolPage({ format }: ToolPageProps) {
             onCopyHtml={handleCopyHtml}
             onUpload={handleUpload}
             onRetry={retry}
+            lang={lang}
           />
 
           {/* Hidden file input */}
@@ -155,7 +150,7 @@ export function ToolPage({ format }: ToolPageProps) {
       )}
 
       {/* SEO Content Section — below-the-fold, always SSR rendered (01 §6.4, 07 任务 4.13-4.19) */}
-      <SeoContentSection format={format} lang={lang} content={seoContent} />
+      <SeoContentSection lang={lang} content={seoContent} />
     </div>
   );
 }

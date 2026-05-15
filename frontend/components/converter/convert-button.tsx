@@ -16,11 +16,14 @@ interface ConvertButtonProps {
   onClick: () => void;
   onCopyHtml?: () => void;
   disabled?: boolean;
+  lang?: string;
 }
 
-export function ConvertButton({ format, status, onClick, onCopyHtml, disabled }: ConvertButtonProps) {
+export function ConvertButton({ format, status, onClick, onCopyHtml, disabled, lang = 'en' }: ConvertButtonProps) {
   const config = FORMAT_CONFIG[format];
   const isLoading = status === 'loading';
+  const convertLabel = lang === 'zh' ? `转换为 ${config.label}` : `Convert to ${config.label}`;
+  const copyLabel = lang === 'zh' ? '复制 HTML' : 'Copy HTML';
 
   return (
     <div className="flex items-center gap-2">
@@ -32,14 +35,14 @@ export function ConvertButton({ format, status, onClick, onCopyHtml, disabled }:
         disabled={disabled || isLoading}
         onClick={onClick}
       >
-        Convert to {config.label}
+        {convertLabel}
       </Button>
 
       {/* HTML format gets an extra "Copy HTML" button */}
       {format === 'html' && onCopyHtml && (
         <Button variant="secondary" size="md" onClick={onCopyHtml} disabled={isLoading}>
           <Copy size={16} className="mr-1.5" />
-          Copy HTML
+          {copyLabel}
         </Button>
       )}
     </div>

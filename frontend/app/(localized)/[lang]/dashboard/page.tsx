@@ -40,5 +40,5 @@ export default async function DashboardPage({
 
   const history = historyResult.data || [];
 
-  return <DashboardClient history={history} />;
+  return <DashboardClient history={history} lang={lang} />;
 }

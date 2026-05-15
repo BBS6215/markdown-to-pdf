@@ -12,10 +12,12 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
   return getPageMetadata(lang, 'login');
 }
 
-export default function LoginPage() {
+export default async function LoginPage({ params }: { params: Promise<{ lang: string }> }) {
+  const { lang } = await params;
+
   return (
     <Suspense>
-      <LoginClient />
+      <LoginClient lang={lang} />
     </Suspense>
   );
 }

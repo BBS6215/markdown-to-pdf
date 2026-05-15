@@ -3,7 +3,6 @@
  * Source: 04-UI规范 §2.1 (bg-gray-50 视觉分隔), 01-主线 §6.4
  */
 
-import type { ConvertFormat } from '@/lib/types';
 import { HowToSteps } from './how-to-steps';
 import { FeaturesGrid } from './features-grid';
 import { FaqAccordion } from './faq-accordion';
@@ -12,7 +11,6 @@ import { JsonLd } from './json-ld';
 import { softwareApplicationSchema, faqSchema } from '@/lib/seo/json-ld-schemas';
 
 interface SeoContentSectionProps {
-  format: ConvertFormat;
   lang: string;
   content: {
     howToTitle: string;
@@ -24,7 +22,7 @@ interface SeoContentSectionProps {
   };
 }
 
-export function SeoContentSection({ format, lang, content }: SeoContentSectionProps) {
+export function SeoContentSection({ lang, content }: SeoContentSectionProps) {
   return (
     <section className="bg-gray-50 border-t border-gray-200">
       <div className="max-w-4xl mx-auto px-4 py-16 space-y-16">
@@ -41,7 +39,7 @@ export function SeoContentSection({ format, lang, content }: SeoContentSectionPr
         <FeaturesGrid features={content.features} />
 
         {/* FAQ */}
-        <FaqAccordion items={content.faq} />
+        <FaqAccordion items={content.faq} lang={lang} />
 
         {/* Guide recommendations */}
         <GuideRecommendations lang={lang} />

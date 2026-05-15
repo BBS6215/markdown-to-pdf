@@ -7,12 +7,19 @@
 import { useState } from 'react';
 import { ChevronDown } from 'lucide-react';
 
-export function FaqAccordion({ items }: { items: ReadonlyArray<{ q: string; a: string }> }) {
+export function FaqAccordion({
+  items,
+  lang = 'en',
+}: {
+  items: ReadonlyArray<{ q: string; a: string }>;
+  lang?: string;
+}) {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
+  const title = lang === 'zh' ? '常见问题' : 'Frequently Asked Questions';
 
   return (
     <div>
-      <h2 className="text-xl font-semibold text-gray-800 mb-6">Frequently Asked Questions</h2>
+      <h2 className="text-xl font-semibold text-gray-800 mb-6">{title}</h2>
       <div className="space-y-2">
         {items.map((item, i) => (
           <div key={i} className="border border-gray-200 rounded-lg overflow-hidden">
