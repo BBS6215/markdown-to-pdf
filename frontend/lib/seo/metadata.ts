@@ -59,14 +59,20 @@ const META: Record<string, Record<PageKey, PageMeta>> = {
     toWord: { title: '在线 Markdown (.md) 转 Word — 免费工具', description: '免费将 Markdown 转为 Word (.docx) 文档。', path: '/zh/to-word' },
     toHtml: { title: '在线 Markdown (.md) 转 HTML — 免费工具', description: '在浏览器中将 Markdown 转为 HTML，数据不离开设备。', path: '/zh/to-html' },
     guides: { title: 'Markdown 指南 — 学习 Markdown 语法', description: '交互式 Markdown 指南，含实时编辑器。', path: '/zh/guides' },
-    guideNewLine: { title: 'Markdown 换行 — 如何添加换行（附示例）', description: '学习如何在 Markdown 中创建换行。', path: '/zh/guides/markdown-new-line' },
-    guideQuote: { title: 'Markdown 引用 — 如何创建引用块', description: '学习如何在 Markdown 中创建引用。', path: '/zh/guides/markdown-quote' },
-    guideCheatSheet: { title: 'Markdown 速查表 — 完整语法参考 2026', description: '完整的 Markdown 语法参考。', path: '/zh/guides/markdown-cheat-sheet' },
-    guideTable: { title: 'Markdown 表格 — 语法、对齐与 PDF/Word 渲染', description: 'Markdown 表格语法、列对齐方式，以及导出 PDF 和 Word 时的渲染说明。', path: '/zh/guides/markdown-table' },
-    guideImage: { title: 'Markdown 图片 — 语法、alt 文本与 PDF/Word 输出', description: 'Markdown 图片插入方式：alt 文本、标题、引用式语法，以及在 PDF / Word 输出中的表现。', path: '/zh/guides/markdown-image' },
-    guideCodeBlock: { title: 'Markdown 代码块 — 围栏式、缩进式与行内代码', description: 'Markdown 代码块的全部语法：围栏式、语言提示、缩进式、行内代码，以及 PDF 渲染细节。', path: '/zh/guides/markdown-code-block' },
-    guideLink: { title: 'Markdown 链接 — 行内、引用与 autolink 语法', description: 'Markdown 中所有写链接的方式：行内、引用、autolink、锚点和邮箱，以及在 PDF 中的渲染表现。', path: '/zh/guides/markdown-link' },
-    guideList: { title: 'Markdown 列表 — 有序、无序、嵌套与任务列表', description: 'Markdown 列表写法：项目符号、有序编号、嵌套、任务列表，以及在 PDF 和 Word 中的渲染说明。', path: '/zh/guides/markdown-list' },
+    // All 8 zh guide detail pages are flagged noindex until the actual
+    // guide content is translated. The route still resolves so users
+    // who land on /zh/guides/<slug> can read the English body, but
+    // search engines should not index a Chinese-titled page with an
+    // English-only body — that is a clear quality flag for AdSense /
+    // Search Console.
+    guideNewLine: { title: 'Markdown 换行 — 如何添加换行（附示例）', description: '学习如何在 Markdown 中创建换行。', path: '/zh/guides/markdown-new-line', noindex: true },
+    guideQuote: { title: 'Markdown 引用 — 如何创建引用块', description: '学习如何在 Markdown 中创建引用。', path: '/zh/guides/markdown-quote', noindex: true },
+    guideCheatSheet: { title: 'Markdown 速查表 — 完整语法参考 2026', description: '完整的 Markdown 语法参考。', path: '/zh/guides/markdown-cheat-sheet', noindex: true },
+    guideTable: { title: 'Markdown 表格 — 语法、对齐与 PDF/Word 渲染', description: 'Markdown 表格语法、列对齐方式，以及导出 PDF 和 Word 时的渲染说明。', path: '/zh/guides/markdown-table', noindex: true },
+    guideImage: { title: 'Markdown 图片 — 语法、alt 文本与 PDF/Word 输出', description: 'Markdown 图片插入方式：alt 文本、标题、引用式语法，以及在 PDF / Word 输出中的表现。', path: '/zh/guides/markdown-image', noindex: true },
+    guideCodeBlock: { title: 'Markdown 代码块 — 围栏式、缩进式与行内代码', description: 'Markdown 代码块的全部语法：围栏式、语言提示、缩进式、行内代码，以及 PDF 渲染细节。', path: '/zh/guides/markdown-code-block', noindex: true },
+    guideLink: { title: 'Markdown 链接 — 行内、引用与 autolink 语法', description: 'Markdown 中所有写链接的方式：行内、引用、autolink、锚点和邮箱，以及在 PDF 中的渲染表现。', path: '/zh/guides/markdown-link', noindex: true },
+    guideList: { title: 'Markdown 列表 — 有序、无序、嵌套与任务列表', description: 'Markdown 列表写法：项目符号、有序编号、嵌套、任务列表，以及在 PDF 和 Word 中的渲染说明。', path: '/zh/guides/markdown-list', noindex: true },
     pricing: { title: '定价 — Markdown 转 PDF', description: 'Markdown 转 PDF 免费使用。', path: '/zh/pricing' },
     privacy: { title: '隐私政策 — Markdown 转 PDF', description: 'markdown-to-pdf.app 隐私政策。', path: '/zh/privacy' },
     terms: { title: '服务条款 — Markdown 转 PDF', description: 'markdown-to-pdf.app 服务条款。', path: '/zh/terms' },

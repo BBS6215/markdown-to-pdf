@@ -35,17 +35,31 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   for (const page of PAGES) {
     for (const lang of ['en', 'zh']) {
+      // /zh/guides/<slug> pages still serve the English body
+      // verbatim until the content is translated. Excluding them
+      // from the sitemap keeps Search Console and AdSense from
+      // crawling pages whose Chinese title disagrees with the
+      // English body. The hreflang `languages` map below also
+      // skips the zh variant for the same pages so we do not
+      // advertise a Chinese alternate that does not really exist.
+      if (lang === 'zh' && page.path.startsWith('/guides/') && page.path !== '/guides') {
+        continue;
+      }
+
+      const alternates: Record<string, string> = {
+        en: `${BASE_URL}/en${page.path}`,
+      };
+      // Only declare a zh alternate when /zh/<path> is actually indexable.
+      if (!(page.path.startsWith('/guides/') && page.path !== '/guides')) {
+        alternates.zh = `${BASE_URL}/zh${page.path}`;
+      }
+
       entries.push({
         url: `${BASE_URL}/${lang}${page.path}`,
         lastModified: new Date(),
         changeFrequency: page.changeFrequency,
         priority: page.priority,
-        alternates: {
-          languages: {
-            en: `${BASE_URL}/en${page.path}`,
-            zh: `${BASE_URL}/zh${page.path}`,
-          },
-        },
+        alternates: { languages: alternates },
       });
     }
   }

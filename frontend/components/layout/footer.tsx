@@ -18,9 +18,14 @@ export function Footer({ lang = 'en' }: { lang?: string }) {
           <div>
             <h4 className="font-medium text-gray-900 mb-3">Guides</h4>
             <ul className="space-y-2 text-gray-500">
+              <li><Link href={`/${lang}/guides/markdown-cheat-sheet`} className="hover:text-gray-700">Cheat Sheet</Link></li>
+              <li><Link href={`/${lang}/guides/markdown-table`} className="hover:text-gray-700">Markdown Table</Link></li>
+              <li><Link href={`/${lang}/guides/markdown-image`} className="hover:text-gray-700">Markdown Image</Link></li>
+              <li><Link href={`/${lang}/guides/markdown-code-block`} className="hover:text-gray-700">Markdown Code Block</Link></li>
+              <li><Link href={`/${lang}/guides/markdown-link`} className="hover:text-gray-700">Markdown Link</Link></li>
+              <li><Link href={`/${lang}/guides/markdown-list`} className="hover:text-gray-700">Markdown List</Link></li>
               <li><Link href={`/${lang}/guides/markdown-new-line`} className="hover:text-gray-700">Markdown New Line</Link></li>
               <li><Link href={`/${lang}/guides/markdown-quote`} className="hover:text-gray-700">Markdown Quote</Link></li>
-              <li><Link href={`/${lang}/guides/markdown-cheat-sheet`} className="hover:text-gray-700">Cheat Sheet</Link></li>
             </ul>
           </div>
           {/* Legal */}

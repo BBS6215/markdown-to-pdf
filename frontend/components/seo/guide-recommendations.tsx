@@ -1,14 +1,22 @@
 /**
  * Guide recommendation cards for tool page bottom.
  * Source: 02-SEO策略 约束 4 (内链网络)
+ *
+ * The three slugs picked here are the most directly relevant to the
+ * conversion flow itself — content pasted from ChatGPT / Claude almost
+ * always contains tables, code blocks, and lists, and these are the
+ * three areas where PDF / Word output behavior diverges the most from
+ * the raw Markdown source. Promoting them on every tool page gives
+ * crawlers stable internal links to the new guides and gives users a
+ * relevant next read.
  */
 
 import Link from 'next/link';
 
 const GUIDES = [
-  { slug: 'markdown-new-line', title: 'Markdown New Line', desc: 'Learn how to create line breaks in Markdown.' },
-  { slug: 'markdown-quote', title: 'Markdown Quote', desc: 'Learn how to create block quotes in Markdown.' },
-  { slug: 'markdown-cheat-sheet', title: 'Markdown Cheat Sheet', desc: 'Complete Markdown syntax reference.' },
+  { slug: 'markdown-table', title: 'Markdown Table', desc: 'Tables, column alignment, and how they render in PDF and Word.' },
+  { slug: 'markdown-code-block', title: 'Markdown Code Block', desc: 'Fenced and inline code, language hints, and PDF output tips.' },
+  { slug: 'markdown-list', title: 'Markdown List', desc: 'Ordered, unordered, nested, and task lists — with Word/PDF notes.' },
 ];
 
 export function GuideRecommendations({ lang }: { lang: string }) {
