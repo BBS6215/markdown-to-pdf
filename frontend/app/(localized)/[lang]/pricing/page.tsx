@@ -3,6 +3,7 @@
  * Source: 01-主线 §6.6 (/en/pricing), 07 §4 任务 4.29
  */
 
+import Link from 'next/link';
 import { getPageMetadata } from '@/lib/seo/metadata';
 import { Check } from 'lucide-react';
 
@@ -23,18 +24,23 @@ const FEATURES = [
   'CJK language support (uses your OS fonts)',
 ];
 
-export default async function PricingPage() {
+export default async function PricingPage({
+  params,
+}: {
+  params: Promise<{ lang: string }>;
+}) {
+  const { lang } = await params;
   return (
     <div className="max-w-2xl mx-auto px-4 py-12 text-center">
       <h1 className="text-3xl font-semibold text-gray-900 mb-2">Pricing</h1>
       <p className="text-base text-gray-500 mb-8">
-        Markdown to PDF is free to use — and runs entirely in your browser.
+        Free to use. Supported by ads so the tool can stay available.
       </p>
 
       <div className="bg-white border border-gray-200 rounded-xl p-8 text-left">
         <div className="text-center mb-6">
-          <span className="text-4xl font-bold text-gray-900">$0</span>
-          <span className="text-gray-500 ml-1">/ forever</span>
+          <span className="text-4xl font-bold text-gray-900">Free</span>
+          <span className="block text-sm text-gray-500 mt-1">No account required</span>
         </div>
 
         <ul className="space-y-3">
@@ -45,6 +51,16 @@ export default async function PricingPage() {
             </li>
           ))}
         </ul>
+
+        <p className="mt-6 text-xs text-gray-500 leading-6">
+          We serve advertising via Google AdSense to keep this tool free.
+          We never read or upload your Markdown — every conversion runs
+          entirely in your browser. See our{' '}
+          <Link href={`/${lang}/privacy`} className="text-blue-600 underline">
+            Privacy Policy
+          </Link>{' '}
+          for details on advertising cookies and how to opt out.
+        </p>
       </div>
     </div>
   );

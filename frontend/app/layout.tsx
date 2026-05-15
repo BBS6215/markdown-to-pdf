@@ -37,6 +37,12 @@ export const metadata: Metadata = {
   icons: {
     icon: '/icon.svg',
   },
+  // Google AdSense site verification (meta-tag method). The AdSense
+  // script itself is not loaded during the review phase — see
+  // docs/10-前端化架构补丁.md for the audit roadmap.
+  other: {
+    'google-adsense-account': 'ca-pub-6542625868833135',
+  },
 };
 
 export default function RootLayout({
