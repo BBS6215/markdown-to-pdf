@@ -118,6 +118,13 @@ interface InlineRun {
   strike?: boolean;
   code?: boolean;
   linkUrl?: boolean;
+  /**
+   * A docx <w:br/> (line break inside the current paragraph). The host
+   * Word application renders this as a soft line break; sibling text on
+   * either side remains in the same paragraph. `text` is ignored when
+   * lineBreak is true.
+   */
+  lineBreak?: boolean;
 }
 
 function collectInlineRuns(
@@ -149,9 +156,21 @@ function collectInlineRuns(
         { text: ` (${node.url})`, linkUrl: true },
       ];
     case 'break':
-      return [{ text: '\n', ...style }];
+      return [{ text: '', lineBreak: true }];
     case 'image':
       return [{ text: node.alt || '[image]', ...style }];
+    case 'html': {
+      // remark parses raw inline HTML (typically <br> inside a paragraph
+      // or a table cell) as an `html` node whose .value is the literal
+      // tag. Translate <br>/<br/>/<br /> to a docx line break; drop any
+      // other inline HTML rather than leaking it as a literal string
+      // into the generated Word document.
+      const value = (node as unknown as { value?: unknown }).value;
+      if (typeof value === 'string' && /^<br\s*\/?>$/i.test(value)) {
+        return [{ text: '', lineBreak: true }];
+      }
+      return [];
+    }
     default:
       if ('value' in node && typeof (node as { value: unknown }).value === 'string') {
         return [{ text: (node as { value: string }).value, ...style }];
@@ -166,6 +185,12 @@ function collectInlineRuns(
 }
 
 function toTextRun(run: InlineRun): TextRun {
+  if (run.lineBreak) {
+    // `break: 1` emits a single <w:br/> with no text; this is the docx
+    // equivalent of HTML <br>. Use this instead of putting "\n" in the
+    // text field, which Word renders as a space, not a line break.
+    return new TextRun({ break: 1 });
+  }
   return new TextRun({
     text: run.text,
     ...(run.bold && { bold: true }),
@@ -270,10 +295,23 @@ function convertNode(node: Content): (Paragraph | Table)[] {
         }),
       ];
 
-    default:
-      if ('value' in node && typeof (node as { value: unknown }).value === 'string') {
-        return [new Paragraph({ children: [new TextRun({ text: (node as { value: string }).value })] })];
+    case 'html': {
+      // Block-level raw HTML — typically a stand-alone <br> on its own
+      // line, or a <div>/<details>/... that the user pasted directly.
+      // Translate <br> to an empty paragraph (visible blank line); drop
+      // everything else rather than leaking the literal tag into Word.
+      const value = (node as unknown as { value?: unknown }).value;
+      if (typeof value === 'string' && /^<br\s*\/?>$/i.test(value.trim())) {
+        return [new Paragraph({ children: [new TextRun({ break: 1 })] })];
       }
+      return [];
+    }
+
+    default:
+      // Unknown block node: drop it rather than dumping `.value` as
+      // literal text. Catching the common case (raw HTML) above means
+      // anything we end up here is almost certainly something we cannot
+      // render meaningfully in docx anyway.
       return [];
   }
 }

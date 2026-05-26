@@ -13,9 +13,9 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
 }
 
 const FEATURES = [
-  'Unlimited PDF conversions (no account needed)',
-  'Unlimited Word (.docx) conversions',
-  'Unlimited HTML conversions',
+  'PDF conversion with no account needed',
+  'Word (.docx) conversion',
+  'HTML conversion',
   'Runs 100% in your browser — your content never leaves your device',
   'Real-time Markdown preview',
   'File upload support (.md files)',
@@ -25,9 +25,9 @@ const FEATURES = [
 ];
 
 const ZH_FEATURES = [
-  '无限 PDF 转换（无需账号）',
-  '无限 Word (.docx) 转换',
-  '无限 HTML 转换',
+  'PDF 转换（无需账号）',
+  'Word (.docx) 转换',
+  'HTML 转换',
   '100% 在浏览器中运行，您的内容不会离开设备',
   '实时 Markdown 预览',
   '支持上传 .md 文件',

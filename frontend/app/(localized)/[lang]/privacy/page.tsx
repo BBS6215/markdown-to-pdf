@@ -59,7 +59,7 @@ export default async function PrivacyPage({ params }: { params: Promise<{ lang: 
           </ul>
 
           <h2 className="text-lg font-medium text-gray-900 mt-8">7. 联系方式</h2>
-          <p>如有隐私相关问题，请联系 privacy@markdown-to-pdf.app。</p>
+          <p>如有隐私相关问题，请发邮件到 <a href="mailto:support@markdown-to-pdf.app" className="text-blue-600 underline">support@markdown-to-pdf.app</a>，邮件标题请注明 <em>Privacy Request</em> 以便我们优先处理。</p>
         </div>
       </div>
     );
@@ -106,7 +106,7 @@ export default async function PrivacyPage({ params }: { params: Promise<{ lang: 
         </ul>
 
         <h2 className="text-lg font-medium text-gray-900 mt-8">7. Contact</h2>
-        <p>For privacy questions, contact us at privacy@markdown-to-pdf.app.</p>
+        <p>For privacy questions, email <a href="mailto:support@markdown-to-pdf.app" className="text-blue-600 underline">support@markdown-to-pdf.app</a> with <em>Privacy Request</em> in the subject line so we can prioritize it.</p>
       </div>
     </div>
   );

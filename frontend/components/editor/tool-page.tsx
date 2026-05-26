@@ -39,8 +39,7 @@ export function ToolPage({ format }: ToolPageProps) {
   const seoContent = t.seo[format];
 
   const handleConvert = () => {
-    // No quota gate — all formats run in the browser, conversions are free
-    // and unlimited. See docs/03 §4.6.
+    // No quota gate: conversion runs in the frontend-only browser pipeline.
     convert(content);
   };
 
@@ -50,13 +49,19 @@ export function ToolPage({ format }: ToolPageProps) {
 
   return (
     <div className="max-w-7xl mx-auto">
-      {/* H1 + Sub-heading (02-SEO 附录 C: Title 必须包含 "Markdown (.md)") */}
-      <div className="px-4 pt-4 pb-2">
+      {/* H1 + Sub-heading + SSR intro paragraph
+          02-SEO 附录 C: Title 必须包含 "Markdown (.md)"
+          intro 段是 SSR 文本（200+ 字），让爬虫在编辑器加载前看到真实内容
+          —— AdSense 审核对工具页"thin content"判定的关键缓解。 */}
+      <div className="px-4 pt-4 pb-2 max-w-4xl">
         <h1 className="text-2xl font-semibold text-gray-800">
           {toolText.h1}
         </h1>
         <p className="mt-1 text-base text-gray-500">
           {toolText.subheading}
+        </p>
+        <p className="mt-3 text-sm text-gray-600 leading-7">
+          {toolText.intro}
         </p>
       </div>
 
@@ -114,7 +119,7 @@ export function ToolPage({ format }: ToolPageProps) {
             </div>
           </FileDropzone>
 
-          {/* Toolbar — no quota props: conversion is unlimited in the
+          {/* Toolbar — no quota props: conversion runs locally in the
               frontend-only pipeline, so EditorToolbar's defaults apply. */}
           <EditorToolbar
             format={format}

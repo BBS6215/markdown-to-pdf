@@ -5,10 +5,16 @@
  * Added 2026-05-15: 5 deeper guide pages (table / image / code-block /
  * link / list) for AdSense audit content depth.
  *
+ * Added 2026-05-26: about / contact pages for AdSense site-information
+ * coverage (footer + sitemap both updated).
+ *
+ * Added 2026-05-26: 4 deeper guides for AdSense content depth and
+ * search-intent coverage around PDF export workflows.
+ *
  * The guide tree is now translated in both EN and ZH, so sitemap
  * includes every public page for both languages.
  *
- * Effective count: 15 pages × 2 languages = 30 URLs.
+ * Effective count: 21 pages × 2 languages = 42 URLs.
  */
 
 import type { MetadataRoute } from 'next';
@@ -28,6 +34,12 @@ const PAGES = [
   { path: '/guides/markdown-code-block', changeFrequency: 'monthly' as const, priority: 0.7 },
   { path: '/guides/markdown-link', changeFrequency: 'monthly' as const, priority: 0.7 },
   { path: '/guides/markdown-list', changeFrequency: 'monthly' as const, priority: 0.7 },
+  { path: '/guides/markdown-to-pdf-best-practices', changeFrequency: 'monthly' as const, priority: 0.7 },
+  { path: '/guides/export-chatgpt-markdown-to-pdf', changeFrequency: 'monthly' as const, priority: 0.7 },
+  { path: '/guides/markdown-vs-word', changeFrequency: 'monthly' as const, priority: 0.7 },
+  { path: '/guides/markdown-frontmatter', changeFrequency: 'monthly' as const, priority: 0.7 },
+  { path: '/about', changeFrequency: 'monthly' as const, priority: 0.5 },
+  { path: '/contact', changeFrequency: 'monthly' as const, priority: 0.4 },
   { path: '/pricing', changeFrequency: 'monthly' as const, priority: 0.3 },
   { path: '/privacy', changeFrequency: 'yearly' as const, priority: 0.1 },
   { path: '/terms', changeFrequency: 'yearly' as const, priority: 0.1 },

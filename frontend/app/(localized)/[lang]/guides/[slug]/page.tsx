@@ -25,6 +25,10 @@ const SLUG_TO_PAGE_KEY: Record<
   | 'guideCodeBlock'
   | 'guideLink'
   | 'guideList'
+  | 'guidePdfBestPractices'
+  | 'guideChatgptExport'
+  | 'guideMarkdownVsWord'
+  | 'guideFrontmatter'
 > = {
   'markdown-new-line': 'guideNewLine',
   'markdown-quote': 'guideQuote',
@@ -34,6 +38,10 @@ const SLUG_TO_PAGE_KEY: Record<
   'markdown-code-block': 'guideCodeBlock',
   'markdown-link': 'guideLink',
   'markdown-list': 'guideList',
+  'markdown-to-pdf-best-practices': 'guidePdfBestPractices',
+  'export-chatgpt-markdown-to-pdf': 'guideChatgptExport',
+  'markdown-vs-word': 'guideMarkdownVsWord',
+  'markdown-frontmatter': 'guideFrontmatter',
 };
 
 export function generateStaticParams() {

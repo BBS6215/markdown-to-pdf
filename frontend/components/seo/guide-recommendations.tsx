@@ -2,19 +2,19 @@
  * Guide recommendation cards for tool page bottom.
  * Source: 02-SEO策略 约束 4 (内链网络)
  *
- * The three slugs picked here are the most directly relevant to the
- * conversion flow itself — content pasted from ChatGPT / Claude almost
- * always contains tables, code blocks, and lists, and these are the
- * three areas where PDF / Word output behavior diverges the most from
- * the raw Markdown source. Promoting them on every tool page gives
- * crawlers stable internal links to the new guides and gives users a
- * relevant next read.
+ * The three slugs picked here are directly tied to the conversion flow:
+ * best practices for export quality, ChatGPT copy/paste workflow, and
+ * tables as the most common layout-sensitive Markdown feature.
  */
 
 import Link from 'next/link';
 import { getGuideBySlug, guideHref } from '@/lib/guides/content';
 
-const RECOMMENDED_GUIDE_SLUGS = ['markdown-table', 'markdown-code-block', 'markdown-list'];
+const RECOMMENDED_GUIDE_SLUGS = [
+  'markdown-to-pdf-best-practices',
+  'export-chatgpt-markdown-to-pdf',
+  'markdown-table',
+];
 
 export function GuideRecommendations({ lang }: { lang: string }) {
   const heading = lang === 'zh' ? 'Markdown 指南' : 'Markdown Guides';

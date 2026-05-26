@@ -103,6 +103,41 @@ Second line
 ### Mistake 2: Forgetting Trailing Spaces
 The two-space method is invisible and easy to forget. Your editor might strip trailing spaces. Prefer \`<br>\` or blank lines instead.
 
+### Mistake 3: Pressing Shift+Enter in a Rich-Text Editor First
+If you drafted text in Notion or Google Docs and then converted to Markdown, soft line breaks inserted with Shift+Enter may not survive the export. Always check the live preview before exporting.
+
+## Why Markdown Works This Way
+
+The behavior is deliberate, not a bug. When John Gruber wrote the original Markdown spec in 2004, the goal was a syntax that read well as plain text in an email or a text file. People naturally hard-wrap long paragraphs at 80 columns for readability — those wrapped lines should stay one paragraph when rendered, not become broken-up shards. So Markdown treats a single newline as a space, and requires an explicit signal (a blank line, two trailing spaces, or a \`<br>\`) when you actually want a break. Every modern flavor — CommonMark, GFM, MDX — keeps the same rule for compatibility.
+
+## Line Breaks in AI-Generated Output
+
+If you got your Markdown from ChatGPT, Claude, Gemini, or another LLM, you'll usually see one of two patterns:
+
+- **Blank-line paragraphs (most common).** Modern chat models almost always separate ideas with a fully blank line. This is the safest pattern and renders cleanly in every Markdown tool — no fix needed.
+- **Hard-wrapped lines without blanks.** Older models, or output piped through certain code editors, sometimes wrap at 80 columns without blank lines in between. Pasted into a strict Markdown renderer, those wrapped lines collapse into one long paragraph. The fix is to delete the in-line newlines or insert blank lines between paragraphs before exporting.
+
+When you paste into the converter on the home page, the live preview shows how each line break is interpreted. If a paragraph looks too long or too short, fix it in the editor on the left and the preview updates instantly.
+
+## Editor Quirks to Watch For
+
+The two-trailing-spaces method is fragile because most editors fight it:
+
+- **VS Code** trims trailing whitespace on save by default (\`files.trimTrailingWhitespace: true\`). You need to either turn that setting off, or add a \`.editorconfig\` exception for \`.md\` files.
+- **Obsidian** keeps trailing spaces in source view, but the live preview may not show the resulting break depending on your theme.
+- **Notion** does not export trailing spaces when you copy as Markdown — the line break is lost in transit.
+- **GitHub's web editor** preserves trailing spaces, which is why the two-space trick is more reliable on GitHub than locally.
+
+For any document that has to survive copy-paste between tools, prefer blank lines or \`<br>\` over the trailing-space method.
+
+## PDF and Word Export Behavior
+
+The converter behind this site renders each method the way the underlying engine intends:
+
+- **PDF export.** Blank-line paragraphs become real paragraph breaks with full spacing. Two trailing spaces and \`<br>\` both become a \`<br>\` in the HTML, which the browser print engine renders as a single soft break — about half the spacing of a paragraph break.
+- **Word export.** Blank-line paragraphs become separate paragraph elements in the .docx file, so Word users can adjust spacing globally through paragraph styles. Inline \`<br>\` becomes a Word line break, which keeps the next line in the same paragraph — useful for addresses, signatures, and poetry-style stanzas.
+- **HTML export.** All three methods produce semantic HTML: \`<p>\` for paragraphs and \`<br>\` for soft breaks. Safe to paste into Notion, Google Docs, or any email client.
+
 ## Try It Yourself
 
 Use the editor below to experiment with different line break methods:`,
@@ -110,6 +145,9 @@ Use the editor below to experiment with different line break methods:`,
       { q: 'Why doesn\'t pressing Enter work in Markdown?', a: 'Markdown treats single line breaks as spaces. This is by design — it allows you to wrap long lines in your source without affecting the output. Use a blank line or two trailing spaces for actual line breaks.' },
       { q: 'What\'s the difference between a line break and a new paragraph?', a: 'A line break (<br>) keeps text in the same paragraph with minimal spacing. A new paragraph (blank line) creates a larger gap between blocks of text.' },
       { q: 'Do AI tools like ChatGPT use proper Markdown line breaks?', a: 'Usually yes — ChatGPT and Claude typically use blank lines between paragraphs. But if you copy from the chat interface, formatting may be lost. Just paste into our converter and it will handle it.' },
+      { q: 'My PDF shows everything on one line — what went wrong?', a: 'Almost always missing blank lines between paragraphs. Paste your Markdown into the editor on the home page; if the preview looks the same wrong way, add blank lines between paragraphs and re-export.' },
+      { q: 'How do I keep a line break inside a Markdown table cell?', a: 'Pure Markdown table syntax does not allow real newlines inside a cell. Use a literal <br> tag — our renderer accepts <br> inside table cells in PDF, Word, and HTML output.' },
+      { q: 'Will my editor break the two-trailing-spaces trick?', a: 'Probably yes. VS Code, Notion, and many "smart" editors automatically trim trailing whitespace. Prefer blank lines or <br> if your document moves between tools.' },
     ],
     relatedSlugs: ['markdown-quote', 'markdown-cheat-sheet'],
   },
@@ -117,7 +155,7 @@ Use the editor below to experiment with different line break methods:`,
     slug: 'markdown-quote',
     title: 'Markdown Quote — How to Create Block Quotes',
     description: 'Learn how to create block quotes, nested quotes, and cited text in Markdown.',
-    readTime: 4,
+    readTime: 6,
     content: `## Basic Block Quote
 
 Use the \`>\` character at the beginning of a line:
@@ -185,6 +223,39 @@ Block quotes are commonly styled with a left border. Most Markdown renderers (in
 - Slightly indented text
 - Lighter text color
 
+## Quotes vs Callouts
+
+Markdown itself only has one quote syntax: \`>\`. Many documentation systems build richer "callout" components on top of it — notes, tips, warnings, and alerts — but those are platform-specific extensions. If you are writing for a portable Markdown document, keep the callout label inside the quote:
+
+\`\`\`markdown
+> **Note:** This converter runs in your browser, so private drafts do not need to be uploaded.
+
+> **Warning:** Browser print settings can change margins, headers, and footers in the final PDF.
+\`\`\`
+
+This pattern works in GitHub, static-site generators, PDF exports, and Word exports because the label is plain Markdown text. Avoid relying on syntax such as \`:::warning\` unless you know the destination renderer supports it.
+
+## Quotes in AI-Generated Notes
+
+ChatGPT, Claude, and other AI tools often use block quotes for two different things: quoted source material and highlighted advice. Before exporting to PDF, decide which one the quote is meant to be. If it is a real citation, add the source on the next quoted line. If it is a note or warning, label it explicitly so the reader does not mistake generated advice for an external quotation.
+
+AI output can also lose the \`>\` marker on wrapped lines. A quote should prefix every visual line in the source, including blank lines between paragraphs. If only the first line starts with \`>\`, the rest may render as regular body text.
+
+## PDF & Word Rendering Notes
+
+- **PDF output** uses the same quote styling as the HTML preview: a left border, muted text color, and extra padding. Long quotes wrap naturally inside the page width.
+- **Word output** converts quotes into indented paragraphs. Simple quotes, nested quotes, and quotes containing lists all survive, but very deep nesting can look crowded after Word applies its own paragraph spacing.
+- **Quoted code blocks** are valid Markdown, but they are easier to maintain if every line is consistently prefixed. When in doubt, paste the quote into the editor and check the preview before exporting.
+
+## Cleanup Checklist
+
+Before converting a document with many quotes, scan for four things:
+
+1. Every quoted paragraph starts with \`>\`.
+2. Blank lines inside multi-paragraph quotes also contain \`>\`.
+3. Attribution is included where the quote is an actual citation.
+4. Callouts are labeled as \`Note\`, \`Tip\`, or \`Warning\` instead of relying on visual style alone.
+
 ## Try It Yourself
 
 Experiment with block quotes in the editor below:`,
@@ -192,6 +263,8 @@ Experiment with block quotes in the editor below:`,
       { q: 'Can I nest quotes inside quotes?', a: 'Yes! Use >> for level 2 nesting, >>> for level 3, and so on. Most renderers support at least 3 levels of nesting.' },
       { q: 'Can I put code blocks inside quotes?', a: 'Yes, you can put any Markdown element inside a quote, including code blocks, lists, and headings. Just prefix each line with >.' },
       { q: 'How do I attribute a quote to someone?', a: 'Markdown doesn\'t have a built-in citation syntax. The common convention is to add a dash and the author name: > "Quote text" — Author Name' },
+      { q: 'Can I make note or warning boxes with block quotes?', a: 'Yes. The portable pattern is to write a label inside the quote, such as > **Note:** or > **Warning:**. Custom callout syntaxes are not supported by every Markdown renderer.' },
+      { q: 'Why did only the first line render as a quote?', a: 'Every quoted source line needs its own > marker. If wrapped lines or blank lines are missing it, the renderer treats those lines as normal text.' },
     ],
     relatedSlugs: ['markdown-new-line', 'markdown-cheat-sheet'],
   },
@@ -199,7 +272,7 @@ Experiment with block quotes in the editor below:`,
     slug: 'markdown-cheat-sheet',
     title: 'Markdown Cheat Sheet — Complete Syntax Reference 2026',
     description: 'Complete Markdown syntax reference with examples for headings, links, images, tables, code, and more.',
-    readTime: 6,
+    readTime: 8,
     content: `## Headings
 
 \`\`\`markdown
@@ -312,6 +385,50 @@ Our converter supports GFM extensions:
 - Tables (as shown above)
 - Auto-linked URLs
 
+## Export-Ready Document Structure
+
+A syntax cheat sheet is useful, but clean export depends on structure as much as syntax. For PDF or Word output, this pattern is the safest:
+
+\`\`\`markdown
+# One document title
+
+Short introduction.
+
+## Main section
+
+Normal paragraphs separated by blank lines.
+
+### Subsection
+
+- Lists for scan-friendly points
+- Tables only where tabular data is clearer than prose
+
+## Appendix
+
+\`\`\`
+
+Use one \`#\` heading for the document title, then \`##\` and \`###\` for sections. Do not jump from \`##\` directly to \`####\` unless the intermediate level really exists. This keeps the document readable, improves accessibility, and gives future tooling a clean outline.
+
+## Copy-Paste Checklist for AI Output
+
+When pasting Markdown from ChatGPT, Claude, Gemini, or another AI tool, check these items before exporting:
+
+- **Headings:** Make sure the first heading is the actual document title, not a chat response label.
+- **Lists:** Nested items should be indented consistently. If a sub-item looks like a normal paragraph in the preview, fix the spaces.
+- **Tables:** Count the pipes in each row if a table looks broken. Every row needs the same number of cells as the header.
+- **Code blocks:** Every opening triple backtick needs a closing triple backtick. One missing fence can turn the rest of the document into code.
+- **Links and images:** Private chat attachments or local file paths will not load for other readers. Use reachable HTTPS URLs for shareable documents.
+
+## What This Converter Supports
+
+The converter uses a GitHub Flavored Markdown pipeline, so the common writing features above are supported. It also accepts a limited amount of inline HTML, which is useful for practical Markdown tasks such as \`<br>\` inside table cells. For security and predictable exports, avoid complex raw HTML blocks, scripts, iframes, and interactive widgets. Markdown should describe the document; PDF and Word exports are static formats.
+
+## PDF vs Word Quick Choice
+
+- Choose **PDF** when the document is finished, needs to look consistent for readers, or contains images that must be visible.
+- Choose **Word** when the recipient needs to edit the content, comment on it, or reuse tables and lists.
+- Choose **HTML** when you want to paste rendered Markdown into a CMS, email, or another web-based editor.
+
 ## Try It Yourself
 
 Use the editor below to test any Markdown syntax:`,
@@ -321,6 +438,8 @@ Use the editor below to test any Markdown syntax:`,
       { q: 'How do I create a table of contents?', a: 'Markdown doesn\'t have built-in TOC support, but many tools generate one automatically from headings. In our converter, headings are rendered with proper hierarchy for easy navigation.' },
       { q: 'What\'s the maximum heading level?', a: 'Markdown supports 6 heading levels (# through ######), corresponding to HTML h1 through h6.' },
       { q: 'Can I embed images from URLs?', a: 'Yes, use the syntax ![alt text](image-url). The image will be embedded in PDF output if accessible.' },
+      { q: 'Should I use one # heading or many?', a: 'Use one # heading for the document title, then ## and ### for sections. Multiple H1s are valid Markdown, but they make exported documents harder to scan.' },
+      { q: 'Why did my AI-generated Markdown export poorly?', a: 'Usually because of a missing blank line, mismatched table pipes, or an unclosed code fence. The live preview is the fastest way to catch these issues before exporting.' },
     ],
     relatedSlugs: ['markdown-new-line', 'markdown-quote'],
   },
@@ -405,14 +524,51 @@ This is where the markdown-to-pdf.app converter's behavior diverges from a gener
 - **Word output** uses the \`docx\` package. Each Markdown table becomes a real Word table with explicit \`width: 100%\` so it spans the page, the first row gets a light gray fill, and every cell is its own paragraph for clean editing in Word or WPS. Column widths are evenly distributed by default — Word users can drag column borders to adjust after opening the file.
 - **No formulas, no merged cells.** Markdown tables are intentionally simple. If you need cell merging, formulas, or banded styling, paste the converted output into Word or Excel and add those features there.
 
+## Tables in AI-Generated Output
+
+Most LLMs are unusually good at Markdown tables, but each has quirks worth knowing about when you paste their output into a converter:
+
+- **ChatGPT** tends to produce well-aligned tables with leading and trailing pipes, evenly spaced columns, and exactly three dashes per column in the divider row. Almost always renders without manual cleanup.
+- **Claude** does the same, but is more likely to use longer cells with embedded \`<br>\` tags when describing options or comparisons. Our renderer handles this cleanly in PDF and Word.
+- **Gemini** sometimes drops the trailing pipe on body rows and occasionally produces tables wider than the source text suggests. If a Gemini-generated table looks ragged, paste it into the editor on the home page and watch the live preview — most rendering issues fix themselves once the content reaches a strict Markdown parser.
+
+If a table from any AI tool contains stray characters between the divider row and the body (a common artifact of streaming output), delete those lines and the table will render correctly.
+
+## Converting From Excel or Google Sheets
+
+The fastest way to turn a spreadsheet selection into a Markdown table:
+
+1. Select the cells you want, copy to the clipboard.
+2. Paste into an online tool like \`tableconvert.com\` or a VS Code extension like \`Excel to Markdown table\`.
+3. Paste the resulting Markdown into the editor on the home page.
+
+Native Markdown does not support cell merging, so any merged cells in your spreadsheet will collapse — usually the merged value lands in the top-left cell and the rest become empty. If preserving merged cells matters, export to Word instead and the converter will produce a real Word table you can re-merge by hand.
+
+## PDF Pagination for Long Tables
+
+The PDF export uses the browser's print engine, so very long tables behave the same way they would when you print any web page:
+
+- Tables that fit on one page render normally with no internal page breaks.
+- Tables that overflow break across pages, but the header row does **not** repeat on the new page by default — a known limitation of CSS-based PDF rendering.
+- If you need a repeated header on each page, the Word export is the better choice: open the .docx file, right-click the header row, and turn on *Repeat as header row at the top of each page*.
+
+For best results with long tables, keep cell text short, prefer right-alignment for numbers, and split very wide tables into two narrower ones.
+
+## CJK and Mixed-Language Tables
+
+If your table mixes Chinese, Japanese, or Korean text with Latin text, the visual width of the source code rarely matches the rendered width — a CJK character is roughly twice as wide as a Latin letter in monospace, but the Markdown parser counts both as a single cell unit. This means your raw source may look ragged in the editor while rendering perfectly in the preview. Trust the live preview, not the editor alignment.
+
 ## Try It Yourself
 
-Use the editor on the home page to paste a real table from your notes — the live preview shows exactly how it will look in the PDF or Word export.`,
+Use the editor on the home page to paste a real table from your notes — the live preview closely matches what the PDF or Word export will look like, and catches most layout issues before you ever click Convert.`,
     faq: [
       { q: 'Why does my table look broken in the preview?', a: 'The most common cause is a missing or malformed divider row. Make sure the second line of the table is dashes separated by pipes, with at least three dashes per column.' },
       { q: 'Can I have multi-line content in a single cell?', a: 'Pure Markdown table syntax does not support it. The standard workaround is an inline <br> HTML tag where you need the line break. Our renderer accepts <br> inside cells in both PDF and Word output.' },
       { q: 'How wide can a table be in PDF output?', a: 'Tables auto-fit the printable page width. If you have many columns or long content, cells wrap and the text becomes smaller. For very wide tables, consider exporting to Word instead and adjusting column widths there.' },
       { q: 'Are tables sortable in the PDF?', a: 'No — PDFs are static documents, not interactive spreadsheets. If you need sortable data, the HTML export or a real spreadsheet is a better fit.' },
+      { q: 'Does the table header repeat on every PDF page?', a: 'Not by default. The PDF export uses the browser print engine and CSS-based table rendering, which does not repeat header rows across page breaks. Word export does support repeating headers — open the .docx, right-click the header row, and enable "Repeat as header row at the top of each page".' },
+      { q: 'Can I merge cells in a Markdown table?', a: 'No, Markdown table syntax intentionally does not support cell merging. If you need merged cells, export to Word and merge cells manually, or write the table in raw HTML and the converter will render the HTML through to PDF.' },
+      { q: 'My table from Gemini or ChatGPT has uneven columns — how do I fix it?', a: 'Paste it into the editor on the home page and check the live preview. Most rendering issues fix themselves once the source hits a strict parser. If columns are still off, count the pipes per row — every row must have the same number of pipes as the header.' },
     ],
     relatedSlugs: ['markdown-list', 'markdown-cheat-sheet'],
   },
@@ -420,7 +576,7 @@ Use the editor on the home page to paste a real table from your notes — the li
     slug: 'markdown-image',
     title: 'Markdown Image — Syntax, Alt Text, and PDF/Word Output',
     description: 'Embed images in Markdown with alt text, titles, and reference syntax — plus how they behave when exported to PDF or Word.',
-    readTime: 6,
+    readTime: 7,
     content: `## The Basic Syntax
 
 Embedding an image in Markdown looks almost identical to a link, except for the leading exclamation mark:
@@ -497,6 +653,22 @@ A good alt text is one short sentence describing the image's content or purpose,
 - **Word output** has an important limitation worth knowing about: the current frontend pipeline does not embed image binaries into the \`.docx\` file. Markdown image syntax is rendered as the **alt text** wrapped in a paragraph (the same fallback you would see if the image failed to load). This is the trade-off for keeping conversions 100% in the browser without uploading your assets to a server. If image embedding in Word is critical, export to PDF instead or use the HTML output and paste it into Word.
 - **Broken images** in the PDF show as a tiny placeholder icon — verify your URLs before exporting.
 
+## Remote Images, Local Files, and Privacy
+
+A Markdown image is just a reference. The converter does not upload your local files, crawl your disk, or copy private assets into a server. That means local paths such as \`C:\\Users\\you\\diagram.png\` or \`./assets/chart.png\` only work if the browser can resolve them in the current context. For a document you plan to share, use a public HTTPS URL or host the image in the same site where the Markdown will be published.
+
+Private images from Slack, Notion, Google Docs, or a chat attachment often look fine for you because your browser is logged in. They may fail in a PDF export or for another reader. The simplest test is to open the image URL in a private window. If it asks for login, do not expect a portable PDF.
+
+## Image Size Strategy
+
+Standard Markdown has no built-in image width syntax. If an image is too large, the most reliable fix is to resize the source image before linking it. For HTML/PDF output, an inline \`<img width="480">\` tag can work, but it is less portable than Markdown image syntax and may not carry over cleanly into Word workflows.
+
+For screenshots in documentation, crop aggressively. A 1600px-wide full-screen screenshot usually becomes unreadable on a PDF page; a focused crop of the relevant panel is easier to read and produces a smaller file.
+
+## AI-Generated Image References
+
+AI tools sometimes invent placeholder image paths such as \`![chart](chart.png)\` or \`![diagram](attachment:image)\`. Those are not real, reachable assets. Before exporting, replace them with a real URL or delete the image line and write a short caption instead.
+
 ## Try It Yourself
 
 Drop a Markdown file that references images and convert it on the home page. The live preview shows what the PDF will look like; if you only see alt text in the preview, the image URL is not reachable from the browser.`,
@@ -512,7 +684,7 @@ Drop a Markdown file that references images and convert it on the home page. The
     slug: 'markdown-code-block',
     title: 'Markdown Code Block — Fenced, Indented, and Inline Code',
     description: 'Master Markdown code blocks: fenced blocks with language hints, indented blocks, inline code, and PDF rendering tips.',
-    readTime: 6,
+    readTime: 7,
     content: `## Inline Code
 
 Wrap a short snippet in single backticks to render it as monospaced code inside a paragraph:
@@ -601,6 +773,25 @@ A code block is rendered **verbatim**: Markdown syntax inside it does not get pa
 - **Word output** renders each fenced block as a Word paragraph with Courier New, size 9pt, on a \`#F6F8FA\` shading background. Each paragraph is one logical block — that means line wrapping in Word follows Word's own rules and may differ slightly from the live preview.
 - **Inline code** in Word switches mid-paragraph to Courier New without changing the paragraph's background, matching the look in the HTML preview.
 
+## Choosing Language Identifiers
+
+Use short, common identifiers rather than marketing names. Write \`ts\` or \`typescript\`, not \`TypeScript React app\`; write \`bash\`, not \`terminal\`; write \`yaml\`, not \`yml config file\`. The language hint is metadata for the renderer, not a caption. If you need a caption, put it in the paragraph before the code block.
+
+For framework-specific files, choose the closest syntax family: \`tsx\` for React TypeScript, \`jsx\` for React JavaScript, \`json\` for package files, and \`bash\` for shell commands. Unknown identifiers still render as code, but they do not help syntax highlighting.
+
+## Long Code Blocks in PDF
+
+PDF pages are narrow compared with code editors. Long lines wrap, which keeps the content visible but can make copy-paste harder to read. For export-friendly code:
+
+- Break long commands with backslashes where the shell allows it.
+- Prefer concise examples over full production files.
+- Put important comments above the relevant line instead of far to the right.
+- Split unrelated snippets into separate code blocks with headings in between.
+
+## Copying Code From AI Tools
+
+AI responses sometimes include prose inside the same fenced block as the code, especially when the answer streams and the closing fence is missing. If the preview shows your explanation in monospace, close the fence before the prose. Also check that generated Markdown examples use four backticks for the outer fence when they demonstrate triple-backtick syntax inside.
+
 ## Try It Yourself
 
 Paste a code snippet on the home page and watch the live preview. Switch between the PDF and Word converters to see the same code rendered for each target — the difference in how line wrapping and fonts behave is most visible on snippets that have long lines.`,
@@ -616,7 +807,7 @@ Paste a code snippet on the home page and watch the live preview. Switch between
     slug: 'markdown-link',
     title: 'Markdown Link — Inline, Reference, and Autolink Syntax',
     description: 'Every way to write links in Markdown: inline, reference, autolink, anchor, and email — plus how they render in PDF.',
-    readTime: 6,
+    readTime: 7,
     content: `## Inline Links
 
 The most common form: square brackets around the visible text, parentheses around the URL.
@@ -720,6 +911,34 @@ Combine link and image syntax to make a clickable image:
 - **Word output** writes each Markdown link as a real Word hyperlink: the visible text is preserved, and the URL is stored as the hyperlink target so Ctrl-clicking in Word opens it. Visited-link color and underline follow Word's default style.
 - **Anchor links** (\`#heading\`) work in HTML but **not** in PDF: PDFs do not preserve the original document's anchor names, only their physical positions. For cross-references inside a PDF, use page numbers or a static table of contents.
 
+## Links From AI and Chat Exports
+
+AI tools often summarize sources as plain text instead of real Markdown links, for example \`OpenAI docs: https://example.com\`. GitHub Flavored Markdown will usually auto-link the bare URL, but explicit Markdown links are cleaner in exported documents:
+
+\`\`\`markdown
+Read the [OpenAI docs](https://example.com) for the API reference.
+\`\`\`
+
+When you ask an AI model to produce a report, add a follow-up instruction such as "write every source as a Markdown link with descriptive link text." That reduces cleanup before PDF or Word export.
+
+## Print-Friendly Link Text
+
+Avoid vague labels such as "click here" or "this page." In a PDF, readers may print the document or read it without hovering, so the visible text should explain the destination:
+
+- Good: \`[Google Search Console sitemap report](https://search.google.com/search-console)\`
+- Weak: \`[click here](https://search.google.com/search-console)\`
+
+If the URL itself is important, write it in the text after the link: \`Google Search Console (https://search.google.com/search-console)\`.
+
+## Link Validation Checklist
+
+Before exporting a long document, check:
+
+1. Important external links open in a private browser window.
+2. Mail links start with \`mailto:\` if the visible text is not already an email address.
+3. URLs with parentheses are wrapped in angle brackets inside the Markdown link.
+4. Internal anchor links are tested in HTML; for PDF, use section names or page numbers instead.
+
 ## Try It Yourself
 
 Paste any document with links into the editor on the home page. The live preview shows the clickable result; export to PDF or Word to verify your links survived the round trip.`,
@@ -735,7 +954,7 @@ Paste any document with links into the editor on the home page. The live preview
     slug: 'markdown-list',
     title: 'Markdown List — Ordered, Unordered, Nested, and Task Lists',
     description: 'Write Markdown lists: bullets, numbered lists, nested lists, and task lists — with notes on how each renders in PDF and Word.',
-    readTime: 6,
+    readTime: 7,
     content: `## Unordered Lists
 
 Any of \`-\`, \`*\`, or \`+\` at the start of a line creates a bullet item. Pick one and stick with it for consistency:
@@ -851,6 +1070,26 @@ A blank line between the list item and the continuation is required.
 - **Word output** has a specific quirk worth understanding. Earlier versions of the converter used \`docx\`'s built-in numbering feature, which has a subtle problem: every Markdown list shared the same numbering reference, so the second ordered list in a document continued from where the first one left off (\`5, 6, 7\` instead of \`1, 2, 3\`). The current converter writes ordered list numbers as **literal text** — \`1. \`, \`2. \`, \`3. \` are inserted directly into the paragraph — so every Markdown list restarts at 1 (or at whatever \`start\` value you used) and behaves as you would expect in Word and WPS.
 - **Unordered list bullets** in Word use \`docx\`'s bullet style at level 0. Nested unordered lists currently flatten to the same level — full nested bullet hierarchy in Word is a known limitation; nested ordered lists work as expected because the explicit-number approach extends naturally to nested numbering.
 
+## Lists in AI-Generated Drafts
+
+AI tools love lists, but they often mix purposes: a paragraph starts as a bullet list, then becomes a numbered procedure, then ends with task-list checkboxes. Before export, normalize the list type:
+
+- Use **ordered lists** for steps that must happen in sequence.
+- Use **unordered lists** for options, features, or non-sequential points.
+- Use **task lists** only when completion state matters.
+
+This makes the exported PDF easier to scan and makes the Word document easier to edit later.
+
+## Spacing for Readable PDFs
+
+Dense lists save space, but a PDF with ten nested levels is hard to read. If a list item needs more than two sentences, consider turning it into a subsection with a heading. If a nested list goes deeper than three levels, split it into multiple smaller lists.
+
+For checklists, keep each item action-oriented: "Configure support email" is better than "Email." The checkbox then communicates status and the text communicates the task.
+
+## When a Table Is Better Than a List
+
+Lists are ideal for sequence and hierarchy. Tables are better when every item has the same fields, such as feature, status, owner, and due date. If each bullet starts repeating the same labels, convert the list into a Markdown table before exporting.
+
 ## Try It Yourself
 
 Try converting a real task list or step-by-step guide on the home page. Compare the PDF and Word outputs side by side — both faithfully preserve the structure, with the small caveats noted above.`,
@@ -861,6 +1100,312 @@ Try converting a real task list or step-by-step guide on the home page. Compare 
       { q: 'Do nested ordered lists number correctly in Word?', a: 'Yes. The converter writes the number as literal text (1. 1.1. 1.1.1.) so nesting is preserved and each list still restarts cleanly. Earlier versions had a bug where lists shared numbering state — that has been fixed.' },
     ],
     relatedSlugs: ['markdown-table', 'markdown-cheat-sheet'],
+  },
+  {
+    slug: 'markdown-to-pdf-best-practices',
+    title: 'Markdown to PDF Best Practices — Clean Exports from AI Text',
+    description: 'Practical rules for exporting Markdown to PDF: structure, headings, tables, code blocks, images, page breaks, and final checks.',
+    readTime: 7,
+    content: `## Start With a Document Outline
+
+The cleanest PDF exports start with clean Markdown. Before worrying about fonts or margins, make sure the document has a simple outline:
+
+\`\`\`markdown
+# Document title
+
+Short summary or introduction.
+
+## Section one
+
+Body text.
+
+## Section two
+
+- Key point
+- Key point
+
+## Appendix
+\`\`\`
+
+Use one \`#\` heading for the document title, then \`##\` and \`###\` for structure. This gives the browser print engine predictable blocks to lay out and makes the exported PDF easier to scan.
+
+## Keep Paragraphs and Lists Separate
+
+Markdown needs blank lines between paragraphs, headings, lists, tables, and code blocks. If a list sticks to the paragraph above it, or a table renders as plain text, the missing blank line is usually the cause.
+
+For AI-generated text, scan for long paragraphs that were hard-wrapped at 80 columns. A single newline is not a paragraph break in Markdown; use a blank line between real paragraphs.
+
+## Tables: Prefer Narrow and Focused
+
+Tables are often the first thing to break in a PDF because pages are narrower than screens. Use Markdown tables for compact, structured data:
+
+- 3-5 columns is comfortable.
+- Long explanations should move below the table.
+- Use right alignment for numeric columns.
+- Use \`<br>\` inside a cell only when a short two-line label is clearer than one long line.
+
+If a table has eight columns, merged cells, formulas, or filtering, it probably belongs in a spreadsheet or a Word document rather than a PDF-first Markdown export.
+
+## Images: Use Reachable URLs
+
+PDF export can only include images that the browser can load. Public HTTPS URLs work best. Private chat attachments, local file paths, and login-protected document images often fail once the export iframe tries to load them.
+
+Before exporting a document that depends on images, open each image URL in a private browser window. If it does not load there, replace it or write a caption instead.
+
+## Code Blocks: Add Language Hints
+
+For code-heavy documents, always use fenced blocks and a language hint:
+
+\`\`\`\`markdown
+\`\`\`ts
+const ok = true;
+\`\`\`
+\`\`\`\`
+
+Language hints make the preview easier to read and keep the source self-documenting. Long lines wrap in PDF output, so trim examples to the important part instead of pasting entire production files.
+
+## Page Break Reality
+
+Browser-based PDF export does not give you the same page-control features as InDesign or Microsoft Word. You should expect automatic page breaks based on content height. Keep sections short, avoid huge images, and split long tables if you want predictable pagination.
+
+If exact page breaks, repeated table headers, or formal corporate templates are required, export to Word first and finish pagination there.
+
+## Final Export Checklist
+
+Before you open the print dialog:
+
+1. Check the live preview for broken tables, unclosed code fences, and missing images.
+2. Remove YAML frontmatter or metadata blocks that should not appear in the PDF.
+3. Verify important links by opening them in a private browser window.
+4. Pick "Save as PDF" in the browser print dialog and review the preview pane before saving.
+
+## Privacy Note
+
+The converter runs in your browser. Your Markdown text does not need to be uploaded to a server for PDF, Word, or HTML export. That is useful for drafts, client notes, internal specs, and AI-generated reports that should stay on your device.`,
+    faq: [
+      { q: 'Why does my PDF look different from the live preview?', a: 'The preview is HTML and the PDF is produced by the browser print engine. They should be close, but browser print settings, margins, headers, footers, and page breaks can change the final result.' },
+      { q: 'Can I force a page break in Markdown?', a: 'Standard Markdown has no page-break syntax. Some HTML/CSS tricks work in specific renderers, but for reliable manual pagination use Word after export.' },
+      { q: 'What is the best Markdown structure for PDF?', a: 'Use one H1 title, H2 section headings, short paragraphs, focused lists, narrow tables, and fenced code blocks with language hints.' },
+      { q: 'Should I export AI text to PDF or Word?', a: 'Use PDF when the text is ready to share. Use Word if someone still needs to edit, comment, or apply a formal template.' },
+    ],
+    relatedSlugs: ['export-chatgpt-markdown-to-pdf', 'markdown-table', 'markdown-code-block'],
+  },
+  {
+    slug: 'export-chatgpt-markdown-to-pdf',
+    title: 'Export ChatGPT Markdown to PDF — Copy, Clean, and Save',
+    description: 'Turn ChatGPT Markdown into a clean PDF. Learn what to copy, what to clean, and how tables, links, code blocks, and images behave.',
+    readTime: 6,
+    content: `## Why ChatGPT Output Works Well as Markdown
+
+ChatGPT often writes answers using headings, bullet lists, tables, code fences, and links. That is already close to Markdown, which makes it easy to turn a response into a PDF for sharing, archiving, or sending to a client.
+
+The best workflow is simple: copy the response, paste it into the converter, inspect the live preview, then open the browser print dialog and choose "Save as PDF".
+
+## Step-by-Step Workflow
+
+1. Ask ChatGPT for the answer in Markdown format.
+2. Copy only the final response, not the surrounding chat UI.
+3. Paste the text into the editor.
+4. Fix headings, tables, code fences, or placeholder links if the preview shows problems.
+5. Click the PDF conversion button, review the print preview, and save as PDF.
+
+For reports, ask ChatGPT to start with a single \`#\` title and use \`##\` for sections. That produces a cleaner exported document than a loose list of bullets.
+
+## Prompt That Produces Cleaner Markdown
+
+Try adding this instruction to your prompt:
+
+\`\`\`text
+Write the answer in clean GitHub Flavored Markdown.
+Use one H1 title, H2 section headings, short paragraphs, and Markdown tables only when tabular data is useful.
+Use fenced code blocks with language identifiers.
+Do not include placeholder image links.
+\`\`\`
+
+This reduces the cleanup you need to do before exporting.
+
+## Common Cleanup Tasks
+
+**Remove chat artifacts.** Chat responses sometimes include labels such as "Sure — here is the report:" or a closing offer to continue. Delete those if they do not belong in the PDF.
+
+**Fix tables.** If a table looks broken, count the pipe characters in each row. Every row needs the same number of cells as the header.
+
+**Close code fences.** A missing closing triple backtick can turn the rest of the document into one large code block.
+
+**Replace fake links.** ChatGPT may output examples such as \`https://example.com\` or invented source links. Verify real URLs before exporting a public document.
+
+## Tables, Code, and Images
+
+Markdown tables from ChatGPT usually export well when they are narrow. If the table is wide, split it into smaller tables or export to Word for final layout.
+
+Code blocks should include a language hint such as \`js\`, \`python\`, \`bash\`, or \`json\`. This keeps the source clear and improves the preview.
+
+Image references in ChatGPT output are often placeholders. If the image URL is not real and reachable, the PDF cannot include it. Use public HTTPS images or remove the image line.
+
+## Privacy and Local Conversion
+
+Pasting ChatGPT output into the converter does not send that Markdown to a server for conversion. The preview and export run in your browser. That matters when the response contains internal notes, drafts, or client-facing work that you do not want to upload again.
+
+## When to Choose Word Instead
+
+PDF is best for a finished response. Choose Word when the ChatGPT output still needs track changes, manual page breaks, a corporate template, or table editing. You can also export to Word first, clean the document there, and then save the final version as PDF from Word.`,
+    faq: [
+      { q: 'Can I export a ChatGPT answer directly to PDF?', a: 'Yes. Copy the Markdown-style answer, paste it into the converter, check the preview, then use the PDF conversion flow and save from the browser print dialog.' },
+      { q: 'Why did my ChatGPT table break?', a: 'The usual cause is a row with too many or too few pipe characters. Every body row must match the header column count.' },
+      { q: 'Is pasted ChatGPT content uploaded?', a: 'No. The conversion runs in your browser, so the Markdown text does not need to leave your device.' },
+      { q: 'What should I ask ChatGPT for before exporting?', a: 'Ask for clean GitHub Flavored Markdown with one H1, H2 sections, fenced code blocks, and no placeholder image links.' },
+    ],
+    relatedSlugs: ['markdown-to-pdf-best-practices', 'markdown-new-line', 'markdown-table'],
+  },
+  {
+    slug: 'markdown-vs-word',
+    title: 'Markdown vs Word — When to Use Each Writing Format',
+    description: 'Compare Markdown and Microsoft Word for drafting, editing, sharing, PDF export, tables, images, and collaboration.',
+    readTime: 6,
+    content: `## The Short Version
+
+Markdown is best for fast drafting, structured plain text, developer documentation, AI-generated reports, and content that needs to move between tools. Word is best for formal editing, comments, tracked changes, precise pagination, corporate templates, and final documents that require manual layout.
+
+You do not have to choose one forever. A practical workflow is: write in Markdown, export to Word when collaboration or final formatting begins, and save the final version as PDF when the content is locked.
+
+## Where Markdown Wins
+
+Markdown is plain text. That gives it several advantages:
+
+- It is easy to copy from ChatGPT, Claude, GitHub, notes apps, and code editors.
+- It keeps headings, lists, links, code blocks, and tables readable even before rendering.
+- It works well with version control because diffs are text-based.
+- It avoids hidden formatting that can accumulate in rich-text editors.
+- It is fast for structured drafts where content matters more than visual design.
+
+For technical writing, product specs, release notes, knowledge-base articles, and AI-generated summaries, Markdown is often the better starting point.
+
+## Where Word Wins
+
+Word is a layout and review tool. It is stronger when you need:
+
+- Comments and tracked changes.
+- Manual page breaks and section breaks.
+- Headers, footers, page numbers, and repeated table headers.
+- Corporate templates and legal formatting.
+- Advanced tables with merged cells, formulas, or precise column widths.
+- Offline review by non-technical stakeholders.
+
+If the final deliverable must match a formal template, do the drafting in Markdown if it helps, but finish in Word.
+
+## PDF Export Differences
+
+Markdown-to-PDF export uses the browser print engine. It is fast and good for clean documents, but page breaks are automatic and depend on the browser print settings.
+
+Word-to-PDF export gives more manual layout control. You can force page breaks, repeat table headers, tune margins, and review pagination before saving.
+
+Use Markdown-to-PDF for speed. Use Word-to-PDF for documents where pagination itself is part of the deliverable.
+
+## Tables, Images, and Code
+
+Markdown tables are excellent for compact comparisons and simple data. Word tables are better for merged cells, multi-page tables, and manually tuned widths.
+
+Markdown image syntax is clean, but PDF export requires the image URL to be reachable. Word is better if you need to embed and resize local images manually.
+
+Markdown is clearly better for code blocks. Fenced blocks with language hints are readable in source and render predictably. Word can display code, but it is more work to maintain.
+
+## Recommended Workflow
+
+1. Draft in Markdown for speed and clean structure.
+2. Use the live preview to catch syntax issues.
+3. Export to PDF for immediate sharing, or export to Word if review and final formatting are still needed.
+4. If the document becomes layout-heavy, stop editing the Markdown source and finish in Word.
+
+That boundary is important. Markdown is a writing format, not a full desktop publishing system.`,
+    faq: [
+      { q: 'Is Markdown better than Word?', a: 'Markdown is better for structured plain-text drafting and technical content. Word is better for final formatting, comments, tracked changes, and precise layout.' },
+      { q: 'Can I convert Markdown to Word and keep editing?', a: 'Yes. The Word export is useful when the Markdown draft is ready for review, comments, or template formatting.' },
+      { q: 'Which format is better for PDF export?', a: 'Markdown-to-PDF is faster for clean documents. Word-to-PDF is better when you need exact page breaks, headers, footers, or formal templates.' },
+      { q: 'Should AI-generated reports start in Markdown?', a: 'Usually yes. AI tools produce headings, lists, tables, and code blocks naturally, which makes Markdown a good intermediate format.' },
+    ],
+    relatedSlugs: ['markdown-to-pdf-best-practices', 'markdown-list', 'markdown-table'],
+  },
+  {
+    slug: 'markdown-frontmatter',
+    title: 'Markdown Frontmatter — YAML Metadata Explained',
+    description: 'Learn what Markdown frontmatter is, where YAML metadata is used, and what to do with it before exporting Markdown to PDF or Word.',
+    readTime: 5,
+    content: `## What Is Frontmatter?
+
+Frontmatter is a metadata block placed at the very top of a Markdown file. It is most often written in YAML and surrounded by triple dashes:
+
+\`\`\`markdown
+---
+title: Markdown to PDF Best Practices
+description: Export clean PDFs from Markdown
+date: 2026-05-26
+tags:
+  - markdown
+  - pdf
+---
+
+# Markdown to PDF Best Practices
+
+Document body starts here.
+\`\`\`
+
+The metadata is not usually meant to be visible content. Static-site generators, documentation tools, and blog engines read it to set titles, descriptions, dates, tags, authors, layouts, and canonical URLs.
+
+## Common Frontmatter Fields
+
+You will often see fields like:
+
+- \`title\` — page title used by the site or CMS.
+- \`description\` — SEO or summary text.
+- \`date\` or \`updated\` — publish and update timestamps.
+- \`author\` — author name or profile reference.
+- \`tags\` or \`categories\` — grouping fields.
+- \`draft\` — whether a page should be published.
+- \`slug\` — the public URL path.
+
+There is no universal required set. Each tool defines its own schema.
+
+## YAML Rules That Matter
+
+YAML is whitespace-sensitive. Use spaces, not tabs. Keep indentation consistent. Quote values when they contain colons, leading special characters, or ambiguous dates.
+
+\`\`\`yaml
+title: "Markdown: PDF Export Notes"
+draft: false
+tags:
+  - markdown
+  - export
+\`\`\`
+
+If a frontmatter block fails to parse in a static-site generator, the page may not build. For plain PDF export, the main issue is simpler: metadata may appear as visible text if your renderer does not treat it specially.
+
+## Frontmatter and PDF/Word Export
+
+This converter is designed for visible document content. If you paste a Markdown file that starts with frontmatter, remove the metadata block before exporting unless you actually want those lines in the output.
+
+For a polished PDF, convert useful metadata into visible content:
+
+\`\`\`markdown
+# Markdown to PDF Best Practices
+
+Updated: May 26, 2026
+Author: Markdown to PDF
+\`\`\`
+
+That reads naturally in a PDF or Word document and avoids leaking internal CMS fields such as \`draft\`, \`slug\`, or private tags.
+
+## When to Keep Frontmatter
+
+Keep frontmatter when the Markdown file is going back into a blog, docs site, static-site generator, or CMS. Remove or rewrite it when the file is becoming a standalone PDF, Word document, email, or handout.
+
+If you are not sure, ask: "Will the reader need to see this line?" If the answer is no, it probably belongs in frontmatter for a website, not in an exported document.`,
+    faq: [
+      { q: 'Is frontmatter part of standard Markdown?', a: 'No. It is a common convention used by static-site generators and CMS tools, but it is not part of the original Markdown syntax.' },
+      { q: 'Should I keep frontmatter when exporting to PDF?', a: 'Usually no. Remove it or convert important fields into visible document text such as title, author, and updated date.' },
+      { q: 'Why does my frontmatter show up in the PDF?', a: 'Because the renderer treated it as ordinary Markdown instead of metadata. Delete the frontmatter block before exporting if it should not be visible.' },
+      { q: 'Can frontmatter include arrays?', a: 'Yes. YAML supports arrays, usually written as indented dash items under a field such as tags.' },
+    ],
+    relatedSlugs: ['markdown-cheat-sheet', 'markdown-to-pdf-best-practices', 'markdown-code-block'],
   },
 ];
 

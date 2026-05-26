@@ -11,6 +11,8 @@ const NAV_ITEMS = [
   { href: '/to-word', label: 'Convert to Word' },
   { href: '/to-html', label: 'Convert to HTML' },
   { href: '/guides', label: 'Guides' },
+  { href: '/about', label: 'About' },
+  { href: '/contact', label: 'Contact' },
   { href: '/auth/login', label: 'Login' },
 ];
 
@@ -19,6 +21,8 @@ const ZH_NAV_LABELS: Record<string, string> = {
   'Convert to Word': '转 Word',
   'Convert to HTML': '转 HTML',
   Guides: '指南',
+  About: '关于',
+  Contact: '联系',
   Login: '登录',
 };
 

@@ -45,7 +45,7 @@ export function RateLimitModal({ open, onClose, isLoggedIn }: RateLimitModalProp
             </Button>
           </Link>
           <p className="text-xs text-gray-400 text-center">
-            HTML conversions are always free and unlimited.
+            HTML conversion is free to use and runs in your browser.
           </p>
         </div>
       )}
