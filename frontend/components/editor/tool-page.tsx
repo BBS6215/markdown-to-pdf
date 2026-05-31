@@ -5,7 +5,7 @@
  * Source: 03-产品结构 §4.3 (工具页模块), 04-UI规范 §2.1 (工具页层级)
  */
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import type { ConvertFormat } from '@/lib/types';
 import { FormatSwitcher } from '@/components/layout/format-switcher';
 import { MarkdownEditor } from '@/components/editor/markdown-editor';
@@ -32,6 +32,12 @@ export function ToolPage({ format }: ToolPageProps) {
   const [mobileTab, setMobileTab] = useState<MobileTab>('edit');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // Clear-with-undo: clearing is destructive and irreversible, so instead of a
+  // confirm dialog (which interrupts the rapid edit→convert→clear loop users
+  // asked for) we clear immediately and offer a few-second Undo toast.
+  const [clearedSnapshot, setClearedSnapshot] = useState<string | null>(null);
+  const undoTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   const pathname = usePathname();
   const lang = pathname.startsWith('/zh') ? 'zh' : 'en';
   const t = getTranslations(lang);
@@ -46,6 +52,40 @@ export function ToolPage({ format }: ToolPageProps) {
   const handleCopyHtml = format === 'html' ? () => copyHtml(content) : undefined;
   const handleUpload = () => fileInputRef.current?.click();
   const handleFileContent = (fileContent: string) => updateContent(fileContent);
+
+  const handleClear = () => {
+    if (!content) return;
+    if (undoTimerRef.current) clearTimeout(undoTimerRef.current);
+    setClearedSnapshot(content);
+    updateContent('');
+    undoTimerRef.current = setTimeout(() => {
+      setClearedSnapshot(null);
+      undoTimerRef.current = null;
+    }, 6000);
+  };
+
+  const handleUndoClear = () => {
+    if (undoTimerRef.current) clearTimeout(undoTimerRef.current);
+    undoTimerRef.current = null;
+    if (clearedSnapshot !== null) updateContent(clearedSnapshot);
+    setClearedSnapshot(null);
+  };
+
+  useEffect(() => {
+    if (clearedSnapshot === null || !content) return;
+    if (undoTimerRef.current) clearTimeout(undoTimerRef.current);
+    undoTimerRef.current = null;
+    setClearedSnapshot(null);
+  }, [clearedSnapshot, content]);
+
+  useEffect(() => {
+    return () => {
+      if (undoTimerRef.current) clearTimeout(undoTimerRef.current);
+    };
+  }, []);
+
+  const clearedLabel = lang === 'zh' ? '已清空' : 'Cleared';
+  const undoLabel = lang === 'zh' ? '撤销' : 'Undo';
 
   return (
     <div className="max-w-7xl mx-auto">
@@ -129,6 +169,8 @@ export function ToolPage({ format }: ToolPageProps) {
             onConvert={handleConvert}
             onCopyHtml={handleCopyHtml}
             onUpload={handleUpload}
+            onClear={handleClear}
+            clearDisabled={!content}
             onRetry={retry}
             lang={lang}
           />
@@ -152,6 +194,23 @@ export function ToolPage({ format }: ToolPageProps) {
             }}
           />
         </>
+      )}
+
+      {/* Undo toast — appears after Clear, lets the user restore the snapshot
+          within a few seconds without breaking the continuous-use flow.
+          Hidden the moment the editor is non-empty again: once the user has
+          pasted/typed a new version, Undo must not clobber it with the old
+          snapshot (the toast and snapshot still expire on the 6s timer). */}
+      {clearedSnapshot !== null && !content && (
+        <div className="fixed bottom-20 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 px-4 py-2.5 bg-gray-900 text-white text-sm rounded-lg shadow-lg">
+          <span>{clearedLabel}</span>
+          <button
+            onClick={handleUndoClear}
+            className="font-medium text-blue-300 hover:text-blue-200 transition-colors"
+          >
+            {undoLabel}
+          </button>
+        </div>
       )}
 
       {/* SEO Content Section — below-the-fold, always SSR rendered (01 §6.4, 07 任务 4.13-4.19) */}
