@@ -8,7 +8,7 @@
  * (progressive enhancement for mobile compatibility, 03-1 §3 P0-问题1).
  */
 
-import { useEffect, useRef, useState } from 'react';
+import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { EditorView } from '@codemirror/view';
 import { EditorState } from '@codemirror/state';
 import { createExtensions } from '@/lib/editor/cm6-extensions';
@@ -21,7 +21,16 @@ interface MarkdownEditorProps {
   lang?: string;
 }
 
-export function MarkdownEditor({ value, onChange, className = '', lang = 'en' }: MarkdownEditorProps) {
+/** Imperative handle so callers (e.g. Clear) can move focus into the editor. */
+export interface MarkdownEditorHandle {
+  focus: () => void;
+}
+
+export const MarkdownEditor = forwardRef<MarkdownEditorHandle, MarkdownEditorProps>(function MarkdownEditor(
+  { value, onChange, className = '', lang = 'en' },
+  ref,
+) {
+  const rootRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const viewRef = useRef<EditorView | null>(null);
   const initialValueRef = useRef(value);
@@ -29,6 +38,24 @@ export function MarkdownEditor({ value, onChange, className = '', lang = 'en' }:
   const onChangeRef = useRef(onChange);
   onChangeRef.current = onChange;
   const t = getTranslations(lang);
+
+  useImperativeHandle(ref, () => ({
+    focus: () => {
+      const view = viewRef.current;
+      if (view) {
+        // Put the cursor at line 1, then focus WITHOUT letting the browser
+        // auto-scroll the caret into view — that auto-scroll fights our own
+        // page scroll below and makes the final position non-deterministic.
+        view.dispatch({ selection: { anchor: 0 } });
+        view.contentDOM.focus({ preventScroll: true });
+      }
+      // Our scroll runs last, so it alone decides where the page lands: the
+      // editor panel pinned to the top of the viewport, ready to type. focus()
+      // alone does NOT reliably scroll the page when CM already holds focus,
+      // which previously left users stranded at the page bottom after Clear.
+      rootRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    },
+  }), []);
 
   // Initialize CodeMirror
   useEffect(() => {
@@ -75,7 +102,7 @@ export function MarkdownEditor({ value, onChange, className = '', lang = 'en' }:
   }, [value]);
 
   return (
-    <div className={`relative ${className}`}>
+    <div ref={rootRef} className={`relative ${className}`}>
       {/* Panel header */}
       <div className="bg-gray-50 border-b border-gray-200 px-4 py-2 min-h-[72px] flex flex-col justify-center">
         <span className="text-sm font-medium text-gray-700">{t.editor.inputTitle}</span>
@@ -94,12 +121,13 @@ export function MarkdownEditor({ value, onChange, className = '', lang = 'en' }:
         />
       )}
 
-      {/* CodeMirror container */}
+      {/* CodeMirror container — height is capped inside the CM theme
+          (.cm-editor maxHeight + .cm-scroller overflow), so CodeMirror's own
+          scroller owns the scroll. The wrapper just hosts it; no outer scroll. */}
       <div
         ref={containerRef}
-        className={`overflow-auto ${cmLoaded ? '' : 'h-0 overflow-hidden'}`}
-        style={{ minHeight: cmLoaded ? '400px' : undefined }}
+        className={cmLoaded ? '' : 'h-0 overflow-hidden'}
       />
     </div>
   );
-}
+});

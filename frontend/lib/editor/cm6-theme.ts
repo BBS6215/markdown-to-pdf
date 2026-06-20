@@ -9,12 +9,23 @@ export const lightTheme = EditorView.theme({
     backgroundColor: '#F9FAFB',  // gray-50
     fontSize: '14px',
     fontFamily: 'var(--font-jetbrains-mono, "JetBrains Mono", monospace)',
+    // Cap the editor height and let CodeMirror's own .cm-scroller own the
+    // scroll (keeps viewport virtualization + correct cursor-into-view for
+    // long docs). Without this the editor grows to full content height and
+    // pushes the whole page down — the root cause of the post-Clear jump.
+    maxHeight: '65vh',
+  },
+  '.cm-scroller': {
+    overflow: 'auto',
   },
   '.cm-content': {
     caretColor: '#111827',       // gray-900
     color: '#111827',
     padding: '16px',
-    minHeight: '400px',
+    // Clamp to the editor cap so short/landscape viewports don't force an
+    // internal scroll on an empty editor, and keep parity with the preview
+    // pane's minHeight (both panes stay the same height at every viewport).
+    minHeight: 'min(400px, 65vh)',
   },
   '.cm-gutters': {
     backgroundColor: '#F9FAFB',  // gray-50

@@ -8,7 +8,7 @@
 import { useState, useRef, useEffect } from 'react';
 import type { ConvertFormat } from '@/lib/types';
 import { FormatSwitcher } from '@/components/layout/format-switcher';
-import { MarkdownEditor } from '@/components/editor/markdown-editor';
+import { MarkdownEditor, type MarkdownEditorHandle } from '@/components/editor/markdown-editor';
 import { MarkdownPreview } from '@/components/editor/markdown-preview';
 import { FileDropzone } from '@/components/editor/file-dropzone';
 import { EditorToolbar } from '@/components/editor/editor-toolbar';
@@ -31,6 +31,7 @@ export function ToolPage({ format }: ToolPageProps) {
   const isMobile = useMobileDetect();
   const [mobileTab, setMobileTab] = useState<MobileTab>('edit');
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const editorRef = useRef<MarkdownEditorHandle>(null);
 
   // Clear-with-undo: clearing is destructive and irreversible, so instead of a
   // confirm dialog (which interrupts the rapid edit→convert→clear loop users
@@ -58,6 +59,13 @@ export function ToolPage({ format }: ToolPageProps) {
     if (undoTimerRef.current) clearTimeout(undoTimerRef.current);
     setClearedSnapshot(content);
     updateContent('');
+    // Reported UX issue: after clearing a long document the page collapses and
+    // the browser clamps scroll to the (now short) page bottom, leaving the
+    // editor off-screen. Move focus back into the editor so the user can type
+    // immediately; focusing also scrolls it into view. On mobile, make sure the
+    // edit tab is active first. Wait one frame for the collapse to settle.
+    if (isMobile) setMobileTab('edit');
+    requestAnimationFrame(() => editorRef.current?.focus());
     undoTimerRef.current = setTimeout(() => {
       setClearedSnapshot(null);
       undoTimerRef.current = null;
@@ -151,7 +159,7 @@ export function ToolPage({ format }: ToolPageProps) {
                   isMobile && mobileTab !== 'edit' ? 'hidden' : ''
                 }`}
               >
-                <MarkdownEditor value={content} onChange={updateContent} lang={lang} />
+                <MarkdownEditor ref={editorRef} value={content} onChange={updateContent} lang={lang} />
               </div>
               <div className={`${isMobile && mobileTab !== 'preview' ? 'hidden' : ''}`}>
                 <MarkdownPreview markdown={content} lang={lang} />

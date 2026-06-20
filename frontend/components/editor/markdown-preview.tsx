@@ -71,7 +71,7 @@ export function MarkdownPreview({ markdown, className = '', lang = 'en' }: Markd
 
       <div
         className="markdown-body p-4 overflow-auto bg-white flex-1"
-        style={{ minHeight: '400px' }}
+        style={{ minHeight: 'min(400px, 65vh)', maxHeight: '65vh' }}
         dangerouslySetInnerHTML={{ __html: html }}
       />
 
