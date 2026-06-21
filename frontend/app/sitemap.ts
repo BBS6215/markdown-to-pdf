@@ -15,6 +15,12 @@
  * includes every public page for both languages.
  *
  * Effective count: 21 pages × 2 languages = 42 URLs.
+ *
+ * lastModified policy: each page carries a STABLE real date (not new Date()).
+ * Google ignores <lastmod> when it changes on every crawl (which new Date()
+ * did). MAINTENANCE: when you materially change a page's body, structured
+ * data, or important links, bump that page's `lastModified` below — otherwise
+ * the date drifts out of truth again and Google stops trusting it.
  */
 
 import type { MetadataRoute } from 'next';
@@ -22,27 +28,27 @@ import type { MetadataRoute } from 'next';
 const BASE_URL = 'https://markdown-to-pdf.app';
 
 const PAGES = [
-  { path: '', changeFrequency: 'weekly' as const, priority: 1.0 },
-  { path: '/to-word', changeFrequency: 'weekly' as const, priority: 0.9 },
-  { path: '/to-html', changeFrequency: 'weekly' as const, priority: 0.9 },
-  { path: '/guides', changeFrequency: 'weekly' as const, priority: 0.8 },
-  { path: '/guides/markdown-new-line', changeFrequency: 'monthly' as const, priority: 0.7 },
-  { path: '/guides/markdown-quote', changeFrequency: 'monthly' as const, priority: 0.7 },
-  { path: '/guides/markdown-cheat-sheet', changeFrequency: 'monthly' as const, priority: 0.7 },
-  { path: '/guides/markdown-table', changeFrequency: 'monthly' as const, priority: 0.7 },
-  { path: '/guides/markdown-image', changeFrequency: 'monthly' as const, priority: 0.7 },
-  { path: '/guides/markdown-code-block', changeFrequency: 'monthly' as const, priority: 0.7 },
-  { path: '/guides/markdown-link', changeFrequency: 'monthly' as const, priority: 0.7 },
-  { path: '/guides/markdown-list', changeFrequency: 'monthly' as const, priority: 0.7 },
-  { path: '/guides/markdown-to-pdf-best-practices', changeFrequency: 'monthly' as const, priority: 0.7 },
-  { path: '/guides/export-chatgpt-markdown-to-pdf', changeFrequency: 'monthly' as const, priority: 0.7 },
-  { path: '/guides/markdown-vs-word', changeFrequency: 'monthly' as const, priority: 0.7 },
-  { path: '/guides/markdown-frontmatter', changeFrequency: 'monthly' as const, priority: 0.7 },
-  { path: '/about', changeFrequency: 'monthly' as const, priority: 0.5 },
-  { path: '/contact', changeFrequency: 'monthly' as const, priority: 0.4 },
-  { path: '/pricing', changeFrequency: 'monthly' as const, priority: 0.3 },
-  { path: '/privacy', changeFrequency: 'yearly' as const, priority: 0.1 },
-  { path: '/terms', changeFrequency: 'yearly' as const, priority: 0.1 },
+  { path: '', changeFrequency: 'weekly' as const, priority: 1.0, lastModified: '2026-05-13' },
+  { path: '/to-word', changeFrequency: 'weekly' as const, priority: 0.9, lastModified: '2026-05-13' },
+  { path: '/to-html', changeFrequency: 'weekly' as const, priority: 0.9, lastModified: '2026-05-13' },
+  { path: '/guides', changeFrequency: 'weekly' as const, priority: 0.8, lastModified: '2026-05-13' },
+  { path: '/guides/markdown-new-line', changeFrequency: 'monthly' as const, priority: 0.7, lastModified: '2026-05-13' },
+  { path: '/guides/markdown-quote', changeFrequency: 'monthly' as const, priority: 0.7, lastModified: '2026-05-13' },
+  { path: '/guides/markdown-cheat-sheet', changeFrequency: 'monthly' as const, priority: 0.7, lastModified: '2026-05-13' },
+  { path: '/guides/markdown-table', changeFrequency: 'monthly' as const, priority: 0.7, lastModified: '2026-05-15' },
+  { path: '/guides/markdown-image', changeFrequency: 'monthly' as const, priority: 0.7, lastModified: '2026-05-15' },
+  { path: '/guides/markdown-code-block', changeFrequency: 'monthly' as const, priority: 0.7, lastModified: '2026-05-15' },
+  { path: '/guides/markdown-link', changeFrequency: 'monthly' as const, priority: 0.7, lastModified: '2026-05-15' },
+  { path: '/guides/markdown-list', changeFrequency: 'monthly' as const, priority: 0.7, lastModified: '2026-05-15' },
+  { path: '/guides/markdown-to-pdf-best-practices', changeFrequency: 'monthly' as const, priority: 0.7, lastModified: '2026-05-26' },
+  { path: '/guides/export-chatgpt-markdown-to-pdf', changeFrequency: 'monthly' as const, priority: 0.7, lastModified: '2026-05-26' },
+  { path: '/guides/markdown-vs-word', changeFrequency: 'monthly' as const, priority: 0.7, lastModified: '2026-05-26' },
+  { path: '/guides/markdown-frontmatter', changeFrequency: 'monthly' as const, priority: 0.7, lastModified: '2026-05-26' },
+  { path: '/about', changeFrequency: 'monthly' as const, priority: 0.5, lastModified: '2026-05-26' },
+  { path: '/contact', changeFrequency: 'monthly' as const, priority: 0.4, lastModified: '2026-05-26' },
+  { path: '/pricing', changeFrequency: 'monthly' as const, priority: 0.3, lastModified: '2026-05-13' },
+  { path: '/privacy', changeFrequency: 'yearly' as const, priority: 0.1, lastModified: '2026-05-13' },
+  { path: '/terms', changeFrequency: 'yearly' as const, priority: 0.1, lastModified: '2026-05-13' },
 ];
 
 export default function sitemap(): MetadataRoute.Sitemap {
@@ -57,7 +63,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
       entries.push({
         url: `${BASE_URL}/${lang}${page.path}`,
-        lastModified: new Date(),
+        lastModified: page.lastModified,
         changeFrequency: page.changeFrequency,
         priority: page.priority,
         alternates: { languages: alternates },
