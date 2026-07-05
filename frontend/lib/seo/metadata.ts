@@ -25,6 +25,9 @@ type PageKey =
   | 'guideChatgptExport'
   | 'guideMarkdownVsWord'
   | 'guideFrontmatter'
+  | 'guideResumeTemplate'
+  | 'guideReadmeTemplate'
+  | 'guideMeetingNotes'
   | 'pricing'
   | 'privacy'
   | 'terms'
@@ -58,6 +61,9 @@ const META: Record<string, Record<PageKey, PageMeta>> = {
     guideChatgptExport: { title: 'Export ChatGPT Markdown to PDF — Copy, Clean, and Save', description: 'Turn ChatGPT Markdown into a clean PDF. Learn what to copy, what to fix, and how tables, links, code blocks, and images behave.', path: '/en/guides/export-chatgpt-markdown-to-pdf' },
     guideMarkdownVsWord: { title: 'Markdown vs Word — When to Use Each Writing Format', description: 'Compare Markdown and Microsoft Word for drafting, editing, sharing, PDF export, tables, images, and collaboration.', path: '/en/guides/markdown-vs-word' },
     guideFrontmatter: { title: 'Markdown Frontmatter — YAML Metadata Explained', description: 'Learn what Markdown frontmatter is, where YAML metadata is used, and what to do with it before exporting to PDF or Word.', path: '/en/guides/markdown-frontmatter' },
+    guideResumeTemplate: { title: 'Markdown Resume Template — Copy, Edit, and Export to PDF', description: 'A free Markdown resume template you can copy, fill in, and export as a clean one-page PDF or Word file — with formatting rules that survive conversion.', path: '/en/guides/markdown-resume-template' },
+    guideReadmeTemplate: { title: 'README Template — Markdown Structure for GitHub Projects', description: 'A practical README.md template with installation, usage, and contributing sections. Copy it, fill it in, and export docs to PDF when needed.', path: '/en/guides/readme-template' },
+    guideMeetingNotes: { title: 'Meeting Notes Template — Markdown Format for Clear Minutes', description: 'A reusable Markdown meeting notes template with agenda, decisions, and action items. Take notes fast, export clean PDF minutes after.', path: '/en/guides/meeting-notes-template' },
     pricing: { title: 'Pricing — Markdown to PDF', description: 'Markdown to PDF is free to use. PDF, Word, and HTML conversion run in your browser, subject to your device memory and browser limits.', path: '/en/pricing' },
     privacy: { title: 'Privacy Policy — Markdown to PDF', description: 'Privacy policy for markdown-to-pdf.app.', path: '/en/privacy' },
     terms: { title: 'Terms of Service — Markdown to PDF', description: 'Terms of service for markdown-to-pdf.app.', path: '/en/terms' },
@@ -83,6 +89,9 @@ const META: Record<string, Record<PageKey, PageMeta>> = {
     guideChatgptExport: { title: '将 ChatGPT Markdown 导出为 PDF — 复制、清理与保存', description: '把 ChatGPT 输出的 Markdown 转为干净 PDF：复制什么、清理什么，以及表格、链接、代码块和图片处理。', path: '/zh/guides/export-chatgpt-markdown-to-pdf' },
     guideMarkdownVsWord: { title: 'Markdown vs Word — 什么时候用哪种写作格式', description: '比较 Markdown 和 Word 在起草、编辑、分享、PDF 导出、表格、图片和协作方面的差异。', path: '/zh/guides/markdown-vs-word' },
     guideFrontmatter: { title: 'Markdown Frontmatter — YAML 元数据说明', description: '了解 Markdown frontmatter 是什么、YAML 元数据在哪里使用，以及导出 PDF 或 Word 前如何处理。', path: '/zh/guides/markdown-frontmatter' },
+    guideResumeTemplate: { title: 'Markdown 简历模板 — 复制、修改、导出 PDF', description: '免费的 Markdown 简历模板：复制、填入经历，导出为干净的单页 PDF 或 Word 文件，格式规则确保转换不走样。', path: '/zh/guides/markdown-resume-template' },
+    guideReadmeTemplate: { title: 'README 模板 — GitHub 项目的 Markdown 文档结构', description: '实用的 README.md 模板：安装、使用、贡献章节齐全，复制填写即可用，需要时可导出 PDF。', path: '/zh/guides/readme-template' },
+    guideMeetingNotes: { title: '会议纪要模板 — 用 Markdown 记录清晰的会议记录', description: '可复用的 Markdown 会议纪要模板：议程、决议、行动项分区清晰，会后导出整洁的 PDF 纪要。', path: '/zh/guides/meeting-notes-template' },
     pricing: { title: '定价 — Markdown 转 PDF', description: 'Markdown 转 PDF 可免费使用。PDF、Word 和 HTML 转换在浏览器内运行，受设备内存和浏览器能力限制。', path: '/zh/pricing' },
     privacy: { title: '隐私政策 — Markdown 转 PDF', description: 'markdown-to-pdf.app 隐私政策。', path: '/zh/privacy' },
     terms: { title: '服务条款 — Markdown 转 PDF', description: 'markdown-to-pdf.app 服务条款。', path: '/zh/terms' },

@@ -441,7 +441,7 @@ Use the editor below to test any Markdown syntax:`,
       { q: 'Should I use one # heading or many?', a: 'Use one # heading for the document title, then ## and ### for sections. Multiple H1s are valid Markdown, but they make exported documents harder to scan.' },
       { q: 'Why did my AI-generated Markdown export poorly?', a: 'Usually because of a missing blank line, mismatched table pipes, or an unclosed code fence. The live preview is the fastest way to catch these issues before exporting.' },
     ],
-    relatedSlugs: ['markdown-new-line', 'markdown-quote'],
+    relatedSlugs: ['markdown-new-line', 'markdown-quote', 'readme-template'],
   },
   {
     slug: 'markdown-table',
@@ -570,7 +570,7 @@ Use the editor on the home page to paste a real table from your notes — the li
       { q: 'Can I merge cells in a Markdown table?', a: 'No, Markdown table syntax intentionally does not support cell merging. If you need merged cells, export to Word and merge cells manually, or write the table in raw HTML and the converter will render the HTML through to PDF.' },
       { q: 'My table from Gemini or ChatGPT has uneven columns — how do I fix it?', a: 'Paste it into the editor on the home page and check the live preview. Most rendering issues fix themselves once the source hits a strict parser. If columns are still off, count the pipes per row — every row must have the same number of pipes as the header.' },
     ],
-    relatedSlugs: ['markdown-list', 'markdown-cheat-sheet'],
+    relatedSlugs: ['markdown-list', 'markdown-cheat-sheet', 'meeting-notes-template'],
   },
   {
     slug: 'markdown-image',
@@ -1188,7 +1188,7 @@ The converter runs in your browser. Your Markdown text does not need to be uploa
       { q: 'What is the best Markdown structure for PDF?', a: 'Use one H1 title, H2 section headings, short paragraphs, focused lists, narrow tables, and fenced code blocks with language hints.' },
       { q: 'Should I export AI text to PDF or Word?', a: 'Use PDF when the text is ready to share. Use Word if someone still needs to edit, comment, or apply a formal template.' },
     ],
-    relatedSlugs: ['export-chatgpt-markdown-to-pdf', 'markdown-table', 'markdown-code-block'],
+    relatedSlugs: ['export-chatgpt-markdown-to-pdf', 'markdown-table', 'markdown-resume-template'],
   },
   {
     slug: 'export-chatgpt-markdown-to-pdf',
@@ -1406,6 +1406,307 @@ If you are not sure, ask: "Will the reader need to see this line?" If the answer
       { q: 'Can frontmatter include arrays?', a: 'Yes. YAML supports arrays, usually written as indented dash items under a field such as tags.' },
     ],
     relatedSlugs: ['markdown-cheat-sheet', 'markdown-to-pdf-best-practices', 'markdown-code-block'],
+  },
+  {
+    slug: 'markdown-resume-template',
+    title: 'Markdown Resume Template — Copy, Edit, and Export to PDF',
+    description: 'A free Markdown resume template you can copy, fill in, and export as a clean one-page PDF or Word file — with formatting rules that survive conversion.',
+    readTime: 7,
+    content: `## Why Write a Resume in Markdown?
+
+A resume is the one document where formatting problems cost you interviews. Writing it in Markdown solves three practical problems:
+
+- **You focus on content, not styling.** No fighting with Word's spacing, floating text boxes, or mystery indentation.
+- **It is plain text.** You can keep it in version control, diff old versions, and maintain one source that exports to PDF for applications and Word when a recruiter insists on .docx.
+- **It converts cleanly.** Headings, bold labels, and bullet lists are exactly the elements that survive Markdown-to-PDF conversion without surprises.
+
+Copy the template below, replace the placeholder text, and export.
+
+## The Template
+
+\`\`\`markdown
+# Alex Chen
+
+Berlin, Germany · alex.chen@email.com · +49 000 0000000
+[linkedin.com/in/alexchen](https://linkedin.com/in/alexchen) · [github.com/alexchen](https://github.com/alexchen)
+
+## Summary
+
+Backend engineer with 6 years of experience building payment and
+billing systems. Led a 4-person team that cut checkout latency by
+40%. Looking for a senior role with ownership of a core service.
+
+## Experience
+
+### Senior Software Engineer — FinPay GmbH
+
+*Mar 2023 – Present, Berlin*
+
+- Own the billing service (Go, PostgreSQL) processing 2M invoices/month
+- Cut p99 checkout latency from 900ms to 540ms by redesigning the retry path
+- Mentor two junior engineers; run the team's weekly design review
+
+### Software Engineer — ShopKit
+
+*Jul 2019 – Feb 2023, Remote*
+
+- Built the subscription engine used by 3,000+ merchants
+- Introduced contract tests that reduced integration bugs by ~30%
+
+## Skills
+
+**Languages:** Go, Python, SQL, TypeScript
+**Infrastructure:** PostgreSQL, Redis, Kafka, AWS, Terraform
+**Practices:** API design, incident response, technical writing
+
+## Education
+
+**B.Sc. Computer Science** — Technical University of Munich, 2019
+\`\`\`
+
+## Section-by-Section Notes
+
+### Header
+
+Use a single \`#\` heading for your name — it becomes the largest text on the page. Put contact details on one line directly below, separated by \`·\` or \`|\`. Links written as \`[text](url)\` stay clickable in the exported PDF.
+
+### Summary
+
+Two or three sentences maximum: what you are, one concrete achievement with a number, what you want next. Recruiters skim this first — numbers stop the skim.
+
+### Experience
+
+The pattern is \`### Job Title — Company\` followed by an italic date line, then 2–4 bullets. Two rules make bullets strong:
+
+1. Start with a verb: *own, built, cut, led, introduced*.
+2. Attach a number wherever honest: latency, revenue, team size, volume.
+
+List jobs in reverse chronological order. Older or less relevant roles can shrink to a single line.
+
+### Skills
+
+Use bold labels (\`**Languages:**\`) instead of a table. Bold-label lines survive every export format; multi-column tables can wrap awkwardly on narrow PDF layouts.
+
+## Keeping It to One Page
+
+- Cut any bullet that does not show impact or scope.
+- Use \`---\` horizontal rules sparingly — each one costs vertical space.
+- Avoid nested bullet lists entirely; a resume should never need level-two indentation.
+- If you are over one page, remove your oldest role before shrinking the font.
+
+## Exporting
+
+Paste the finished Markdown into the [editor on the homepage](/en), check the live preview, and save as PDF. Applying somewhere that requires .docx? Use the [Markdown to Word converter](/en/to-word) with the same source text.`,
+    faq: [
+      { q: 'Is a Markdown resume ATS-friendly?', a: 'Yes — usually more so than a heavily designed one. Exported Markdown produces a simple single-column layout with real text, which is exactly what applicant tracking systems parse most reliably.' },
+      { q: 'Should the resume fit on one page?', a: 'For under ten years of experience, one page is the safe default. Cut the oldest role first, not the font size — anything below 10pt is hard to read.' },
+      { q: 'Can I add a photo?', a: 'You can embed one with Markdown image syntax, but in most English-speaking markets (US, UK) resumes conventionally omit photos. Check the norms of your target country first.' },
+      { q: 'How do I get a Word version from the same file?', a: 'Paste the identical Markdown into the Markdown to Word converter on this site. One source text, two output formats — no reformatting.' },
+    ],
+    relatedSlugs: ['markdown-to-pdf-best-practices', 'markdown-cheat-sheet', 'meeting-notes-template'],
+  },
+  {
+    slug: 'readme-template',
+    title: 'README Template — Markdown Structure for GitHub Projects',
+    description: 'A practical README.md template with installation, usage, and contributing sections. Copy it, fill it in, and export project docs to PDF when you need a handoff file.',
+    readTime: 6,
+    content: `## What a Good README Answers
+
+A README has one job: let a stranger decide in thirty seconds whether your project solves their problem, and then install it without asking you anything. Every section in the template below exists to answer one of four questions:
+
+1. **What is this?** — title and one-line description
+2. **Does it work for my case?** — features and requirements
+3. **How do I run it?** — installation and usage
+4. **How do I get help or contribute?** — contributing and license
+
+## The Template
+
+\`\`\`markdown
+# project-name
+
+One sentence: what it does and who it is for.
+
+## Features
+
+- Converts X to Y with zero configuration
+- Runs fully offline — no data leaves the machine
+- Single binary, no runtime dependencies
+
+## Requirements
+
+- Node.js 20+
+- PostgreSQL 15+ (only for persistent mode)
+
+## Installation
+
+npm install project-name
+
+Or with a single script:
+
+curl -fsSL https://example.com/install.sh | sh
+
+## Usage
+
+Basic conversion:
+
+project-name input.md -o output.pdf
+
+Common flags:
+
+| Flag | Meaning | Default |
+| --- | --- | --- |
+| -o | Output file path | stdout |
+| --theme | PDF theme name | plain |
+| --toc | Insert table of contents | off |
+
+## Configuration
+
+Create a project-name.config.json in the project root:
+
+{
+  "theme": "plain",
+  "pageSize": "A4"
+}
+
+## Contributing
+
+Bug reports and pull requests are welcome. Before opening a PR,
+run the test suite and describe what behavior changes.
+
+## License
+
+MIT — see LICENSE for details.
+\`\`\`
+
+> The code fences around install commands are omitted inside the template above so it stays copy-pasteable as one block. When you fill it in, wrap commands and config in fenced code blocks with a language hint — \`bash\`, \`json\`, and so on.
+
+## Section Notes
+
+### Title and Description
+
+The first line under the title is the most-read sentence in the file. Make it concrete: "Converts Markdown to PDF in the browser" beats "A modern, blazing-fast document solution".
+
+### Installation
+
+Give the shortest path that actually works on a clean machine, and state version requirements explicitly. Every support issue you have ever received is a candidate for one more line here.
+
+### Usage
+
+Show a real command with real file names, then a table of the flags people actually change. A features table renders cleanly in both GitHub and PDF export — see the [Markdown table guide](/en/guides/markdown-table) for alignment syntax.
+
+### What to Leave Out
+
+- Screenshots of plain text output (the text itself is better)
+- Badges beyond build status and version — badge walls slow comprehension
+- A changelog section — link to releases instead
+
+## Exporting a README to PDF
+
+READMEs occasionally need to leave GitHub: project handoffs, client deliverables, internal reviews. Paste the file into the [converter](/en) and export. Code blocks keep their monospace formatting and syntax highlighting — the details are in the [code block guide](/en/guides/markdown-code-block).`,
+    faq: [
+      { q: 'How long should a README be?', a: 'Long enough that a new user never has to open an issue to get started — usually 100 to 300 lines. Move deep reference material into a docs folder and link to it.' },
+      { q: 'Do badges render when exporting to PDF?', a: 'Badges are remote images, so they render only if the converter fetches remote images. Since they mostly signal live CI state, consider removing them from PDF exports — the information is stale the moment it is printed.' },
+      { q: 'Should every folder have a README?', a: 'Only when a folder is an entry point someone consumes independently, like a package in a monorepo. Elsewhere, one root README beats many stale ones.' },
+      { q: 'Does GitHub-flavored Markdown work in the export?', a: 'Tables, task lists, and fenced code blocks with language hints are GFM features and convert cleanly here. GitHub-only features like mentions and issue links become plain text.' },
+    ],
+    relatedSlugs: ['markdown-code-block', 'markdown-table', 'markdown-resume-template'],
+  },
+  {
+    slug: 'meeting-notes-template',
+    title: 'Meeting Notes Template — Markdown Format for Clear Minutes',
+    description: 'A reusable Markdown meeting notes template with agenda, decisions, and action items. Take notes fast during the call, export clean PDF minutes after.',
+    readTime: 6,
+    content: `## Why Take Meeting Notes in Markdown
+
+Notes taken during a meeting have to be fast; minutes shared after a meeting have to be clean. Markdown is one of the few formats that does both: you type plain text at conversation speed, and the same file exports as presentable PDF minutes without reformatting.
+
+The template below separates the three things people actually look for later: **what was decided, who does what by when, and what was discussed**.
+
+## The Template
+
+\`\`\`markdown
+# Weekly Product Sync — 2026-07-05
+
+| | |
+| --- | --- |
+| **Date** | 2026-07-05, 14:00–14:45 |
+| **Attendees** | Alex (chair), Mei, Jonas, Priya |
+| **Absent** | Sam (on leave) |
+| **Note taker** | Jonas |
+
+## Agenda
+
+1. Q3 roadmap freeze
+2. Onboarding funnel drop-off
+3. Open floor
+
+## Decisions
+
+- **Q3 roadmap is frozen as of today.** New requests go to the Q4
+  backlog unless marked as a production incident.
+- Onboarding email step moves from day 3 to day 1 (trial data showed
+  62% of drop-off happens before day 2).
+
+## Action Items
+
+- [ ] **Mei** — draft Q4 backlog intake process — due 2026-07-10
+- [ ] **Jonas** — ship day-1 onboarding email variant — due 2026-07-12
+- [ ] **Priya** — share funnel dashboard link in #product — due 2026-07-06
+
+## Discussion Notes
+
+### Q3 roadmap freeze
+
+Mei raised the risk that two committed features share the same
+engineer. Agreed to resolve by swapping the delivery order.
+
+> "If everything is priority one, nothing is." — Alex, on the
+> incoming request volume
+
+### Onboarding funnel
+
+Drop-off concentrates between signup and first document created.
+Hypothesis: users who convert one file in the first session retain
+at roughly twice the rate.
+
+## Next Meeting
+
+2026-07-12, same time. Carry-over: review email variant results.
+\`\`\`
+
+## How Each Section Works
+
+### The Metadata Table
+
+A small two-column table at the top beats scattered lines of text — it renders as a tidy block in the PDF and makes minutes findable months later. The empty header row (\`| | |\`) is intentional: it keeps the table compact.
+
+### Decisions Before Discussion
+
+Most templates bury decisions in chronological notes. Putting **Decisions** and **Action Items** above the discussion means a reader who opens the file for ten seconds still leaves with the outcome.
+
+### Action Items as Task Lists
+
+The \`- [ ]\` syntax is a GFM task list. Keep one owner per item in bold and a real due date — "someone should look into this" is not an action item. Checked items (\`- [x]\`) render with filled checkboxes in the export, so the same file tracks completion at next week's meeting.
+
+### Quoting People
+
+Use a \`>\` blockquote when the exact words matter. Attribute inline. Details on nesting are in the [quote guide](/en/guides/markdown-quote).
+
+## The Recurring-Meeting Workflow
+
+1. Duplicate last week's file, update the date in the title.
+2. Move unfinished \`- [ ]\` items into the new file's Action Items.
+3. Take notes in Discussion during the call — decisions and actions get promoted up top in the five minutes after it ends.
+4. Paste into the [converter](/en) and export the PDF for people who were absent.
+
+That last step is the whole reason to keep minutes in Markdown: the file you typed at speed is already the file you share.`,
+    faq: [
+      { q: 'Do task list checkboxes render in the PDF?', a: 'Yes. GFM task lists render as checkbox glyphs — unchecked for open items, filled for completed ones — so the exported minutes show action-item status at a glance.' },
+      { q: 'One file per meeting or one running file?', a: 'One file per meeting. A running file grows unsearchable, and per-meeting files let you export exactly one meeting as PDF. Name files by date: 2026-07-05-product-sync.md.' },
+      { q: 'What if nobody reads the minutes?', a: 'Shrink them. The Decisions and Action Items sections alone are useful minutes; the Discussion section is optional detail. A ten-line file people read beats a two-page file they skip.' },
+      { q: 'Can I track action items across weeks?', a: 'Yes — carry unfinished items forward when you duplicate the template, and mark them done with [x] where they complete. For anything beyond a handful of items, promote them to your real task tracker.' },
+    ],
+    relatedSlugs: ['markdown-table', 'markdown-list', 'markdown-resume-template'],
   },
 ];
 

@@ -2,6 +2,9 @@ import Link from 'next/link';
 import { getGuideBySlug, guideHref } from '@/lib/guides/content';
 
 const GUIDE_SLUGS = [
+  'markdown-resume-template',
+  'readme-template',
+  'meeting-notes-template',
   'markdown-to-pdf-best-practices',
   'export-chatgpt-markdown-to-pdf',
   'markdown-vs-word',

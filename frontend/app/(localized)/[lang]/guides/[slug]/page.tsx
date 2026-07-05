@@ -29,6 +29,9 @@ const SLUG_TO_PAGE_KEY: Record<
   | 'guideChatgptExport'
   | 'guideMarkdownVsWord'
   | 'guideFrontmatter'
+  | 'guideResumeTemplate'
+  | 'guideReadmeTemplate'
+  | 'guideMeetingNotes'
 > = {
   'markdown-new-line': 'guideNewLine',
   'markdown-quote': 'guideQuote',
@@ -42,6 +45,9 @@ const SLUG_TO_PAGE_KEY: Record<
   'export-chatgpt-markdown-to-pdf': 'guideChatgptExport',
   'markdown-vs-word': 'guideMarkdownVsWord',
   'markdown-frontmatter': 'guideFrontmatter',
+  'markdown-resume-template': 'guideResumeTemplate',
+  'readme-template': 'guideReadmeTemplate',
+  'meeting-notes-template': 'guideMeetingNotes',
 };
 
 export function generateStaticParams() {

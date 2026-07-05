@@ -14,7 +14,7 @@
  * The guide tree is now translated in both EN and ZH, so sitemap
  * includes every public page for both languages.
  *
- * Effective count: 21 pages × 2 languages = 42 URLs.
+ * Effective count: 24 pages × 2 languages = 48 URLs.
  *
  * lastModified policy: each page carries a STABLE real date (not new Date()).
  * Google ignores <lastmod> when it changes on every crawl (which new Date()
@@ -44,6 +44,9 @@ const PAGES = [
   { path: '/guides/export-chatgpt-markdown-to-pdf', changeFrequency: 'monthly' as const, priority: 0.7, lastModified: '2026-05-26' },
   { path: '/guides/markdown-vs-word', changeFrequency: 'monthly' as const, priority: 0.7, lastModified: '2026-05-26' },
   { path: '/guides/markdown-frontmatter', changeFrequency: 'monthly' as const, priority: 0.7, lastModified: '2026-05-26' },
+  { path: '/guides/markdown-resume-template', changeFrequency: 'monthly' as const, priority: 0.7, lastModified: '2026-07-05' },
+  { path: '/guides/readme-template', changeFrequency: 'monthly' as const, priority: 0.7, lastModified: '2026-07-05' },
+  { path: '/guides/meeting-notes-template', changeFrequency: 'monthly' as const, priority: 0.7, lastModified: '2026-07-05' },
   { path: '/about', changeFrequency: 'monthly' as const, priority: 0.5, lastModified: '2026-05-26' },
   { path: '/contact', changeFrequency: 'monthly' as const, priority: 0.4, lastModified: '2026-05-26' },
   { path: '/pricing', changeFrequency: 'monthly' as const, priority: 0.3, lastModified: '2026-05-13' },
