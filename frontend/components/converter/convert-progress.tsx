@@ -3,6 +3,11 @@
 /**
  * Conversion progress feedback overlay.
  * Source: 03-1-交互补充 §6 风险 3
+ *
+ * The outer wrapper is a permanently-mounted live region: screen readers
+ * only announce changes inside a live region that exists BEFORE the text
+ * appears, so we cannot mount a fresh node with the message already in it.
+ * Errors escalate to role="alert" (assertive) on the inner node.
  */
 
 import { Spinner } from '@/components/ui/spinner';
@@ -20,21 +25,19 @@ interface ConvertProgressProps {
 }
 
 export function ConvertProgress({ status, format, lastAction, errorMessage, onRetry, lang = 'en' }: ConvertProgressProps) {
-  if (status === 'idle') return null;
-
   const formatLabel = FORMAT_CONFIG[format].label;
   const t = getTranslations(lang);
 
+  let content: React.ReactNode = null;
+
   if (status === 'loading') {
-    return (
+    content = (
       <div className="flex items-center gap-2 text-sm text-gray-600">
         <Spinner size="sm" />
         <span>{t.conversion.generating.replace('{format}', formatLabel)}</span>
       </div>
     );
-  }
-
-  if (status === 'success') {
+  } else if (status === 'success') {
     // Pick the success line based on what the user actually just did.
     // Single 'success' status is shared by three different actions:
     //   - copy   -> "Copied!"   (Copy HTML button)
@@ -48,19 +51,18 @@ export function ConvertProgress({ status, format, lastAction, errorMessage, onRe
     } else {
       message = t.conversion.downloaded;
     }
-    return (
+    content = (
       <div className="text-sm text-green-600 font-medium">
         {message}
       </div>
     );
-  }
-
-  if (status === 'error') {
-    return (
-      <div className="flex items-center gap-2 text-sm text-red-600">
+  } else if (status === 'error') {
+    content = (
+      <div role="alert" className="flex items-center gap-2 text-sm text-red-600">
         <span>{errorMessage || t.conversion.failed.replace('{format}', formatLabel)}</span>
         {onRetry && (
           <button
+            type="button"
             onClick={onRetry}
             className="underline hover:no-underline font-medium"
           >
@@ -71,5 +73,9 @@ export function ConvertProgress({ status, format, lastAction, errorMessage, onRe
     );
   }
 
-  return null;
+  return (
+    <div role="status" aria-live="polite" aria-atomic="true" className="flex items-center">
+      {content}
+    </div>
+  );
 }

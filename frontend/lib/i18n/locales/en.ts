@@ -50,6 +50,7 @@ const en = {
     editTab: 'Edit',
     previewTab: 'Preview',
     loading: 'Loading editor...',
+    previewError: 'Preview failed to update — the content below may be outdated.',
   },
 
   // ─── Conversion ─────────────────────────────────────

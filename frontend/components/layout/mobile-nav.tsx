@@ -28,15 +28,24 @@ const ZH_NAV_LABELS: Record<string, string> = {
 
 export function MobileNav({ lang }: { lang: string }) {
   const [open, setOpen] = useState(false);
+  const openLabel = lang === 'zh' ? '打开导航菜单' : 'Open navigation menu';
+  const closeLabel = lang === 'zh' ? '关闭导航菜单' : 'Close navigation menu';
 
   return (
     <div className="md:hidden">
-      <button onClick={() => setOpen(!open)} className="p-2 text-gray-600 hover:text-gray-900">
+      <button
+        type="button"
+        onClick={() => setOpen(!open)}
+        aria-expanded={open}
+        aria-controls="mobile-nav-menu"
+        aria-label={open ? closeLabel : openLabel}
+        className="p-2 text-gray-600 hover:text-gray-900"
+      >
         {open ? <X size={20} /> : <Menu size={20} />}
       </button>
 
       {open && (
-        <div className="absolute top-14 left-0 right-0 bg-white border-b border-gray-200 shadow-lg z-50">
+        <div id="mobile-nav-menu" className="absolute top-14 left-0 right-0 bg-white border-b border-gray-200 shadow-lg z-50">
           <nav className="flex flex-col p-4 gap-1">
             <LanguageSwitcher variant="menu" onNavigate={() => setOpen(false)} />
             {NAV_ITEMS.map((item) => {

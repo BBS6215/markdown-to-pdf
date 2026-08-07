@@ -2,9 +2,9 @@
 
 /**
  * Dashboard client component — renders the conversion history.
- * The usage-bar was removed when PDF/Word moved fully to the frontend, since
- * there is no longer any quota to display. UsageBar component is kept in the
- * tree (components/dashboard/usage-bar.tsx) for future re-enablement.
+ * The quota UI slice (usage bar, rate-limit modal, usage hooks) was removed
+ * when PDF/Word moved fully to the frontend pipeline — there is no quota to
+ * display. Recoverable from git history if a backend renderer returns.
  */
 
 import { HistoryList } from '@/components/dashboard/history-list';

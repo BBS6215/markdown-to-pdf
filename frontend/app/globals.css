@@ -9,12 +9,33 @@
  */
 
 @theme {
-  /* ─── Font Families (04 §3.1) ──────────────────────────── */
-  --font-sans: "Inter", system-ui, -apple-system, sans-serif;
-  --font-mono: "JetBrains Mono", "Fira Code", monospace;
+  /* ─── Font Families (04 §3.1) ────────────────────────────
+   * Reference the CSS variables injected by next/font/local (see
+   * app/layout.tsx) so we get the real web font PLUS next/font's
+   * adjusted fallback metrics. The previous literal names happened
+   * to match for Inter (case-insensitive family matching) but
+   * "JetBrains Mono" never matched the generated `jetbrainsMono`
+   * family — mono text fell back to the OS monospace. */
+  --font-sans: var(--font-inter), system-ui, -apple-system, sans-serif;
+  --font-mono: var(--font-jetbrains-mono), "Fira Code", monospace;
 
-  /* ─── Format-specific Colors (04 §4.2) ─────────────────── */
-  --color-format-pdf: #DC2626;       /* red-600 */
-  --color-format-word: #2563EB;      /* blue-600 */
-  --color-format-html: #F97316;      /* orange-500 */
+  /* ─── Core Palette (04 §4.1) ───────────────────────────── */
+  --color-primary: #2563EB;            /* blue-600  — main CTA, links, selected state */
+  --color-primary-hover: #1D4ED8;      /* blue-700 */
+  --color-primary-light: #EFF6FF;      /* blue-50   — CTA banner bg, light highlight */
+  --color-surface: #F9FAFB;            /* gray-50   — editor bg, SEO section bg, cards */
+  --color-border: #E5E7EB;             /* gray-200  — dividers, input/panel borders */
+  --color-text-primary: #111827;       /* gray-900 */
+  --color-text-secondary: #6B7280;     /* gray-500 */
+  --color-text-tertiary: #9CA3AF;      /* gray-400  — gutters/timestamps only, never body text */
+
+  /* ─── Format-specific Colors (04 §4.2) ───────────────────
+   * Used ONLY for elements directly tied to an output format
+   * (format switcher, convert button, dashboard badges). */
+  --color-format-pdf: #DC2626;         /* red-600 */
+  --color-format-pdf-hover: #B91C1C;   /* red-700 */
+  --color-format-word: #2563EB;        /* blue-600 */
+  --color-format-word-hover: #1D4ED8;  /* blue-700 */
+  --color-format-html: #F97316;        /* orange-500 */
+  --color-format-html-hover: #EA580C;  /* orange-600 */
 }

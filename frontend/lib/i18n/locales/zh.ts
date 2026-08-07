@@ -49,6 +49,7 @@ const zh: Translations = {
     editTab: '编辑',
     previewTab: '预览',
     loading: '正在加载编辑器...',
+    previewError: '预览更新失败，以下内容可能已过期。',
   },
 
   conversion: {

@@ -5,6 +5,7 @@
 
 import { type ButtonHTMLAttributes, forwardRef } from 'react';
 import type { ConvertFormat } from '@/lib/types';
+import { Spinner } from '@/components/ui/spinner';
 
 type ButtonVariant = 'primary' | 'secondary' | 'tertiary' | 'ghost';
 type ButtonSize = 'lg' | 'md' | 'sm';
@@ -17,15 +18,15 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const FORMAT_COLORS: Record<ConvertFormat, string> = {
-  pdf: 'bg-red-600 hover:bg-red-700',
-  word: 'bg-blue-600 hover:bg-blue-700',
-  html: 'bg-orange-500 hover:bg-orange-600',
+  pdf: 'bg-format-pdf hover:bg-format-pdf-hover',
+  word: 'bg-format-word hover:bg-format-word-hover',
+  html: 'bg-format-html hover:bg-format-html-hover',
 };
 
 const VARIANT_STYLES: Record<ButtonVariant, string> = {
   primary: 'text-white shadow-sm font-medium',
   secondary: 'border border-gray-300 text-gray-700 hover:bg-gray-50 font-medium',
-  tertiary: 'text-blue-600 hover:text-blue-700 hover:underline',
+  tertiary: 'text-primary hover:text-primary-hover hover:underline',
   ghost: 'text-gray-600 hover:text-gray-900',
 };
 
@@ -46,7 +47,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       variant === 'primary' && format
         ? FORMAT_COLORS[format]
         : variant === 'primary'
-          ? 'bg-blue-600 hover:bg-blue-700'
+          ? 'bg-primary hover:bg-primary-hover'
           : '';
 
     const disabledClass = isDisabled
@@ -66,23 +67,10 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         `.trim()}
         {...props}
       >
-        {loading && <Spinner className="mr-2" />}
+        {loading && <Spinner size="sm" className="mr-2" />}
         {children}
       </button>
     );
   }
 );
 Button.displayName = 'Button';
-
-function Spinner({ className = '' }: { className?: string }) {
-  return (
-    <svg
-      className={`animate-spin h-4 w-4 ${className}`}
-      viewBox="0 0 24 24"
-      fill="none"
-    >
-      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-    </svg>
-  );
-}

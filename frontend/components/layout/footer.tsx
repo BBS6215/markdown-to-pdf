@@ -99,7 +99,7 @@ export function Footer({ lang = 'en' }: { lang?: string }) {
             </ul>
           </div>
         </div>
-        <div className="mt-8 pt-6 border-t border-gray-200 text-center text-xs text-gray-400">
+        <div className="mt-8 pt-6 border-t border-gray-200 text-center text-xs text-gray-500">
           &copy; {new Date().getFullYear()} Markdown to PDF. {copy.rights}
         </div>
       </div>

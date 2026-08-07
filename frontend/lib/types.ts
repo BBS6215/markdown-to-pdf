@@ -17,26 +17,26 @@ export const FORMAT_CONFIG: Record<
 > = {
   pdf: {
     label: 'PDF',
-    color: 'border-red-600',
-    hoverColor: 'hover:text-red-600',
-    bgColor: 'bg-red-600 hover:bg-red-700',
-    textColor: 'text-red-600',
+    color: 'border-format-pdf',
+    hoverColor: 'hover:text-format-pdf',
+    bgColor: 'bg-format-pdf hover:bg-format-pdf-hover',
+    textColor: 'text-format-pdf',
     ext: '.pdf',
   },
   word: {
     label: 'Word',
-    color: 'border-blue-600',
-    hoverColor: 'hover:text-blue-600',
-    bgColor: 'bg-blue-600 hover:bg-blue-700',
-    textColor: 'text-blue-600',
+    color: 'border-format-word',
+    hoverColor: 'hover:text-format-word',
+    bgColor: 'bg-format-word hover:bg-format-word-hover',
+    textColor: 'text-format-word',
     ext: '.docx',
   },
   html: {
     label: 'HTML',
-    color: 'border-orange-500',
-    hoverColor: 'hover:text-orange-500',
-    bgColor: 'bg-orange-500 hover:bg-orange-600',
-    textColor: 'text-orange-500',
+    color: 'border-format-html',
+    hoverColor: 'hover:text-format-html',
+    bgColor: 'bg-format-html hover:bg-format-html-hover',
+    textColor: 'text-format-html',
     ext: '.html',
   },
 };
@@ -50,12 +50,6 @@ export type ConversionStatus = 'idle' | 'loading' | 'success' | 'error';
  * clipboard vs. opened the print dialog).
  */
 export type ConversionAction = 'download' | 'copy' | 'print' | null;
-
-/** Usage limits (mirrored from shared) */
-export const USAGE_LIMITS = {
-  ANONYMOUS_DAILY: 2,
-  LOGGED_IN_DAILY: 5,
-} as const;
 
 /** Content limits */
 export const CONTENT_LIMITS = {

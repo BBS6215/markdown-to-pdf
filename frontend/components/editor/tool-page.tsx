@@ -15,7 +15,6 @@ import { EditorToolbar } from '@/components/editor/editor-toolbar';
 import { SeoContentSection } from '@/components/seo/seo-content-section';
 import { useEditorContent } from '@/hooks/use-editor-content';
 import { useConversion } from '@/hooks/use-conversion';
-import { useMobileDetect } from '@/hooks/use-mobile-detect';
 import { usePathname } from 'next/navigation';
 import { getTranslations } from '@/lib/i18n/get-translations';
 
@@ -28,7 +27,6 @@ type MobileTab = 'edit' | 'preview';
 export function ToolPage({ format }: ToolPageProps) {
   const { content, updateContent, getContent, isInitialized } = useEditorContent();
   const { status, lastAction, errorMessage, convert, copyHtml, retry } = useConversion(format);
-  const isMobile = useMobileDetect();
   const [mobileTab, setMobileTab] = useState<MobileTab>('edit');
   const fileInputRef = useRef<HTMLInputElement>(null);
   const editorRef = useRef<MarkdownEditorHandle>(null);
@@ -62,9 +60,10 @@ export function ToolPage({ format }: ToolPageProps) {
     // Reported UX issue: after clearing a long document the page collapses and
     // the browser clamps scroll to the (now short) page bottom, leaving the
     // editor off-screen. Move focus back into the editor so the user can type
-    // immediately; focusing also scrolls it into view. On mobile, make sure the
-    // edit tab is active first. Wait one frame for the collapse to settle.
-    if (isMobile) setMobileTab('edit');
+    // immediately; focusing also scrolls it into view. Make sure the edit tab
+    // is active first (no-op on desktop, where both panes are always visible).
+    // Wait one frame for the collapse to settle.
+    setMobileTab('edit');
     requestAnimationFrame(() => editorRef.current?.focus());
     undoTimerRef.current = setTimeout(() => {
       setClearedSnapshot(null);
@@ -121,47 +120,62 @@ export function ToolPage({ format }: ToolPageProps) {
       {/* Editor area — wait for sessionStorage initialization */}
       {!isInitialized ? (
         <div className="flex items-center justify-center h-96">
-          <div className="text-gray-400 text-sm">{t.editor.loading}</div>
+          <div className="text-gray-500 text-sm">{t.editor.loading}</div>
         </div>
       ) : (
         <>
-          {/* Mobile: edit/preview tab selector */}
-          {isMobile && (
-            <div className="flex border-b border-gray-200 px-4">
-              <button
-                onClick={() => setMobileTab('edit')}
-                className={`py-2 px-4 text-sm border-b-2 ${
-                  mobileTab === 'edit'
-                    ? 'text-gray-900 font-medium border-gray-900'
-                    : 'text-gray-500 border-transparent'
-                }`}
-              >
-                {t.editor.editTab}
-              </button>
-              <button
-                onClick={() => setMobileTab('preview')}
-                className={`py-2 px-4 text-sm border-b-2 ${
-                  mobileTab === 'preview'
-                    ? 'text-gray-900 font-medium border-gray-900'
-                    : 'text-gray-500 border-transparent'
-                }`}
-              >
-                {t.editor.previewTab}
-              </button>
-            </div>
-          )}
+          {/* Mobile-only edit/preview switcher. Plain group+toggle semantics
+              rather than tab/tablist: on desktop BOTH panes are visible at
+              once (the switcher is md:hidden), so a single aria-selected tab
+              would contradict the visible state. aria-pressed toggles keep
+              the visual and a11y states consistent at every breakpoint. */}
+          <div role="group" aria-label={t.editor.editTab + ' / ' + t.editor.previewTab} className="flex border-b border-gray-200 px-4 md:hidden">
+            <button
+              type="button"
+              onClick={() => setMobileTab('edit')}
+              aria-pressed={mobileTab === 'edit'}
+              aria-controls="editor-pane"
+              className={`py-2 px-4 text-sm border-b-2 ${
+                mobileTab === 'edit'
+                  ? 'text-gray-900 font-medium border-gray-900'
+                  : 'text-gray-500 border-transparent'
+              }`}
+            >
+              {t.editor.editTab}
+            </button>
+            <button
+              type="button"
+              onClick={() => setMobileTab('preview')}
+              aria-pressed={mobileTab === 'preview'}
+              aria-controls="preview-pane"
+              className={`py-2 px-4 text-sm border-b-2 ${
+                mobileTab === 'preview'
+                  ? 'text-gray-900 font-medium border-gray-900'
+                  : 'text-gray-500 border-transparent'
+              }`}
+            >
+              {t.editor.previewTab}
+            </button>
+          </div>
 
-          {/* Editor + Preview */}
+          {/* Editor + Preview — CSS breakpoints decide the layout (no JS
+              mobile detection, so no SSR/hydration layout flash). Mobile:
+              single pane toggled by the switcher above; desktop (md+): both
+              panes side by side via md:block + the grid template. */}
           <FileDropzone onFileContent={handleFileContent} lang={lang}>
-            <div className={`${isMobile ? '' : 'grid grid-cols-[minmax(460px,1fr)_minmax(0,2fr)]'} border-b border-gray-200`}>
+            <div className="grid md:grid-cols-[minmax(460px,1fr)_minmax(0,2fr)] border-b border-gray-200">
               <div
-                className={`${!isMobile ? 'border-r border-gray-200' : ''} ${
-                  isMobile && mobileTab !== 'edit' ? 'hidden' : ''
-                }`}
+                id="editor-pane"
+                className={`md:border-r md:border-gray-200 ${
+                  mobileTab !== 'edit' ? 'hidden' : ''
+                } md:block`}
               >
                 <MarkdownEditor ref={editorRef} value={content} onChange={updateContent} lang={lang} />
               </div>
-              <div className={`${isMobile && mobileTab !== 'preview' ? 'hidden' : ''}`}>
+              <div
+                id="preview-pane"
+                className={`${mobileTab !== 'preview' ? 'hidden' : ''} md:block`}
+              >
                 <MarkdownPreview markdown={content} lang={lang} />
               </div>
             </div>
@@ -210,7 +224,7 @@ export function ToolPage({ format }: ToolPageProps) {
           pasted/typed a new version, Undo must not clobber it with the old
           snapshot (the toast and snapshot still expire on the 6s timer). */}
       {clearedSnapshot !== null && !content && (
-        <div className="fixed bottom-20 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 px-4 py-2.5 bg-gray-900 text-white text-sm rounded-lg shadow-lg">
+        <div role="status" aria-live="polite" className="fixed bottom-20 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 px-4 py-2.5 bg-gray-900 text-white text-sm rounded-lg shadow-lg">
           <span>{clearedLabel}</span>
           <button
             onClick={handleUndoClear}

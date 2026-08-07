@@ -48,7 +48,7 @@ export function HistoryList({ records, lang = 'en' }: { records: HistoryRecord[]
 
   if (records.length === 0) {
     return (
-      <div className="text-center py-12 text-gray-400 text-sm">
+      <div className="text-center py-12 text-gray-500 text-sm">
         {t.dashboard.historyEmpty}
       </div>
     );
@@ -57,7 +57,7 @@ export function HistoryList({ records, lang = 'en' }: { records: HistoryRecord[]
   return (
     <div>
       {/* Privacy notice */}
-      <p className="text-sm text-gray-400 mb-4">
+      <p className="text-sm text-gray-500 mb-4">
         {t.dashboard.privacyNote}
       </p>
 
@@ -87,12 +87,12 @@ export function HistoryList({ records, lang = 'en' }: { records: HistoryRecord[]
               </span>
 
               {/* Size */}
-              <span className="text-xs text-gray-400 w-16 text-right">
+              <span className="text-xs text-gray-500 w-16 text-right">
                 {formatBytes(record.file_size_bytes)}
               </span>
 
               {/* Time */}
-              <span className="text-xs text-gray-400 w-24 text-right">
+              <span className="text-xs text-gray-500 w-24 text-right">
                 {formatTime(record.created_at, lang)}
               </span>
             </div>

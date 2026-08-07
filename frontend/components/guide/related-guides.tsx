@@ -24,7 +24,7 @@ export function RelatedGuides({ guides, lang = 'en' }: { guides: GuideData[]; la
           >
             <h3 className="text-lg font-medium text-gray-900 mb-1">{guide.title}</h3>
             <p className="text-sm text-gray-500 mb-2 line-clamp-2">{guide.description}</p>
-            <span className="flex items-center gap-1 text-xs text-gray-400">
+            <span className="flex items-center gap-1 text-xs text-gray-500">
               <Clock size={12} />
               {readTime(guide.readTime)}
             </span>

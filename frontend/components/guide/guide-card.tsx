@@ -17,7 +17,7 @@ export function GuideCard({ guide, lang = 'en' }: { guide: GuideData; lang?: str
     >
       <h2 className="text-lg font-medium text-gray-900 mb-2">{guide.title}</h2>
       <p className="text-sm text-gray-500 mb-3 line-clamp-2">{guide.description}</p>
-      <span className="flex items-center gap-1 text-xs text-gray-400">
+      <span className="flex items-center gap-1 text-xs text-gray-500">
         <Clock size={12} />
         {readTimeLabel}
       </span>

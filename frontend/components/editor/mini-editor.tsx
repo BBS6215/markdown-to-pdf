@@ -36,7 +36,7 @@ export function MiniEditor({ defaultContent = '', lang = 'en' }: MiniEditorProps
         <textarea
           value={content}
           onChange={(e) => setContent(e.target.value)}
-          className="w-full h-full p-3 bg-gray-50 text-sm font-mono text-gray-900 resize-none outline-none"
+          className="w-full h-full p-3 bg-gray-50 text-sm font-mono text-gray-900 resize-none outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blue-500"
           placeholder={copy.placeholder}
         />
         <div className="overflow-auto">

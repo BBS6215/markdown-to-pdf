@@ -96,7 +96,7 @@ export default async function GuidePage({ params }: { params: Promise<{ lang: st
       <p className="text-base text-gray-500 mb-8">{guide.description}</p>
 
       {/* Guide content rendered as Markdown */}
-      <div className="prose-custom">
+      <div>
         <MarkdownPreview markdown={guide.content} lang={lang} />
       </div>
 

@@ -21,6 +21,11 @@ export const lightTheme = EditorView.theme({
   '.cm-content': {
     caretColor: '#111827',       // gray-900
     color: '#111827',
+    // CM6's base theme sets `.cm-content { font-family: monospace }`, which
+    // beats the fontFamily inherited from `&` above — without this line the
+    // editor body fell back to the OS monospace (NSimSun on Windows) and the
+    // self-hosted JetBrains Mono never rendered.
+    fontFamily: 'var(--font-jetbrains-mono, "JetBrains Mono", monospace)',
     padding: '16px',
     // Clamp to the editor cap so short/landscape viewports don't force an
     // internal scroll on an empty editor, and keep parity with the preview
@@ -49,7 +54,7 @@ export const lightTheme = EditorView.theme({
     borderLeftColor: '#111827',
   },
   '.cm-placeholder': {
-    color: '#9CA3AF',            // gray-400
+    color: '#6B7280',            // gray-500 — placeholder is meaningful text (WCAG AA)
     fontStyle: 'italic',
   },
 });

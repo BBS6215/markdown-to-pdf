@@ -24,7 +24,7 @@ interface SeoContentSectionProps {
 
 export function SeoContentSection({ lang, content }: SeoContentSectionProps) {
   return (
-    <section className="bg-gray-50 border-t border-gray-200">
+    <section className="bg-surface border-t border-border">
       <div className="max-w-4xl mx-auto px-4 py-16 space-y-16">
         {/* How to */}
         <HowToSteps title={content.howToTitle} steps={content.howToSteps} />

@@ -69,7 +69,7 @@ export function LoginForm({ redirectTo, lang = 'en' }: { redirectTo?: string; la
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
-          className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-base outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
+          className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-base outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-500"
           placeholder="you@example.com"
         />
       </div>
@@ -85,7 +85,7 @@ export function LoginForm({ redirectTo, lang = 'en' }: { redirectTo?: string; la
           onChange={(e) => setPassword(e.target.value)}
           required
           minLength={6}
-          className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-base outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
+          className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-base outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-500"
           placeholder={mode === 'signup' ? t.auth.passwordSignupPlaceholder : t.auth.passwordLoginPlaceholder}
         />
       </div>

@@ -13,6 +13,7 @@ import { useEffect, useState } from 'react';
 import { useDebounce } from '@/hooks/use-debounce';
 import { CONTENT_LIMITS } from '@/lib/types';
 import { renderMarkdownToSafeHtml } from '@/lib/markdown/render';
+import { PanelHeader } from '@/components/editor/panel-header';
 import { getTranslations } from '@/lib/i18n/get-translations';
 
 import 'github-markdown-css/github-markdown-light.css';
@@ -26,6 +27,10 @@ interface MarkdownPreviewProps {
 export function MarkdownPreview({ markdown, className = '', lang = 'en' }: MarkdownPreviewProps) {
   const [html, setHtml] = useState('');
   const [truncated, setTruncated] = useState(false);
+  // Render-failure state: keep showing the last good HTML and flag it as
+  // possibly stale, rather than blanking the panel. Cleared on empty input,
+  // at the start of every new render, and on success.
+  const [renderError, setRenderError] = useState(false);
   const debouncedMarkdown = useDebounce(markdown, 300);
   const t = getTranslations(lang);
 
@@ -34,10 +39,15 @@ export function MarkdownPreview({ markdown, className = '', lang = 'en' }: Markd
 
     async function render() {
       if (!debouncedMarkdown) {
-        setHtml('');
-        setTruncated(false);
+        if (!cancelled) {
+          setHtml('');
+          setTruncated(false);
+          setRenderError(false);
+        }
         return;
       }
+
+      if (!cancelled) setRenderError(false);
 
       const sizeBytes = new Blob([debouncedMarkdown]).size;
       const isTruncated = sizeBytes > CONTENT_LIMITS.PREVIEW_TRUNCATION;
@@ -50,9 +60,13 @@ export function MarkdownPreview({ markdown, className = '', lang = 'en' }: Markd
         if (!cancelled) {
           setHtml(rendered);
           setTruncated(isTruncated);
+          setRenderError(false);
         }
       } catch (err) {
-        console.error('[preview] Render error:', err);
+        if (!cancelled) {
+          console.error('[preview] Render error:', err);
+          setRenderError(true);
+        }
       }
     }
 
@@ -62,12 +76,13 @@ export function MarkdownPreview({ markdown, className = '', lang = 'en' }: Markd
 
   return (
     <div className={`flex flex-col ${className}`}>
-      <div className="bg-gray-50 border-b border-gray-200 px-4 py-2 min-h-[72px] flex flex-col justify-center">
-        <span className="text-sm font-medium text-gray-700">{t.editor.previewTitle}</span>
-        <span className="block text-xs text-gray-400 mt-0.5">
-          {t.editor.previewSubtitle}
-        </span>
-      </div>
+      <PanelHeader title={t.editor.previewTitle} subtitle={t.editor.previewSubtitle} />
+
+      {renderError && (
+        <div role="alert" className="px-4 py-2 bg-red-50 border-b border-red-200 text-xs text-red-700">
+          {t.editor.previewError}
+        </div>
+      )}
 
       <div
         className="markdown-body p-4 overflow-auto bg-white flex-1"

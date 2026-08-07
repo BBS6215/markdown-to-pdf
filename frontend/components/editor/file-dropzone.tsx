@@ -1,11 +1,15 @@
 'use client';
 
 /**
- * File upload dropzone — drag & drop + click to upload .md files.
+ * File upload dropzone — drag & drop .md files onto the editor area.
  * Source: 03-产品结构 §4.1 (编辑器模块), 04-UI规范 §4.5 (拖拽高亮态)
+ *
+ * Click-to-upload lives in tool-page.tsx (toolbar button → hidden input);
+ * this component intentionally handles drop only, so there is exactly one
+ * file input on the page.
  */
 
-import { useState, useRef, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { Upload } from 'lucide-react';
 import { decodeFileBuffer } from '@/lib/editor/encoding-detector';
 import { getTranslations } from '@/lib/i18n/get-translations';
@@ -18,7 +22,6 @@ interface FileDropzoneProps {
 
 export function FileDropzone({ onFileContent, children, lang = 'en' }: FileDropzoneProps) {
   const [isDragging, setIsDragging] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
   const t = getTranslations(lang);
 
   const handleFile = useCallback(
@@ -73,36 +76,6 @@ export function FileDropzone({ onFileContent, children, lang = 'en' }: FileDropz
           </div>
         </div>
       )}
-
-      {/* Hidden file input for click upload */}
-      <input
-        ref={fileInputRef}
-        type="file"
-        accept=".md,.markdown,.txt"
-        className="hidden"
-        onChange={(e) => {
-          const file = e.target.files?.[0];
-          if (file) handleFile(file);
-          e.target.value = ''; // Reset for re-upload same file
-        }}
-      />
     </div>
-  );
-}
-
-/**
- * Upload button to trigger file input.
- */
-export function UploadButton({ onClick, lang = 'en' }: { onClick: () => void; lang?: string }) {
-  const t = getTranslations(lang);
-
-  return (
-    <button
-      onClick={onClick}
-      className="inline-flex items-center gap-1.5 px-4 py-2 text-sm border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
-    >
-      <Upload size={16} />
-      <span className="hidden sm:inline">{t.editor.uploadButton}</span>
-    </button>
   );
 }

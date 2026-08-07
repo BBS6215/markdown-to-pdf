@@ -98,9 +98,11 @@ export function Header() {
                 {lang === 'zh' ? ZH_NAV_LABELS.Dashboard : 'Dashboard'}
               </Link>
               <button
+                type="button"
                 onClick={handleLogout}
-                className="px-2 py-2 text-sm text-gray-400 hover:text-gray-600 rounded-md"
-                title="Log out"
+                aria-label={lang === 'zh' ? '退出登录' : 'Log out'}
+                className="px-2 py-2 text-sm text-gray-500 hover:text-gray-700 rounded-md"
+                title={lang === 'zh' ? '退出登录' : 'Log out'}
               >
                 <LogOut size={16} />
               </button>

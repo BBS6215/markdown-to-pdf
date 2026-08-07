@@ -35,7 +35,7 @@ export function LoginClient({ lang }: { lang: string }) {
 
         <div className="my-4 flex items-center gap-3">
           <div className="flex-1 h-px bg-gray-200" />
-          <span className="text-xs text-gray-400">{t.auth.or}</span>
+          <span className="text-xs text-gray-500">{t.auth.or}</span>
           <div className="flex-1 h-px bg-gray-200" />
         </div>
 

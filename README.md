@@ -91,14 +91,15 @@ The original design docs are in Chinese. Architecture summary in English is abov
 
 | # | Doc | Status |
 |---|---|---|
+| **00** | **[Document index & Definition of Done](./docs/00-文档索引与完成定义.md)** | ✅ **Governance and delivery gates** |
 | 01 | [项目主线文档](./docs/01-项目主线文档.md) | ✅ Active |
 | 02 | [SEO 策略与搜索需求](./docs/02-SEO策略与搜索需求设计说明.md) | ✅ Active |
 | 03 | [产品结构文档](./docs/03-产品结构文档.md) | ✅ Active |
 | 03-1 | [交互与体验补充](./docs/03-1-交互与体验补充说明.md) | ✅ Active |
 | 04 | [UI 设计与视觉规范](./docs/04-UI设计与视觉规范建议.md) | ✅ Active |
-| 05 | [技术方案文档](./docs/05-技术方案文档.md) | ⚠️ Partly superseded by 10 |
+| 05 | [技术方案文档](./docs/05-技术方案文档.md) | 🗄 Historical baseline; architecture superseded by 10 |
 | 06 | [数据库设计说明](./docs/06-数据库设计说明.md) | ⚠️ Quota flow superseded by 10 |
-| 07 | [开发方案与实施步骤](./docs/07-开发方案与实施步骤说明.md) | ⚠️ Deploy section superseded by DEPLOY.md |
+| 07 | [开发方案与实施步骤](./docs/07-开发方案与实施步骤说明.md) | 🗄 Historical implementation baseline |
 | 08 | [安全设计补丁](./docs/08-安全设计补丁.md) | ⚠️ §3 active, §4-5 obsolete |
 | 09 | [服务端权威用量补丁](./docs/09-服务端权威用量补丁.md) | ❌ Entirely obsolete |
 | **10** | **[前端化架构补丁](./docs/10-前端化架构补丁.md)** | ✅ **Current architecture** |
