@@ -1,6 +1,6 @@
 /**
  * Homepage — PDF converter tool page.
- * Source: 05-技术方案 §4.1, §9.1, 01-主线 §6.6 (首页 /en/)
+ * Source: 03-产品结构 §5, 02-SEO策略 §9.1 (首页 /en/)
  */
 
 import { getPageMetadata } from '@/lib/seo/metadata';
@@ -11,6 +11,7 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
   return getPageMetadata(lang, 'home');
 }
 
-export default function HomePage() {
-  return <ToolPage format="pdf" />;
+export default async function HomePage({ params }: { params: Promise<{ lang: string }> }) {
+  const { lang } = await params;
+  return <ToolPage format="pdf" lang={lang} />;
 }

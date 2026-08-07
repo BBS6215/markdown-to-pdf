@@ -1,6 +1,6 @@
 /**
  * Word converter tool page.
- * Source: 05-技术方案 §4.1, §9.1, 01-主线 §6.6 (/en/to-word/)
+ * Source: 03-产品结构 §5, 02-SEO策略 §9.2 (/en/to-word/)
  */
 
 import { getPageMetadata } from '@/lib/seo/metadata';
@@ -11,6 +11,7 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
   return getPageMetadata(lang, 'toWord');
 }
 
-export default function ToWordPage() {
-  return <ToolPage format="word" />;
+export default async function ToWordPage({ params }: { params: Promise<{ lang: string }> }) {
+  const { lang } = await params;
+  return <ToolPage format="word" lang={lang} />;
 }

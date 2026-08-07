@@ -1,6 +1,6 @@
 /**
  * HTML converter tool page.
- * Source: 05-技术方案 §4.1, §9.1, 01-主线 §6.6 (/en/to-html/)
+ * Source: 03-产品结构 §5, 02-SEO策略 §9.2 (/en/to-html/)
  */
 
 import { getPageMetadata } from '@/lib/seo/metadata';
@@ -11,6 +11,7 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
   return getPageMetadata(lang, 'toHtml');
 }
 
-export default function ToHtmlPage() {
-  return <ToolPage format="html" />;
+export default async function ToHtmlPage({ params }: { params: Promise<{ lang: string }> }) {
+  const { lang } = await params;
+  return <ToolPage format="html" lang={lang} />;
 }

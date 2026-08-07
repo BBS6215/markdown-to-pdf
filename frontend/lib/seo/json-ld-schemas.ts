@@ -1,17 +1,41 @@
 /**
  * JSON-LD structured data schemas.
- * Source: 05-技术方案 §9.2
+ * Source: 02-SEO策略 §9, 03-产品结构 §4.8
  */
 
-export function softwareApplicationSchema() {
+import type { ConvertFormat, SupportedLang } from '@/lib/types';
+
+const SITE_URL = 'https://markdown-to-pdf.app';
+
+const SOFTWARE_APPLICATION = {
+  pdf: {
+    path: '',
+    en: 'Markdown to PDF Converter',
+    zh: 'Markdown 转 PDF 工具',
+  },
+  word: {
+    path: '/to-word',
+    en: 'Markdown to Word Converter',
+    zh: 'Markdown 转 Word 工具',
+  },
+  html: {
+    path: '/to-html',
+    en: 'Markdown to HTML Converter',
+    zh: 'Markdown 转 HTML 工具',
+  },
+} as const satisfies Record<ConvertFormat, { path: string; en: string; zh: string }>;
+
+export function softwareApplicationSchema(format: ConvertFormat, lang: SupportedLang) {
+  const application = SOFTWARE_APPLICATION[format];
+
   return {
     '@context': 'https://schema.org',
     '@type': 'SoftwareApplication',
-    name: 'Markdown to PDF Converter',
+    name: application[lang],
     applicationCategory: 'UtilityApplication',
     operatingSystem: 'Web',
     offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
-    url: 'https://markdown-to-pdf.app',
+    url: `${SITE_URL}/${lang}${application.path}`,
   };
 }
 

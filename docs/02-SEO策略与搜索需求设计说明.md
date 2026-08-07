@@ -2,8 +2,9 @@
 
 > **文档性质**: SEO 设计依据文档，作为《产品结构文档》、UI 设计、技术设计的前置输入
 > **依据**: 01-项目主线文档.md + SEO 调研数据（Ahrefs/Semrush/Google Trends，2026-03-17）+ 补充调研（2026-03-23）
-> **版本**: v1.0
+> **版本**: v1.1（工具页减负修订）
 > **创建日期**: 2026-03-23
+> **最后更新**: 2026-08-07
 
 ---
 
@@ -82,7 +83,7 @@
 |---------|------|-----------|------------|
 | **Transactional（交易型）** | 用户想立即使用工具完成转换 | md to pdf, markdown to word, convert md to html | **工具页**：首屏即工具，用完即走 |
 | **Informational（信息型）** | 用户想学习 Markdown 语法或了解转换方法 | markdown new line, markdown quote, how to convert md to pdf | **指南页**：教程内容+引导使用工具 |
-| **Commercial Investigation（商业调查）** | 用户在比较不同转换工具 | best markdown to pdf converter, markdown to pdf converter free | **首页/工具页**：SEO 内容区+功能对比 |
+| **Commercial Investigation（商业调查）** | 用户在比较不同转换工具 | best markdown to pdf converter, markdown to pdf converter free | **首页/工具页**：让真实转换体验直接证明产品能力，不增加伪对比内容 |
 | **Navigational（导航型）** | 用户搜索特定品牌/产品 | markdowntopdf, cloudconvert markdown | 暂不适用（品牌尚未建立） |
 
 ### 3.2 核心意图洞察
@@ -145,8 +146,8 @@
 | markdown quote | `/en/guides/markdown-quote` | 1-3 个月 | 高搜索低KD，必做 |
 | markdown block quote | `/en/guides/markdown-quote` | 1-2 个月 | 同页覆盖 |
 | markdown horizontal line | `/en/guides/markdown-new-line` | 1-3 个月 | 可归入换行指南 |
-| how to convert markdown to pdf | 首页 SEO 区 | 3-6 个月 | 首页下方内容覆盖 |
-| how to convert md to word | `/en/to-word/` SEO 区 | 2-4 个月 | 工具页下方内容覆盖 |
+| how to convert markdown to pdf | 暂不单独承接 | 持续观察 | 先由工具页自然承接；只有 GSC 证明独立需求且能提供原创价值时再立项 |
+| how to convert md to word | 暂不单独承接 | 持续观察 | 不为关键词机械创建薄内容页 |
 
 ### 第四层：占位词（Placeholder Keywords）
 V1.0 内容中自然提及但不单独发力的词，留给后续版本。
@@ -207,7 +208,7 @@ markdown 速查集群       →  /en/guides/markdown-cheat-sheet  →  指南页
 ### 5.2 承接原则
 
 1. **一个关键词集群对应且仅对应一个页面**——避免站内多个页面争抢同一关键词（Keyword Cannibalization）
-2. **工具页承接交易型意图**——首屏是工具，下方才是 SEO 内容
+2. **工具页承接交易型意图**——H1 和一句说明之后立即提供工具，不附加无助于转换任务的内容
 3. **指南页承接信息型意图**——内容为主，底部引导到工具页
 4. **每个指南页至少包含一个 CTA（引导到工具页）**——"Try it yourself → Convert Markdown to PDF"
 5. **不为 SEO 单独创建没有用户价值的页面**
@@ -254,7 +255,7 @@ markdown 速查集群       →  /en/guides/markdown-cheat-sheet  →  指南页
 
 | 栏目 | URL 前缀 | 内容 | SEO 作用 |
 |------|---------|------|---------|
-| 转换工具 | `/en/`, `/en/to-word/`, `/en/to-html/` | 在线工具 + 下方 SEO 内容 | 承接交易型关键词 |
+| 转换工具 | `/en/`, `/en/to-word/`, `/en/to-html/` | H1 + 一句说明 + 在线工具 | 承接交易型关键词 |
 | 指南中心 | `/en/guides/` | Markdown 语法指南 | 承接信息型关键词，为工具页导流 |
 
 ### V1.0 不建议设置的栏目
@@ -330,11 +331,10 @@ markdown 速查集群       →  /en/guides/markdown-cheat-sheet  →  指南页
 | **Title** | `Markdown to PDF Converter — Convert .md Files to PDF Free Online` |
 | **H1** | `Convert Markdown (.md) to PDF — Free Online Tool` |
 | **Description** | `Free online Markdown to PDF converter. Paste your markdown or upload .md files. Convert to professional PDF, Word, or HTML in seconds. No registration required.` |
-| **首屏** | 转换工具（编辑器+预览+转换按钮），不是营销文案 |
-| **SEO 内容区** | 位于工具下方：How to步骤、Why 使用场景、Features 特性、FAQ（5+ 问题） |
-| **结构化数据** | SoftwareApplication + FAQPage JSON-LD |
-| **内链** | 链向 to-word、to-html（"Also convert to Word/HTML"）+ 指南页（"Markdown Guides"） |
-| **文案聚焦** | 专注工具功能本身，V1.0 不在 SEO 内容中融入 AI 场景描述 |
+| **页面主体** | H1 + 一句说明 + 转换工具（编辑器+预览+转换按钮）；工具之后直接进入 Footer |
+| **结构化数据** | SoftwareApplication JSON-LD，name 与 url 必须匹配 PDF、当前语言和当前 canonical |
+| **内链** | FormatSwitcher 链向 Word/HTML；Footer 保留指南与辅助页入口 |
+| **文案聚焦** | 只说明输入、预览、输出和隐私，不增加 How-to、Why、Features、FAQ 或营销模块 |
 
 ### 9.2 工具页 (`/en/to-word/`, `/en/to-html/`)
 
@@ -344,10 +344,9 @@ markdown 速查集群       →  /en/guides/markdown-cheat-sheet  →  指南页
 | **Title** | `Markdown to Word Converter — Convert .md to .docx Free Online` | `Markdown to HTML Converter — Convert .md to HTML Free Online` |
 | **H1** | `Convert Markdown (.md) to Word (.docx) — Free Online` | `Convert Markdown (.md) to HTML — Free Online` |
 | **Description** | 包含: free, online, convert, markdown, .md, word/docx 或 html | 同左逻辑 |
-| **首屏** | 共用转换器布局，默认高亮对应的转换按钮 | 同左，但强调"纯前端处理，数据不离开浏览器" |
-| **SEO 内容区** | 针对 Word 格式的 How to + Why + FAQ | 针对 HTML 的 How to + Why + FAQ |
-| **结构化数据** | SoftwareApplication + FAQPage | 同左 |
-| **内链** | 链向首页（"Also convert to PDF"）+ to-html + 指南页 | 链向首页 + to-word + 指南页 |
+| **页面主体** | H1 + 一句 Word 专属说明 + 共用转换器 | H1 + 一句 HTML 专属说明 + 共用转换器 |
+| **结构化数据** | Word 专属 SoftwareApplication，url 指向当前语言 `/to-word` | HTML 专属 SoftwareApplication，url 指向当前语言 `/to-html` |
+| **内链** | FormatSwitcher 链向 PDF/HTML；Footer 保持不变 | FormatSwitcher 链向 PDF/Word；Footer 保持不变 |
 | **差异化卖点** | "No formatting loss when converting to .docx" | "100% client-side. Your data never leaves your browser." |
 
 ### 9.3 指南页 (`/en/guides/[slug]`)
@@ -459,12 +458,11 @@ markdown 速查集群       →  /en/guides/markdown-cheat-sheet  →  指南页
 - `/en/guides/markdown-quote` ← 已在主线文档中
 - `/en/guides/markdown-cheat-sheet` ← **建议新增**（KD 43 虽偏高，但作为 Markdown 工具站的"基建页面"，它是用户和 Google 判断网站权威性的标配内容）
 
-**2. 主线文档第 6.4 节 SEO 基础设施建议补充**
+**2. 主线文档第 6.4 节 SEO 基础设施已于 2026-08-07 修订**
 
-建议增加：
-- "每个工具页下方 SEO 内容区至少包含 How to 步骤 + Features + FAQ（5+ 问题）"
-- "指南页文章内容不低于 800 词（英文）"
-- "所有页面设置 canonical URL 和 hreflang 标签"
+- 工具页采用 H1 + 一句说明 + 转换器的极简结构，不再设置下方 SEO 内容区
+- 指南页继续承接真正的信息型需求，并保持 canonical、hreflang 和可见内容匹配的结构化数据
+- 不按最低字数或 FAQ 数量评价工具页质量；真实工具体验就是页面核心内容
 
 **3. 关于 AI 用户定位的 SEO 融入**
 
@@ -479,12 +477,12 @@ markdown 速查集群       →  /en/guides/markdown-cheat-sheet  →  指南页
 ### 约束 1：页面结构必须遵循 SEO 承接关系
 - 首页必须承接 "markdown to pdf" 关键词集群，**不能做成纯品牌介绍页**
 - `/en/to-word/` 和 `/en/to-html/` 必须是独立页面，**不能做成首页的 Tab 切换**（Tab 内容不被 Google 独立索引）
-- 每个工具页必须有独立的 URL、独立的 Title/H1、独立的 SEO 内容区
+- 每个工具页必须有独立的 URL、Title/H1、一句格式专属说明和正确的 SoftwareApplication；不要求额外 SEO 内容区
 
-### 约束 2：首屏必须是工具，SEO 内容在下方
+### 约束 2：工具页必须把任务放在第一位
 - Google 对工具型搜索意图的页面，期望首屏就是工具本身
-- SEO 文字内容（How to、Features、FAQ）必须放在工具下方（Below the Fold）
-- 这不意味着 SEO 内容不重要——它是 Google 判断页面质量的关键
+- H1 和一句说明之后立即进入格式切换、编辑、预览和转换流程
+- 不为补字数堆叠 How-to、Features、FAQ，也不新增折叠区、徽章或帮助链接行
 
 ### 约束 3：指南页必须有 CTA 引导到工具页
 - 每篇指南必须在文中和文末包含引导链接/按钮，导向对应的工具页
@@ -492,8 +490,8 @@ markdown 速查集群       →  /en/guides/markdown-cheat-sheet  →  指南页
 
 ### 约束 4：内链网络设计
 产品结构文档在设计页面布局时，必须为以下内链预留位置：
-- 工具页 → 其他工具页（"Also convert to Word/HTML"）
-- 工具页 → 指南页（"Markdown Guides" 区域）
+- 工具页 → 其他工具页（FormatSwitcher）
+- 工具页 → 指南页（全站 Footer，工具主体不另设推荐模块）
 - 指南页 → 工具页（CTA 按钮/横幅）
 - 指南页 → 其他指南页（"Related Guides"）
 - 所有页面 → 首页（Logo 链接 + 面包屑）
@@ -510,7 +508,12 @@ markdown 速查集群       →  /en/guides/markdown-cheat-sheet  →  指南页
 ### 约束 7：中文版的 SEO 优先级
 - V1.0 中文版不是 SEO 发力点（目标市场是海外英文用户）
 - 中文版页面通过 hreflang 正确标注即可
-- 中文版的 SEO 内容可以简化（不需要和英文版一样详尽的 FAQ 和指南）
+- 中文与英文工具页采用相同的极简信息结构，只做准确翻译，不产生两套产品体验
+
+### 约束 8：新增 SEO 页面必须有证据
+- 不因 URL 含关键词或“保排名”的想象新建承接页
+- 新页面立项必须同时满足：GSC 等真实数据证明独立搜索意图；现有页面无法合理承接；能提供原创且对用户有用的独立内容
+- 不满足上述条件时，优先改进现有工具或指南，避免薄内容、关键词内耗和长期维护成本
 
 ---
 

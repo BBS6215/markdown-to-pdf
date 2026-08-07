@@ -19,20 +19,17 @@ const en = {
   tool: {
     pdf: {
       h1: 'Convert Markdown (.md) to PDF — Free Online Tool',
-      subheading: 'Convert your Markdown or AI-generated text into a professional PDF in seconds.',
-      intro: 'Paste Markdown on the left, see the live preview on the right, and click Convert to PDF — the exporter opens your browser\'s print dialog where you pick "Save as PDF", the same flow as printing any web page. Conversion runs entirely in your browser, your content is never uploaded to a server, and there is no signup. The live preview closely matches the final PDF for headings, lists, tables, code blocks, and images, so most layout issues are visible before you export.',
+      subheading: 'Paste Markdown, preview it live, and export a PDF in your browser — no signup or upload.',
       convertButton: 'Convert to PDF',
     },
     word: {
       h1: 'Convert Markdown (.md) to Word — Free Online Tool',
-      subheading: 'Convert your Markdown or AI-generated text into a Word document in seconds.',
-      intro: 'Paste Markdown, preview, and download a real .docx file that opens natively in Microsoft Word, Google Docs, and Pages. The Word export runs entirely in your browser and uses the open-source docx library with font tuning for mixed Latin and CJK text, so headings keep their hierarchy, lists keep their indentation, and code blocks keep a monospaced look. No signup, no upload, and no server-side quota — the only practical limit is what your browser can hold in memory.',
+      subheading: 'Paste Markdown, preview it live, and download a Word (.docx) file — no signup or upload.',
       convertButton: 'Convert to Word',
     },
     html: {
       h1: 'Convert Markdown (.md) to HTML — Free Online Tool',
-      subheading: 'Convert your Markdown to clean HTML — 100% in your browser, data never leaves your device.',
-      intro: 'Paste Markdown, preview the rendered output, and copy production-ready HTML to your clipboard. The HTML is sanitized by rehype-sanitize, so it is safe to paste into Notion, Google Docs, an email, or any CMS without dragging along unsafe scripts or messy inline styles. Everything happens in your browser — your Markdown is never sent to a server.',
+      subheading: 'Paste Markdown, preview it live, and copy clean HTML — no signup or upload.',
       convertButton: 'Convert to HTML',
       copyHtml: 'Copy HTML',
     },
@@ -99,82 +96,6 @@ const en = {
     privacyNote: 'Only file names and timestamps are kept — your actual content never reaches our servers.',
   },
 
-  // ─── SEO Content (tool page below-fold) ─────────────
-  seo: {
-    pdf: {
-      howToTitle: 'How to Convert Markdown to PDF',
-      howToSteps: [
-        'Open markdown-to-pdf.app in your browser',
-        'Paste your Markdown or AI-generated text into the editor',
-        'Preview the formatted result in the right panel',
-        'Click "Convert to PDF", then choose "Save as PDF" in the browser print dialog',
-      ],
-      whyTitle: 'Why Convert Markdown to PDF?',
-      whyContent: 'PDF is the universal format for sharing documents. Whether you need to submit an AI-generated report, share meeting notes, or archive your documentation, converting Markdown to PDF ensures your content looks professional and consistent across all devices and platforms.',
-      features: [
-        { title: 'Instant Conversion', desc: 'Convert Markdown to PDF in seconds — no signup, no upload, no waiting.' },
-        { title: 'AI-Friendly', desc: 'Paste output from ChatGPT, Claude, Gemini, or any AI tool directly.' },
-        { title: 'Professional Layout', desc: 'Clean GitHub-style formatting with proper headings, tables, code blocks, and images.' },
-        { title: 'Free to Use', desc: 'No server-side quota. Conversion runs in your browser and is limited by your device.' },
-      ],
-      faq: [
-        { q: 'Is this tool free?', a: 'Yes. The converter is free to use and no account is required. An optional free account just saves your conversion history.' },
-        { q: 'What is Markdown? Do I need to learn it?', a: 'Markdown is a simple text formatting language — those #, **, and - symbols you see in ChatGPT or Claude output. You don\'t need to learn it. Just paste your text and we\'ll convert it into a clean PDF.' },
-        { q: 'Is my data safe?', a: 'Yes. PDF generation happens entirely in your browser via the native print engine — your Markdown content never reaches our server. Your file stays on your device.' },
-        { q: 'What Markdown features are supported?', a: 'We support GitHub Flavored Markdown (GFM) including headings, bold, italic, links, images, code blocks with syntax highlighting, tables, task lists, and blockquotes.' },
-        { q: 'Can I convert long documents?', a: 'Yes, you can convert documents up to 500KB in size. For very long documents, the PDF may take a few extra seconds to generate.' },
-      ],
-    },
-    word: {
-      howToTitle: 'How to Convert Markdown to Word',
-      howToSteps: [
-        'Open the Word converter page',
-        'Paste your Markdown text or upload a .md file',
-        'Preview the formatted output',
-        'Click "Convert to Word" to download as .docx',
-      ],
-      whyTitle: 'Why Convert Markdown to Word?',
-      whyContent: 'Word documents are the standard for business communication. Convert your Markdown notes, AI outputs, or technical documentation to .docx format for easy editing in Microsoft Word, Google Docs, or LibreOffice.',
-      features: [
-        { title: 'Real .docx Format', desc: 'Generate Word documents that open natively in Microsoft Word, Google Docs, and LibreOffice.' },
-        { title: 'Preserve Formatting', desc: 'Headings, lists, tables, bold, italic, and code blocks are all preserved.' },
-        { title: 'AI Output Ready', desc: 'Perfect for converting ChatGPT or Claude responses into editable Word documents.' },
-        { title: 'Free to Use', desc: 'No server-side quota. Conversion runs in your browser — your content stays on your device.' },
-      ],
-      faq: [
-        { q: 'Is the Word output editable?', a: 'Yes! The generated .docx file is fully editable in Microsoft Word, Google Docs, or any application that supports the Word format.' },
-        { q: 'Does it support tables?', a: 'Yes, Markdown tables are converted to native Word tables with proper formatting.' },
-        { q: 'What about code blocks?', a: 'Code blocks are rendered in monospace font with a light gray background. Syntax highlighting in Word is limited compared to PDF.' },
-        { q: 'Can I convert AI-generated content?', a: 'Absolutely! Just paste the output from ChatGPT, Claude, or any AI tool and convert it to a Word document.' },
-        { q: 'Is there a size limit?', a: 'Content up to 500KB is supported. Most documents are well within this limit.' },
-      ],
-    },
-    html: {
-      howToTitle: 'How to Convert Markdown to HTML',
-      howToSteps: [
-        'Open the HTML converter page',
-        'Paste your Markdown text or upload a .md file',
-        'Preview the rendered HTML output',
-        'Click "Convert to HTML" to download or "Copy HTML" for the source code',
-      ],
-      whyTitle: 'Why Convert Markdown to HTML?',
-      whyContent: 'HTML is the language of the web. Convert your Markdown to HTML for use in websites, blogs, emails, or any web-based platform. Our converter runs entirely in your browser — your data never leaves your device.',
-      features: [
-        { title: '100% Client-Side', desc: 'Your Markdown content stays in your browser. No content upload is required.' },
-        { title: 'Free to Use', desc: 'HTML conversion has no server-side quota and runs within your browser limits.' },
-        { title: 'Copy or Download', desc: 'Download as an .html file or copy the HTML source code to your clipboard.' },
-        { title: 'Clean Output', desc: 'Semantic HTML with proper heading hierarchy, lists, tables, and code blocks.' },
-      ],
-      faq: [
-        { q: 'Is my data sent to a server?', a: 'No! Like PDF and Word, HTML conversion happens entirely in your browser. Your content never leaves your device.' },
-        { q: 'Is there a conversion limit?', a: 'There is no server-side quota for HTML conversion. Very large documents are still limited by your browser memory and performance.' },
-        { q: 'What is the "Copy HTML" button for?', a: 'It copies the HTML source code to your clipboard. You can paste it into a website editor, email template, or any tool that accepts HTML.' },
-        { q: 'Does it include CSS styling?', a: 'The downloaded .html file includes basic inline CSS for a clean, readable layout. The copied HTML source code is unstyled — you can add your own CSS.' },
-        { q: 'Can I use this for my blog?', a: 'Yes! Convert your Markdown posts to HTML and paste them into your blog\'s editor.' },
-      ],
-    },
-  },
-
   // ─── Guide pages ────────────────────────────────────
   guidesIndex: {
     title: 'Markdown Guides',
@@ -209,24 +130,6 @@ const en = {
     },
   },
 
-  // ─── Prefill example ───────────────────────────────
-  prefill: `# Welcome to Markdown to PDF
-
-This is **Markdown** — the same format used by ChatGPT, Claude, and other AI tools.
-
-## How to use
-1. Select all text here (Ctrl+A / Cmd+A)
-2. Paste your own Markdown or AI-generated text
-3. Preview the formatted result on the right →
-4. Click **Convert to PDF** below
-
-## Markdown basics
-- \`#\` creates headings
-- \`**bold**\` makes text **bold**
-- \`-\` creates bullet lists like this one
-
-> Tip: You don't need to know Markdown — just paste and convert!
-`,
 } as const;
 
 /** Recursively widen literal types to string/number/boolean for locale compatibility */

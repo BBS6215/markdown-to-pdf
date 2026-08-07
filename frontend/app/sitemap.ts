@@ -1,6 +1,6 @@
 /**
  * Dynamic sitemap.
- * Source: 05-技术方案 §9.3
+ * Source: 02-SEO策略 §6, §10
  *
  * Added 2026-05-15: 5 deeper guide pages (table / image / code-block /
  * link / list) for AdSense audit content depth.
@@ -28,9 +28,9 @@ import type { MetadataRoute } from 'next';
 const BASE_URL = 'https://markdown-to-pdf.app';
 
 const PAGES = [
-  { path: '', changeFrequency: 'weekly' as const, priority: 1.0, lastModified: '2026-05-13' },
-  { path: '/to-word', changeFrequency: 'weekly' as const, priority: 0.9, lastModified: '2026-05-13' },
-  { path: '/to-html', changeFrequency: 'weekly' as const, priority: 0.9, lastModified: '2026-05-13' },
+  { path: '', changeFrequency: 'weekly' as const, priority: 1.0, lastModified: '2026-08-07' },
+  { path: '/to-word', changeFrequency: 'weekly' as const, priority: 0.9, lastModified: '2026-08-07' },
+  { path: '/to-html', changeFrequency: 'weekly' as const, priority: 0.9, lastModified: '2026-08-07' },
   { path: '/guides', changeFrequency: 'weekly' as const, priority: 0.8, lastModified: '2026-05-13' },
   { path: '/guides/markdown-new-line', changeFrequency: 'monthly' as const, priority: 0.7, lastModified: '2026-05-13' },
   { path: '/guides/markdown-quote', changeFrequency: 'monthly' as const, priority: 0.7, lastModified: '2026-05-13' },

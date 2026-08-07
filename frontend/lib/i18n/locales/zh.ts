@@ -19,20 +19,17 @@ const zh: Translations = {
   tool: {
     pdf: {
       h1: '在线 Markdown (.md) 转 PDF — 免费工具',
-      subheading: '将 Markdown 或 AI 生成的文本快速转换为专业 PDF。',
-      intro: '在左侧粘贴 Markdown，右侧实时预览，点击"转换为 PDF"后浏览器会弹出打印对话框，选择"另存为 PDF"即可保存——与打印任意网页是同一个流程。整个转换过程完全在你的浏览器里完成，内容不会上传到任何服务器，也不需要注册。标题、列表、表格、代码块、图片的预览与最终 PDF 非常接近，绝大多数排版问题在导出前就能在预览里发现。',
+      subheading: '粘贴 Markdown，实时预览并在浏览器中导出 PDF；无需注册，内容不会上传。',
       convertButton: '转换为 PDF',
     },
     word: {
       h1: '在线 Markdown (.md) 转 Word — 免费工具',
-      subheading: '将 Markdown 或 AI 生成的文本转换为 Word 文档。',
-      intro: '粘贴 Markdown、预览效果、下载真实的 .docx 文件 —— 在 Microsoft Word、Google Docs、Pages 里都能原生打开。Word 导出完全在浏览器内运行，使用开源的 docx 库并针对中英文混排做了字体调优，标题层级、列表缩进、代码块等宽字体都会被正确保留。无需注册、不上传服务器；没有服务端配额，唯一的实际上限是你浏览器能装下多少内容。',
+      subheading: '粘贴 Markdown，实时预览并下载 Word（.docx）；无需注册，内容不会上传。',
       convertButton: '转换为 Word',
     },
     html: {
       h1: '在线 Markdown (.md) 转 HTML — 免费工具',
-      subheading: '将 Markdown 转换为 HTML — 100% 浏览器端处理，数据不离开您的设备。',
-      intro: '粘贴 Markdown、预览渲染效果、把生产就绪的 HTML 一键复制到剪贴板。输出的 HTML 经过 rehype-sanitize 清洗，可以直接粘贴到 Notion、Google Docs、邮件或任意 CMS，不会带入危险脚本或杂乱的内联样式。整个过程在你的浏览器内完成，Markdown 内容不会发送到服务器。',
+      subheading: '粘贴 Markdown，实时预览并复制干净的 HTML；无需注册，内容不会上传。',
       convertButton: '转换为 HTML',
       copyHtml: '复制 HTML',
     },
@@ -95,71 +92,6 @@ const zh: Translations = {
     privacyNote: '历史仅保存文件名和时间戳，您的实际内容不会到达我们的服务器。',
   },
 
-  seo: {
-    pdf: {
-      howToTitle: '如何将 Markdown 转换为 PDF',
-      howToSteps: [
-        '在浏览器中打开 markdown-to-pdf.app',
-        '将 Markdown 或 AI 生成的文本粘贴到编辑器中',
-        '在右侧面板预览格式化效果',
-        '点击"转换为 PDF"，然后在浏览器打印对话框中选择“另存为 PDF”',
-      ],
-      whyTitle: '为什么要将 Markdown 转为 PDF？',
-      whyContent: 'PDF 是通用的文档分享格式。无论是提交 AI 生成的报告、分享会议记录还是归档文档，将 Markdown 转为 PDF 可确保内容在所有设备和平台上呈现一致的专业外观。',
-      features: [
-        { title: '即时转换', desc: '几秒内将 Markdown 转为 PDF，无需注册、无需上传、无需等待。' },
-        { title: 'AI 友好', desc: '直接粘贴 ChatGPT、Claude、Gemini 或任何 AI 工具的输出。' },
-        { title: '专业排版', desc: '干净的 GitHub 风格，标题、表格、代码块和图片都正确显示。' },
-        { title: '免费使用', desc: '不设服务端配额。转换在浏览器中完成，受设备能力限制。' },
-      ],
-      faq: [
-        { q: '这个工具是免费的吗？', a: '是的，可免费使用，无需注册账号。注册免费账号仅用于保存转换历史。' },
-        { q: '什么是 Markdown？我需要学它吗？', a: 'Markdown 是一种简单的文本格式语言——就是你在 ChatGPT 或 Claude 输出中看到的那些 #、** 和 - 符号。你不需要学它，直接粘贴文本就能转换。' },
-        { q: '我的数据安全吗？', a: '安全。PDF 生成完全在您的浏览器中通过原生打印引擎完成，您的 Markdown 内容从不发送到我们的服务器，文件始终留在您的设备上。' },
-        { q: '支持哪些 Markdown 功能？', a: '支持 GitHub Flavored Markdown (GFM)，包括标题、加粗、斜体、链接、图片、代码高亮、表格、任务列表和引用。' },
-        { q: '可以转换长文档吗？', a: '可以，支持最大 500KB 的文档。超长文档可能需要多几秒生成时间。' },
-      ],
-    },
-    word: {
-      howToTitle: '如何将 Markdown 转换为 Word',
-      howToSteps: ['打开 Word 转换页面', '粘贴 Markdown 文本或上传 .md 文件', '预览格式化输出', '点击"转换为 Word"下载 .docx'],
-      whyTitle: '为什么要将 Markdown 转为 Word？',
-      whyContent: 'Word 文档是商务沟通的标准格式。将 Markdown 笔记、AI 输出或技术文档转为 .docx，方便在 Microsoft Word、Google Docs 或 LibreOffice 中编辑。',
-      features: [
-        { title: '真正的 .docx 格式', desc: '生成可在 Microsoft Word、Google Docs 和 LibreOffice 中原生打开的 Word 文档。' },
-        { title: '保留格式', desc: '标题、列表、表格、加粗、斜体和代码块都会保留。' },
-        { title: 'AI 输出就绪', desc: '完美适合将 ChatGPT 或 Claude 的回复转为可编辑的 Word 文档。' },
-        { title: '免费使用', desc: '不设服务端配额。转换在您的浏览器中完成，内容始终留在您的设备上。' },
-      ],
-      faq: [
-        { q: 'Word 输出可以编辑吗？', a: '可以！生成的 .docx 文件可在 Microsoft Word、Google Docs 或任何支持 Word 格式的应用中完全编辑。' },
-        { q: '支持表格吗？', a: '支持，Markdown 表格会转为原生 Word 表格。' },
-        { q: '代码块怎么处理？', a: '代码块以等宽字体和浅灰色背景呈现。' },
-        { q: '可以转换 AI 生成的内容吗？', a: '当然！直接粘贴 ChatGPT、Claude 或任何 AI 工具的输出即可。' },
-        { q: '有大小限制吗？', a: '支持最大 500KB 的内容，大多数文档远在此范围内。' },
-      ],
-    },
-    html: {
-      howToTitle: '如何将 Markdown 转换为 HTML',
-      howToSteps: ['打开 HTML 转换页面', '粘贴 Markdown 文本或上传 .md 文件', '预览渲染后的 HTML 输出', '点击"转换为 HTML"下载或"复制 HTML"获取源代码'],
-      whyTitle: '为什么要将 Markdown 转为 HTML？',
-      whyContent: 'HTML 是网页的语言。将 Markdown 转为 HTML 可用于网站、博客、邮件或任何网络平台。我们的转换器完全在浏览器中运行——数据不会离开您的设备。',
-      features: [
-        { title: '100% 浏览器端', desc: 'Markdown 内容留在浏览器中，不需要上传内容。' },
-        { title: '免费使用', desc: 'HTML 转换不设服务端配额，实际受浏览器能力限制。' },
-        { title: '复制或下载', desc: '下载 .html 文件或复制 HTML 源代码到剪贴板。' },
-        { title: '干净输出', desc: '语义化 HTML，标题层级正确，列表、表格和代码块完整。' },
-      ],
-      faq: [
-        { q: '数据会发送到服务器吗？', a: '不会！与 PDF 和 Word 一样，HTML 转换完全在浏览器中完成，内容不会离开您的设备。' },
-        { q: '有转换限制吗？', a: 'HTML 转换不设服务端配额。非常大的文档仍会受浏览器内存和性能限制。' },
-        { q: '"复制 HTML"按钮是做什么的？', a: '它会将 HTML 源代码复制到剪贴板，您可以粘贴到网站编辑器、邮件模板或任何接受 HTML 的工具中。' },
-        { q: '包含 CSS 样式吗？', a: '下载的 .html 文件包含基础内联 CSS。复制的 HTML 源代码不含样式，您可以添加自己的 CSS。' },
-        { q: '可以用来写博客吗？', a: '可以！将 Markdown 文章转为 HTML 并粘贴到博客编辑器中。' },
-      ],
-    },
-  },
-
   guidesIndex: {
     title: 'Markdown 指南',
     subtitle: '通过交互式示例学习 Markdown 语法。',
@@ -191,23 +123,6 @@ const zh: Translations = {
     },
   },
 
-  prefill: `# 欢迎使用 Markdown 转 PDF
-
-这是 **Markdown** 格式 — ChatGPT、Claude 等 AI 工具使用的相同格式。
-
-## 使用方法
-1. 全选此处文本 (Ctrl+A / Cmd+A)
-2. 粘贴您的 Markdown 或 AI 生成的文本
-3. 在右侧预览格式化效果 →
-4. 点击下方 **转换为 PDF**
-
-## Markdown 基础语法
-- \`#\` 创建标题
-- \`**加粗**\` 使文本 **加粗**
-- \`-\` 创建像这样的列表
-
-> 提示：您不需要学习 Markdown — 直接粘贴并转换！
-`,
 } as const;
 
 export default zh;

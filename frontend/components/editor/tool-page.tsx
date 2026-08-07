@@ -12,19 +12,20 @@ import { MarkdownEditor, type MarkdownEditorHandle } from '@/components/editor/m
 import { MarkdownPreview } from '@/components/editor/markdown-preview';
 import { FileDropzone } from '@/components/editor/file-dropzone';
 import { EditorToolbar } from '@/components/editor/editor-toolbar';
-import { SeoContentSection } from '@/components/seo/seo-content-section';
+import { JsonLd } from '@/components/seo/json-ld';
 import { useEditorContent } from '@/hooks/use-editor-content';
 import { useConversion } from '@/hooks/use-conversion';
-import { usePathname } from 'next/navigation';
 import { getTranslations } from '@/lib/i18n/get-translations';
+import { softwareApplicationSchema } from '@/lib/seo/json-ld-schemas';
 
 interface ToolPageProps {
   format: ConvertFormat;
+  lang: string;
 }
 
 type MobileTab = 'edit' | 'preview';
 
-export function ToolPage({ format }: ToolPageProps) {
+export function ToolPage({ format, lang }: ToolPageProps) {
   const { content, updateContent, getContent, isInitialized } = useEditorContent();
   const { status, lastAction, errorMessage, convert, copyHtml, retry } = useConversion(format);
   const [mobileTab, setMobileTab] = useState<MobileTab>('edit');
@@ -37,11 +38,9 @@ export function ToolPage({ format }: ToolPageProps) {
   const [clearedSnapshot, setClearedSnapshot] = useState<string | null>(null);
   const undoTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const pathname = usePathname();
-  const lang = pathname.startsWith('/zh') ? 'zh' : 'en';
-  const t = getTranslations(lang);
+  const supportedLang = lang === 'zh' ? 'zh' : 'en';
+  const t = getTranslations(supportedLang);
   const toolText = t.tool[format];
-  const seoContent = t.seo[format];
 
   const handleConvert = () => {
     // No quota gate: conversion runs in the frontend-only browser pipeline.
@@ -91,24 +90,18 @@ export function ToolPage({ format }: ToolPageProps) {
     };
   }, []);
 
-  const clearedLabel = lang === 'zh' ? '已清空' : 'Cleared';
-  const undoLabel = lang === 'zh' ? '撤销' : 'Undo';
+  const clearedLabel = supportedLang === 'zh' ? '已清空' : 'Cleared';
+  const undoLabel = supportedLang === 'zh' ? '撤销' : 'Undo';
 
   return (
     <div className="max-w-7xl mx-auto">
-      {/* H1 + Sub-heading + SSR intro paragraph
-          02-SEO 附录 C: Title 必须包含 "Markdown (.md)"
-          intro 段是 SSR 文本（200+ 字），让爬虫在编辑器加载前看到真实内容
-          —— AdSense 审核对工具页"thin content"判定的关键缓解。 */}
+      {/* Compact tool heading: one clear promise, then the converter. */}
       <div className="px-4 pt-4 pb-2 max-w-4xl">
         <h1 className="text-2xl font-semibold text-gray-800">
           {toolText.h1}
         </h1>
         <p className="mt-1 text-base text-gray-500">
           {toolText.subheading}
-        </p>
-        <p className="mt-3 text-sm text-gray-600 leading-7">
-          {toolText.intro}
         </p>
       </div>
 
@@ -162,7 +155,7 @@ export function ToolPage({ format }: ToolPageProps) {
               mobile detection, so no SSR/hydration layout flash). Mobile:
               single pane toggled by the switcher above; desktop (md+): both
               panes side by side via md:block + the grid template. */}
-          <FileDropzone onFileContent={handleFileContent} lang={lang}>
+          <FileDropzone onFileContent={handleFileContent} lang={supportedLang}>
             <div className="grid md:grid-cols-[minmax(460px,1fr)_minmax(0,2fr)] border-b border-gray-200">
               <div
                 id="editor-pane"
@@ -170,13 +163,13 @@ export function ToolPage({ format }: ToolPageProps) {
                   mobileTab !== 'edit' ? 'hidden' : ''
                 } md:block`}
               >
-                <MarkdownEditor ref={editorRef} value={content} onChange={updateContent} lang={lang} />
+                <MarkdownEditor ref={editorRef} value={content} onChange={updateContent} lang={supportedLang} />
               </div>
               <div
                 id="preview-pane"
                 className={`${mobileTab !== 'preview' ? 'hidden' : ''} md:block`}
               >
-                <MarkdownPreview markdown={content} lang={lang} />
+                <MarkdownPreview markdown={content} lang={supportedLang} />
               </div>
             </div>
           </FileDropzone>
@@ -194,7 +187,7 @@ export function ToolPage({ format }: ToolPageProps) {
             onClear={handleClear}
             clearDisabled={!content}
             onRetry={retry}
-            lang={lang}
+            lang={supportedLang}
           />
 
           {/* Hidden file input */}
@@ -235,8 +228,7 @@ export function ToolPage({ format }: ToolPageProps) {
         </div>
       )}
 
-      {/* SEO Content Section — below-the-fold, always SSR rendered (01 §6.4, 07 任务 4.13-4.19) */}
-      <SeoContentSection lang={lang} content={seoContent} />
+      <JsonLd data={softwareApplicationSchema(format, supportedLang)} />
     </div>
   );
 }

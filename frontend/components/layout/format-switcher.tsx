@@ -5,7 +5,7 @@
  * Source: 04-UI规范 §5.3, 03-产品结构 §6.3
  *
  * Implemented as Next.js <Link> for client-side navigation (no full page reload).
- * Saves editor content to sessionStorage before navigation (05 §5.3).
+ * Saves editor content to sessionStorage before navigation (03 §6.3).
  */
 
 import Link from 'next/link';
@@ -30,7 +30,7 @@ export function FormatSwitcher({ currentFormat, getContent }: FormatSwitcherProp
   const lang = pathname.startsWith('/zh') ? 'zh' : 'en';
 
   const handleClick = () => {
-    // Save current editor content before navigating (05 §5.3 场景 3)
+    // Save current editor content before navigating (03 §6.3)
     if (getContent) {
       saveEditorContent(getContent());
     }
