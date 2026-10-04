@@ -11,7 +11,7 @@
 @theme {
   /* ─── Font Families (04 §3.1) ────────────────────────────
    * Reference the CSS variables injected by next/font/local (see
-   * app/layout.tsx) so we get the real web font PLUS next/font's
+   * lib/layout/document-shell.tsx) so we get the real web font PLUS next/font's
    * adjusted fallback metrics. The previous literal names happened
    * to match for Inter (case-insensitive family matching) but
    * "JetBrains Mono" never matched the generated `jetbrainsMono`

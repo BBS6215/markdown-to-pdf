@@ -1,0 +1,71 @@
+// @vitest-environment jsdom
+import { beforeEach, afterEach, it, expect, vi } from 'vitest';
+import { renderHook, act, cleanup } from '@testing-library/react';
+const mocks = vi.hoisted(() => ({ html: vi.fn(), copy: vi.fn(), download: vi.fn() }));
+vi.mock('@/lib/converter/html-export', () => ({ exportHtml: mocks.html, copyHtmlToClipboard: mocks.copy }));
+vi.mock('@/components/converter/download-trigger', () => ({ triggerDownload: mocks.download }));
+vi.mock('@/lib/supabase/client', () => ({ getSupabaseBrowserClient: () => { throw Error('offline'); } }));
+import { useConversion } from '../hooks/use-conversion';
+const resultBlob = () => ({ blob: new Blob(['safe']), html: '<p>safe</p>' });
+beforeEach(() => {
+  vi.useFakeTimers();
+  mocks.html.mockReset().mockResolvedValue(resultBlob());
+  mocks.copy.mockReset().mockResolvedValue('<p>safe</p>');
+  mocks.download.mockReset();
+  vi.spyOn(console, 'error').mockImplementation(() => {});
+  vi.spyOn(console, 'warn').mockImplementation(() => {});
+});
+afterEach(() => { cleanup(); vi.useRealTimers(); });
+it('locks synchronously, shows copy loading and ignores duplicate conversions', async () => {
+  let finish!: (value: string) => void;
+  mocks.copy.mockReturnValueOnce(new Promise<string>(resolve => { finish = resolve; }));
+  const { result } = renderHook(() => useConversion({ format: 'html', lang: 'en', markdown: 'text' }));
+  let pending!: Promise<void>;
+  act(() => { pending = result.current.copyHtml(); void result.current.convert(); });
+  expect(result.current.status).toBe('loading');
+  expect(mocks.html).not.toHaveBeenCalled();
+  await act(async () => { finish('html'); await pending; });
+  expect(result.current.status).toBe('success');
+});
+it('really retries a failed action and clears that action after editing', async () => {
+  mocks.html.mockRejectedValueOnce(Error('broken'));
+  const { result, rerender } = renderHook(({ markdown }) => useConversion({ format: 'html', lang: 'zh', markdown }), { initialProps: { markdown: 'old' } });
+  await act(async () => { await result.current.convert(); });
+  expect(result.current.status).toBe('error');
+  expect(result.current.errorMessage).toBe('生成 HTML 失败。');
+  await act(async () => { await result.current.retry(); });
+  expect(mocks.html).toHaveBeenCalledTimes(2);
+  expect(mocks.download).toHaveBeenCalledTimes(1);
+  mocks.html.mockRejectedValueOnce(Error('broken'));
+  await act(async () => { await result.current.convert(); });
+  rerender({ markdown: 'new' });
+  await act(async () => { await result.current.retry(); });
+  expect(mocks.html).toHaveBeenCalledTimes(3);
+});
+it('old success timers cannot reset a newer loading state', async () => {
+  const { result } = renderHook(() => useConversion({ format: 'html', lang: 'en', markdown: 'text' }));
+  await act(async () => { await result.current.copyHtml(); });
+  act(() => { vi.advanceTimersByTime(1500); });
+  let finish!: (value: ReturnType<typeof resultBlob>) => void;
+  mocks.html.mockReturnValueOnce(new Promise(resolve => { finish = resolve; }));
+  let pending!: Promise<void>;
+  act(() => { pending = result.current.convert(); });
+  act(() => { vi.advanceTimersByTime(2000); });
+  expect(result.current.status).toBe('loading');
+  await act(async () => { finish(resultBlob()); await pending; });
+  expect(result.current.status).toBe('success');
+});
+it('does not emit a delayed download after unmount and ignores blank content', async () => {
+  let finish!: (value: ReturnType<typeof resultBlob>) => void;
+  mocks.html.mockReturnValueOnce(new Promise(resolve => { finish = resolve; }));
+  const { result, unmount } = renderHook(() => useConversion({ format: 'html', lang: 'en', markdown: 'text' }));
+  let pending!: Promise<void>;
+  act(() => { pending = result.current.convert(); });
+  unmount();
+  finish(resultBlob()); await pending;
+  expect(mocks.download).not.toHaveBeenCalled();
+  const empty = renderHook(() => useConversion({ format: 'html', lang: 'en', markdown: ' \n ' }));
+  await act(async () => { await empty.result.current.convert(); await empty.result.current.copyHtml(); });
+  expect(empty.result.current.canConvert).toBe(false);
+  expect(mocks.copy).not.toHaveBeenCalled();
+});

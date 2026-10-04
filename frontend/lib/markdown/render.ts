@@ -1,49 +1,63 @@
 /**
- * Shared Markdown → sanitized HTML pipeline for the frontend.
- *
- * Used by both the live preview and the HTML export so they cannot drift.
- * Mirrors the schema in backend/src/services/markdown-renderer.ts.
- *
- * Source: docs/08-安全设计补丁.md
+ * Rendering and text segmentation run off the browser's main thread.
+ * Unsupported/blocked Workers fall back to the same sanitized core.
  */
+export { getMarkdownProcessor } from './render-core';
+import { renderMarkdownCore, type MarkdownRenderResult, type RenderOptions } from './render-core';
+import type { RenderResponse } from './render.worker';
+export type { MarkdownRenderResult, RenderOptions } from './render-core';
 
-let processorPromise: Promise<{ process: (md: string) => Promise<unknown> }> | null = null;
-
-export async function getMarkdownProcessor() {
-  if (!processorPromise) {
-    processorPromise = (async () => {
-      const { unified } = await import('unified');
-      const { default: remarkParse } = await import('remark-parse');
-      const { default: remarkGfm } = await import('remark-gfm');
-      const { default: remarkRehype } = await import('remark-rehype');
-      const { default: rehypeRaw } = await import('rehype-raw');
-      const { default: rehypeSanitize, defaultSchema } = await import('rehype-sanitize');
-      const { default: rehypeHighlight } = await import('rehype-highlight');
-      const { default: rehypeStringify } = await import('rehype-stringify');
-
-      const schema = {
-        ...defaultSchema,
-        tagNames: [
-          ...(defaultSchema.tagNames ?? []),
-          'details', 'summary', 'sub', 'sup', 'kbd', 'mark', 'ins', 'abbr',
-        ],
-      };
-
-      return unified()
-        .use(remarkParse)
-        .use(remarkGfm)
-        .use(remarkRehype, { allowDangerousHtml: true })
-        .use(rehypeRaw)
-        .use(rehypeSanitize, schema)
-        .use(rehypeHighlight, { detect: true })
-        .use(rehypeStringify);
-    })();
-  }
-  return processorPromise;
+class WorkerUnavailableError extends Error {}
+let worker: Worker | null = null;
+let unavailable = false;
+let sequence = 0;
+const pending = new Map<number, {
+  resolve: (result: MarkdownRenderResult) => void;
+  reject: (error: Error) => void;
+}>();
+function failWorker() {
+  unavailable = true;
+  worker?.terminate();
+  worker = null;
+  for (const request of pending.values()) request.reject(new WorkerUnavailableError('Worker unavailable'));
+  pending.clear();
 }
-
+function getWorker(): Worker | null {
+  if (unavailable || typeof window === 'undefined' || typeof Worker === 'undefined') return null;
+  if (!worker) {
+    try {
+      worker = new Worker(new URL('./render.worker.ts', import.meta.url), { type: 'module' });
+      worker.onmessage = (event: MessageEvent<RenderResponse>) => {
+        const request = pending.get(event.data.id);
+        if (!request) return;
+        pending.delete(event.data.id);
+        if (event.data.result) request.resolve(event.data.result);
+        else request.reject(new Error(event.data.error ?? 'Markdown rendering failed'));
+      };
+      worker.onerror = failWorker;
+      worker.onmessageerror = failWorker;
+    } catch {
+      unavailable = true;
+      worker = null;
+    }
+  }
+  return worker;
+}
+export async function renderMarkdown(markdown: string, options: RenderOptions = {}): Promise<MarkdownRenderResult> {
+  const currentWorker = getWorker();
+  if (!currentWorker) return renderMarkdownCore(markdown, options);
+  try {
+    return await new Promise<MarkdownRenderResult>((resolve, reject) => {
+      const id = ++sequence;
+      pending.set(id, { resolve, reject });
+      try { currentWorker.postMessage({ id, markdown, options }); }
+      catch { failWorker(); }
+    });
+  } catch (error) {
+    if (error instanceof WorkerUnavailableError) return renderMarkdownCore(markdown, options);
+    throw error;
+  }
+}
 export async function renderMarkdownToSafeHtml(markdown: string): Promise<string> {
-  const processor = await getMarkdownProcessor();
-  const result = await processor.process(markdown);
-  return String(result);
+  return (await renderMarkdown(markdown)).html;
 }

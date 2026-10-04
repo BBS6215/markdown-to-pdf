@@ -7,8 +7,8 @@
 
 import { Button } from '@/components/ui/button';
 import type { ConvertFormat, ConversionStatus } from '@/lib/types';
-import { FORMAT_CONFIG } from '@/lib/types';
 import { Copy } from 'lucide-react';
+import { getTranslations } from '@/lib/i18n/get-translations';
 
 interface ConvertButtonProps {
   format: ConvertFormat;
@@ -20,13 +20,13 @@ interface ConvertButtonProps {
 }
 
 export function ConvertButton({ format, status, onClick, onCopyHtml, disabled, lang = 'en' }: ConvertButtonProps) {
-  const config = FORMAT_CONFIG[format];
   const isLoading = status === 'loading';
-  const convertLabel = lang === 'zh' ? `转换为 ${config.label}` : `Convert to ${config.label}`;
-  const copyLabel = lang === 'zh' ? '复制 HTML' : 'Copy HTML';
+  const t = getTranslations(lang);
+  const convertLabel = format === 'html' ? t.conversion.downloadHtml : t.tool[format].convertButton;
+  const copyLabel = t.conversion.copySource;
 
   return (
-    <div className="flex items-center gap-2">
+    <div className={`order-2 w-full gap-2 sm:order-3 sm:flex sm:w-auto ${format === 'html' ? 'grid min-[360px]:grid-cols-2' : 'flex'}`}>
       <Button
         variant="primary"
         size="lg"
@@ -34,13 +34,16 @@ export function ConvertButton({ format, status, onClick, onCopyHtml, disabled, l
         loading={isLoading}
         disabled={disabled || isLoading}
         onClick={onClick}
+        className="flex-1 min-w-0 whitespace-nowrap sm:flex-none"
+        style={{ paddingInline: '12px' }}
       >
         {convertLabel}
       </Button>
 
       {/* HTML format gets an extra "Copy HTML" button */}
       {format === 'html' && onCopyHtml && (
-        <Button variant="secondary" size="md" onClick={onCopyHtml} disabled={isLoading}>
+        <Button variant="secondary" size="lg" onClick={onCopyHtml} disabled={disabled || isLoading}
+          className="flex-1 min-w-0 whitespace-nowrap sm:flex-none" style={{ paddingInline: '12px' }}>
           <Copy size={16} className="mr-1.5" />
           {copyLabel}
         </Button>

@@ -15,6 +15,7 @@ import { EditorToolbar } from '@/components/editor/editor-toolbar';
 import { JsonLd } from '@/components/seo/json-ld';
 import { useEditorContent } from '@/hooks/use-editor-content';
 import { useConversion } from '@/hooks/use-conversion';
+import { useFileUpload } from '@/hooks/use-file-upload';
 import { getTranslations } from '@/lib/i18n/get-translations';
 import { softwareApplicationSchema } from '@/lib/seo/json-ld-schemas';
 
@@ -26,8 +27,11 @@ interface ToolPageProps {
 type MobileTab = 'edit' | 'preview';
 
 export function ToolPage({ format, lang }: ToolPageProps) {
-  const { content, updateContent, getContent, isInitialized } = useEditorContent();
-  const { status, lastAction, errorMessage, convert, copyHtml, retry } = useConversion(format);
+  const supportedLang = lang === 'zh' ? 'zh' : 'en';
+  const { content, updateContent, getContent, isInitialized, storageFailed } = useEditorContent();
+  const { status, lastAction, errorMessage, convert, copyHtml, retry, canConvert } =
+    useConversion({ format, lang: supportedLang, markdown: content });
+  const { upload, reading, error: uploadError, cancel: cancelUpload } = useFileUpload(updateContent, supportedLang);
   const [mobileTab, setMobileTab] = useState<MobileTab>('edit');
   const fileInputRef = useRef<HTMLInputElement>(null);
   const editorRef = useRef<MarkdownEditorHandle>(null);
@@ -38,20 +42,20 @@ export function ToolPage({ format, lang }: ToolPageProps) {
   const [clearedSnapshot, setClearedSnapshot] = useState<string | null>(null);
   const undoTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const supportedLang = lang === 'zh' ? 'zh' : 'en';
   const t = getTranslations(supportedLang);
   const toolText = t.tool[format];
 
   const handleConvert = () => {
     // No quota gate: conversion runs in the frontend-only browser pipeline.
-    convert(content);
+    void convert();
   };
 
-  const handleCopyHtml = format === 'html' ? () => copyHtml(content) : undefined;
+  const handleCopyHtml = format === 'html' ? () => { void copyHtml(); } : undefined;
   const handleUpload = () => fileInputRef.current?.click();
-  const handleFileContent = (fileContent: string) => updateContent(fileContent);
+  const handleEdit = (value: string) => { cancelUpload(); updateContent(value); };
 
   const handleClear = () => {
+    cancelUpload();
     if (!content) return;
     if (undoTimerRef.current) clearTimeout(undoTimerRef.current);
     setClearedSnapshot(content);
@@ -90,8 +94,8 @@ export function ToolPage({ format, lang }: ToolPageProps) {
     };
   }, []);
 
-  const clearedLabel = supportedLang === 'zh' ? '已清空' : 'Cleared';
-  const undoLabel = supportedLang === 'zh' ? '撤销' : 'Undo';
+  const clearedLabel = t.editor.cleared;
+  const undoLabel = t.editor.undo;
 
   return (
     <div className="max-w-7xl mx-auto">
@@ -108,6 +112,11 @@ export function ToolPage({ format, lang }: ToolPageProps) {
       {/* Format Switcher */}
       <div className="px-4">
         <FormatSwitcher currentFormat={format} getContent={getContent} />
+      </div>
+      <div role="status" aria-live="polite">
+        {reading && <p className="px-4 py-2 text-sm text-gray-600">{t.editor.readingFile}</p>}
+        {uploadError && <p role="alert" className="px-4 py-2 text-sm text-red-700">{uploadError}</p>}
+        {storageFailed && <p className="px-4 py-2 text-sm text-yellow-800">{t.editor.storageWarning}</p>}
       </div>
 
       {/* Editor area — wait for sessionStorage initialization */}
@@ -155,21 +164,21 @@ export function ToolPage({ format, lang }: ToolPageProps) {
               mobile detection, so no SSR/hydration layout flash). Mobile:
               single pane toggled by the switcher above; desktop (md+): both
               panes side by side via md:block + the grid template. */}
-          <FileDropzone onFileContent={handleFileContent} lang={supportedLang}>
-            <div className="grid md:grid-cols-[minmax(460px,1fr)_minmax(0,2fr)] border-b border-gray-200">
+          <FileDropzone onFile={(file) => { void upload(file); }} lang={supportedLang}>
+            <div className="grid md:grid-cols-[minmax(0,1fr)_minmax(0,1.5fr)] border-b border-gray-200">
               <div
                 id="editor-pane"
                 className={`md:border-r md:border-gray-200 ${
                   mobileTab !== 'edit' ? 'hidden' : ''
                 } md:block`}
               >
-                <MarkdownEditor ref={editorRef} value={content} onChange={updateContent} lang={supportedLang} />
+                <MarkdownEditor ref={editorRef} value={content} onChange={handleEdit} lang={supportedLang} />
               </div>
               <div
                 id="preview-pane"
                 className={`${mobileTab !== 'preview' ? 'hidden' : ''} md:block`}
               >
-                <MarkdownPreview markdown={content} lang={supportedLang} />
+                <MarkdownPreview markdown={content} lang={supportedLang} showStats />
               </div>
             </div>
           </FileDropzone>
@@ -186,6 +195,7 @@ export function ToolPage({ format, lang }: ToolPageProps) {
             onUpload={handleUpload}
             onClear={handleClear}
             clearDisabled={!content}
+            convertDisabled={!canConvert || reading}
             onRetry={retry}
             lang={supportedLang}
           />
@@ -198,13 +208,7 @@ export function ToolPage({ format, lang }: ToolPageProps) {
             className="hidden"
             onChange={(e) => {
               const file = e.target.files?.[0];
-              if (file) {
-                file.arrayBuffer().then(async (buffer) => {
-                  const { decodeFileBuffer } = await import('@/lib/editor/encoding-detector');
-                  const text = await decodeFileBuffer(buffer);
-                  handleFileContent(text);
-                });
-              }
+              if (file) void upload(file);
               e.target.value = '';
             }}
           />

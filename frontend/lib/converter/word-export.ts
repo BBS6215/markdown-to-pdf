@@ -32,6 +32,7 @@ import {
   WidthType,
   BorderStyle,
   AlignmentType,
+  type IParagraphOptions,
 } from 'docx';
 import type { Root, Content, PhrasingContent, List as MdList } from 'mdast';
 import { unified } from 'unified';
@@ -205,160 +206,122 @@ function extractText(node: PhrasingContent): TextRun[] {
   return collectInlineRuns(node).map(toTextRun);
 }
 
-function convertNode(node: Content): (Paragraph | Table)[] {
+interface BlockContext {
+  listDepth: number;
+  quoteDepth: number;
+  prefix?: string;
+  bulletLevel?: number;
+}
+const ROOT_CONTEXT: BlockContext = { listDepth: 0, quoteDepth: 0 };
+function withoutMarker(context: BlockContext): BlockContext {
+  return { listDepth: context.listDepth, quoteDepth: context.quoteDepth };
+}
+function paragraph(children: TextRun[], context: BlockContext, options: IParagraphOptions = {}): Paragraph {
+  const left = context.listDepth * 360 + context.quoteDepth * 720;
+  const marked = context.prefix !== undefined || context.bulletLevel !== undefined;
+  return new Paragraph({
+    children: context.prefix ? [new TextRun({ text: context.prefix }), ...children] : children,
+    spacing: { after: 200 },
+    ...options,
+    ...(left > 0 && { indent: { left, ...(marked && { hanging: 240 }) } }),
+    ...(context.bulletLevel !== undefined && { bullet: { level: context.bulletLevel } }),
+    ...(context.quoteDepth > 0 && { border: { left: { style: BorderStyle.SINGLE, size: 6, color: 'CCCCCC', space: 10 } } }),
+  });
+}
+function convertNode(node: Content, context: BlockContext = ROOT_CONTEXT): (Paragraph | Table)[] {
   switch (node.type) {
     case 'heading':
-      return [
-        new Paragraph({
-          heading: HEADING_LEVELS[node.depth] || HeadingLevel.HEADING_1,
-          children: (node.children as PhrasingContent[]).flatMap(extractText),
-        }),
-      ];
-
+      return [paragraph(node.children.flatMap(extractText), context, {
+        heading: HEADING_LEVELS[node.depth] || HeadingLevel.HEADING_1,
+      })];
     case 'paragraph':
-      return [
-        new Paragraph({
-          children: (node.children as PhrasingContent[]).flatMap(extractText),
-          spacing: { after: 200 },
-        }),
-      ];
-
+      return [paragraph(node.children.flatMap(extractText), context)];
     case 'list':
-      return convertList(node as MdList);
-
-    case 'code':
-      return [
-        new Paragraph({
-          children: [
-            new TextRun({
-              text: node.value,
-              font: { name: 'Courier New' },
-              size: 18,
-            }),
-          ],
-          spacing: { before: 200, after: 200 },
-          shading: { type: 'clear', color: 'auto', fill: 'F6F8FA' },
-        }),
-      ];
-
-    case 'blockquote': {
-      const children: Paragraph[] = [];
-      for (const child of node.children) {
-        if (child.type === 'paragraph') {
-          children.push(
-            new Paragraph({
-              children: (child.children as PhrasingContent[]).flatMap(extractText),
-              indent: { left: 720 },
-              spacing: { after: 120 },
-              border: {
-                left: { style: BorderStyle.SINGLE, size: 6, color: 'CCCCCC', space: 10 },
-              },
-            })
-          );
-        }
-      }
-      return children;
-    }
-
-    case 'table': {
-      if (!node.children || node.children.length === 0) return [];
-      const rows = node.children.map((row: Content, rowIndex: number) => {
-        const rowChildren = (row as unknown as { children: { children: PhrasingContent[] }[] }).children;
-        const cells = rowChildren.map(
-          (cell) =>
-            new TableCell({
-              children: [
-                new Paragraph({
-                  children: cell.children.flatMap(extractText),
-                  alignment: AlignmentType.LEFT,
-                }),
-              ],
-              width: { size: 100 / rowChildren.length, type: WidthType.PERCENTAGE },
-              shading: rowIndex === 0 ? { fill: 'F0F0F0' } : undefined,
-            })
-        );
-        return new TableRow({ children: cells });
+      return convertList(node, context);
+    case 'code': {
+      const runs: TextRun[] = [];
+      node.value.split(/\r?\n/).forEach((line, index) => {
+        if (index) runs.push(new TextRun({ break: 1 }));
+        runs.push(new TextRun({ text: line, font: { name: 'Courier New' }, size: 18 }));
       });
-      return [
-        new Table({
-          rows,
-          width: { size: 100, type: WidthType.PERCENTAGE },
-        }),
-      ];
+      return [paragraph(runs, context, {
+        spacing: { before: 200, after: 200 },
+        shading: { type: 'clear', color: 'auto', fill: 'F6F8FA' },
+      })];
     }
-
-    case 'thematicBreak':
-      return [
-        new Paragraph({
-          children: [new TextRun({ text: '─'.repeat(50), color: 'CCCCCC' })],
-          spacing: { before: 200, after: 200 },
-        }),
-      ];
-
-    case 'html': {
-      // Block-level raw HTML — typically a stand-alone <br> on its own
-      // line, or a <div>/<details>/... that the user pasted directly.
-      // Translate <br> to an empty paragraph (visible blank line); drop
-      // everything else rather than leaking the literal tag into Word.
-      const value = (node as unknown as { value?: unknown }).value;
-      if (typeof value === 'string' && /^<br\s*\/?>$/i.test(value.trim())) {
-        return [new Paragraph({ children: [new TextRun({ break: 1 })] })];
+    case 'blockquote': {
+      const result: (Paragraph | Table)[] = [];
+      let first = true;
+      for (const child of node.children) {
+        const childContext = { ...(first ? context : withoutMarker(context)), quoteDepth: context.quoteDepth + 1 };
+        const converted = convertNode(child, childContext);
+        if (converted.length) first = false;
+        result.push(...converted);
       }
-      return [];
+      return result;
     }
-
+    case 'table': {
+      if (!node.children.length) return [];
+      // A quoted/nested table must fit the remaining A4 text area; 100%
+      // plus indentation would overflow the right page margin.
+      const left = Math.min(context.listDepth * 360 + context.quoteDepth * 720, 9746 - 1440);
+      const width = 9746 - left;
+      const columnCount = node.children[0].children.length;
+      const columnWidths = Array.from({ length: columnCount }, (_, column) =>
+        Math.floor(width / columnCount) + (column < width % columnCount ? 1 : 0));
+      const rows = node.children.map((row, rowIndex) => new TableRow({
+        children: columnWidths.map((cellWidth, column) => new TableCell({
+          children: [new Paragraph({
+            children: row.children[column]?.children.flatMap(extractText) ?? [],
+            alignment: node.align?.[column] === 'right' ? AlignmentType.RIGHT :
+              node.align?.[column] === 'center' ? AlignmentType.CENTER : AlignmentType.LEFT,
+          })],
+          width: { size: cellWidth, type: WidthType.DXA },
+          shading: rowIndex === 0 ? { type: 'clear', fill: 'F0F0F0' } : undefined,
+        })),
+        tableHeader: rowIndex === 0,
+      }));
+      const table = new Table({ rows, columnWidths, width: { size: width, type: WidthType.DXA },
+        ...(left > 0 && { indent: { size: left, type: WidthType.DXA } }) });
+      return context.prefix !== undefined || context.bulletLevel !== undefined ? [paragraph([], context), table] : [table];
+    }
+    case 'thematicBreak':
+      return [paragraph([new TextRun({ text: '─'.repeat(50), color: 'CCCCCC' })], context)];
+    case 'html':
+      return /^<br\s*\/?>$/i.test(node.value.trim()) ? [paragraph([new TextRun({ break: 1 })], context)] : [];
     default:
-      // Unknown block node: drop it rather than dumping `.value` as
-      // literal text. Catching the common case (raw HTML) above means
-      // anything we end up here is almost certainly something we cannot
-      // render meaningfully in docx anyway.
       return [];
   }
 }
 
-/**
- * Convert a Markdown list (ordered or unordered) into docx paragraphs.
- *
- * Ordered lists intentionally use plain text prefixes instead of docx's
- * `numbering.config`. Reusing one numbering reference across separate
- * Markdown lists can make the second list continue from the previous one
- * in Word/WPS. ABeiTools avoids that by writing "1. " directly, which is
- * the behavior we want for this frontend-first converter.
- */
-function convertList(node: MdList): Paragraph[] {
-  const isOrdered = node.ordered === true;
-  let orderedIndex = node.start ?? 1;
-  const items: Paragraph[] = [];
-
+/** Every item has one marker; following blocks keep indentation, never a second marker. */
+function convertList(node: MdList, context: BlockContext): (Paragraph | Table)[] {
+  const result: (Paragraph | Table)[] = [];
+  // A parent item starting with a nested list still needs its own marker.
+  if (context.prefix !== undefined || context.bulletLevel !== undefined) result.push(paragraph([], context));
+  const depth = context.listDepth + 1;
+  let index = node.start ?? 1;
   for (const item of node.children) {
-    if (item.type !== 'listItem') continue;
-    let isFirstParagraphInItem = true;
-
+    const itemContext: BlockContext = { listDepth: depth, quoteDepth: context.quoteDepth };
+    if (typeof item.checked === 'boolean') {
+      itemContext.prefix = (node.ordered ? `${index}. ` : '') + (item.checked ? '☑ ' : '☐ ');
+    } else if (node.ordered) {
+      itemContext.prefix = `${index}. `;
+    } else if (depth <= 9) {
+      itemContext.bulletLevel = depth - 1;
+    } else {
+      itemContext.prefix = '• ';
+    }
+    let first = true;
     for (const child of item.children) {
-      if (child.type !== 'paragraph') continue;
-      const children = (child.children as PhrasingContent[]).flatMap(extractText);
-
-      items.push(
-        new Paragraph({
-          children:
-            isOrdered && isFirstParagraphInItem
-              ? [new TextRun({ text: `${orderedIndex}. ` }), ...children]
-              : children,
-          ...(isOrdered
-            ? {}
-            : { bullet: { level: 0 } }),
-          spacing: { after: 80 },
-        })
-      );
-
-      isFirstParagraphInItem = false;
+      const converted = convertNode(child, first ? itemContext : withoutMarker(itemContext));
+      if (converted.length) first = false;
+      result.push(...converted);
     }
-
-    if (isOrdered) {
-      orderedIndex += 1;
-    }
+    if (first) result.push(paragraph([], itemContext));
+    index++;
   }
-  return items;
+  return result;
 }
 
 function parseMarkdown(markdown: string): Root {
@@ -369,7 +332,7 @@ function parseMarkdown(markdown: string): Root {
  * Convert Markdown to a .docx Blob plus a suggested filename.
  * Runs entirely in the browser.
  */
-export async function exportWord(markdown: string): Promise<{ blob: Blob; filename: string }> {
+export function createWordDocument(markdown: string): Document {
   const ast = parseMarkdown(markdown);
 
   const docElements: (Paragraph | Table)[] = [];
@@ -394,7 +357,11 @@ export async function exportWord(markdown: string): Promise<{ blob: Blob; filena
     ],
   });
 
-  const blob = await Packer.toBlob(doc);
+  return doc;
+}
+
+export async function exportWord(markdown: string): Promise<{ blob: Blob; filename: string }> {
+  const blob = await Packer.toBlob(createWordDocument(markdown));
   const filename = generateFilename(markdown, 'word');
   return { blob, filename };
 }

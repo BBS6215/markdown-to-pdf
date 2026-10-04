@@ -14,6 +14,7 @@ import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 're
 import type { EditorView } from '@codemirror/view';
 import { PanelHeader } from '@/components/editor/panel-header';
 import { getTranslations } from '@/lib/i18n/get-translations';
+import { SourceStatistics } from './text-statistics';
 
 interface MarkdownEditorProps {
   value: string;
@@ -96,6 +97,7 @@ export const MarkdownEditor = forwardRef<MarkdownEditorHandle, MarkdownEditorPro
           doc: latestValueRef.current,
           extensions: [
             ...extensions,
+            EditorView.contentAttributes.of({ 'aria-label': t.editor.inputTitle }),
             EditorView.updateListener.of((update) => {
               if (update.docChanged) {
                 onChangeRef.current(update.state.doc.toString());
@@ -151,7 +153,7 @@ export const MarkdownEditor = forwardRef<MarkdownEditorHandle, MarkdownEditorPro
       view?.destroy();
       viewRef.current = null;
     };
-  }, [t.editor.placeholder]);
+  }, [t.editor.placeholder, t.editor.inputTitle]);
 
   // Sync external value changes into CM (e.g., file upload, sessionStorage restore)
   useEffect(() => {
@@ -168,12 +170,13 @@ export const MarkdownEditor = forwardRef<MarkdownEditorHandle, MarkdownEditorPro
   return (
     <div ref={rootRef} className={`relative ${className}`}>
       {/* Panel header */}
-      <PanelHeader title={t.editor.inputTitle} subtitle={t.editor.inputSubtitle} />
+      <PanelHeader title={t.editor.inputTitle} subtitle={t.editor.inputSubtitle} stats={<SourceStatistics content={value} lang={lang} />} />
 
       {/* Textarea fallback (shown until CM6 loads) */}
       {!cmLoaded && (
         <textarea
           ref={textareaRef}
+          aria-label={t.editor.inputTitle}
           value={value}
           onChange={(e) => onChange(e.target.value)}
           placeholder={t.editor.placeholder}

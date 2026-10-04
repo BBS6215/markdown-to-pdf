@@ -1,131 +1,121 @@
 'use client';
 
-/**
- * Conversion state management hook — pure-frontend pipeline.
- *
- * All three formats run entirely in the browser:
- *   - HTML: unified + rehype-sanitize -> Blob (no quota).
- *   - PDF : window.print() against a styled iframe (user picks "Save as PDF").
- *   - Word: docx package -> Blob (no quota).
- *
- * Backend conversion routes (backend/src/routes/convert-*.ts) and the
- * server-authoritative quota machinery are intentionally kept in the repo.
- * They are unused while we ship the zero-cost flavor of the site, and can be
- * re-enabled by switching this hook back to the API-client path once a
- * server is provisioned (see docs/09).
- *
- * Resilience contract: the conversion (download / print) must succeed even
- * if Supabase is unreachable. The auth lookup and history insert are
- * best-effort, wrapped so they cannot break the user-visible action.
- */
-
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import type { ConvertFormat, ConversionStatus, ConversionAction } from '@/lib/types';
 import { exportHtml, copyHtmlToClipboard } from '@/lib/converter/html-export';
 import { generateFilename } from '@/lib/converter/filename-generator';
 import { triggerDownload } from '@/components/converter/download-trigger';
 import { getSupabaseBrowserClient } from '@/lib/supabase/client';
+import { getTranslations } from '@/lib/i18n/get-translations';
 
-// Word and PDF code paths are dynamically imported so the docx package
-// (~300KB gzip) and the print iframe helper are not part of the initial
-// bundle for users who never touch them.
+interface FailedAction { markdown: string; format: ConvertFormat; action: 'convert' | 'copy' }
 
-export function useConversion(format: ConvertFormat) {
+/** One execution lock and one timer for download, print, copy and retry. */
+export function useConversion({ format, lang, markdown }: { format: ConvertFormat; lang: string; markdown: string }) {
   const [status, setStatus] = useState<ConversionStatus>('idle');
   const [lastAction, setLastAction] = useState<ConversionAction>(null);
   const [errorMessage, setErrorMessage] = useState<string>();
+  const active = useRef(false);
+  const mounted = useRef(false);
+  const operation = useRef(0);
+  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const failed = useRef<FailedAction | null>(null);
+  const current = useRef({ markdown, format });
+  current.current = { markdown, format };
+  const t = getTranslations(lang);
 
-  const convert = useCallback(
-    async (markdown: string) => {
-      if (!markdown.trim()) return;
+  const clearTimer = useCallback(() => {
+    if (timer.current) clearTimeout(timer.current);
+    timer.current = null;
+  }, []);
+  useEffect(() => {
+    mounted.current = true;
+    return () => {
+      mounted.current = false;
+      active.current = false;
+      clearTimer();
+    };
+  }, [clearTimer]);
+  useEffect(() => {
+    failed.current = null;
+    clearTimer();
+    if (!active.current) { setStatus('idle'); setErrorMessage(undefined); }
+  }, [markdown, format, clearTimer]);
 
-      setStatus('loading');
-      setLastAction(format === 'pdf' ? 'print' : 'download');
-      setErrorMessage(undefined);
-
-      const sourceSize = new Blob([markdown]).size;
-
-      let blob: Blob | null = null;
-      let filename: string;
-
-      try {
-        if (format === 'html') {
-          const result = await exportHtml(markdown);
-          blob = result.blob;
-          filename = generateFilename(markdown, 'html');
-          triggerDownload(blob, filename);
-        } else if (format === 'word') {
-          const { exportWord } = await import('@/lib/converter/word-export');
-          const result = await exportWord(markdown);
-          blob = result.blob;
-          filename = result.filename;
-          triggerDownload(blob, filename);
-        } else {
-          // PDF: opens the browser print dialog; user chooses "Save as PDF".
-          // No Blob is produced on our side — the browser owns the save UX.
-          const { printMarkdownAsPdf } = await import('@/lib/converter/pdf-print');
-          const result = await printMarkdownAsPdf(markdown);
-          filename = result.filename;
-        }
-
-        setStatus('success');
-        setTimeout(() => setStatus('idle'), 3000);
-      } catch (err) {
-        setStatus('error');
-        setErrorMessage(
-          err instanceof Error ? err.message : 'An unexpected error occurred. Please try again.'
-        );
-        return;
+  const execute = useCallback(async (request: FailedAction) => {
+    if (!request.markdown.trim() || active.current) return;
+    active.current = true;
+    clearTimer();
+    failed.current = null;
+    const id = ++operation.current;
+    const isCurrent = () => mounted.current && id === operation.current;
+    setStatus('loading');
+    setErrorMessage(undefined);
+    setLastAction(request.action === 'copy' ? 'copy' : request.format === 'pdf' ? 'print' : 'download');
+    let blob: Blob | null = null;
+    let filename = '';
+    try {
+      if (request.action === 'copy') {
+        await copyHtmlToClipboard(request.markdown);
+      } else if (request.format === 'word') {
+        const { exportWord } = await import('@/lib/converter/word-export');
+        const result = await exportWord(request.markdown);
+        blob = result.blob;
+        filename = result.filename;
+        if (isCurrent()) triggerDownload(blob, filename);
+      } else if (request.format === 'html') {
+        const result = await exportHtml(request.markdown);
+        blob = result.blob;
+        filename = generateFilename(request.markdown, 'html');
+        if (isCurrent()) triggerDownload(blob, filename);
+      } else {
+        const { printMarkdownAsPdf } = await import('@/lib/converter/pdf-print');
+        if (!isCurrent()) return;
+        await printMarkdownAsPdf(request.markdown);
       }
+      if (!isCurrent()) return;
+      setStatus('success');
+      timer.current = setTimeout(() => {
+        if (isCurrent()) setStatus('idle');
+        timer.current = null;
+      }, request.action === 'copy' ? 2000 : 3000);
 
-      // Best-effort history write. Never blocks or fails the conversion.
-      // Runs only after the user-visible action has already succeeded.
-      //
-      // PDF is intentionally skipped: it goes through the browser's print
-      // dialog, and the page has no way to tell whether the user picked
-      // "Save as PDF" or cancelled. Recording every PDF click as a
-      // successful conversion would pollute the Dashboard with phantom
-      // rows. HTML and Word actually emit a Blob and trigger a download,
-      // so those are recorded.
-      if (format !== 'pdf') {
+      // Best-effort history never blocks export. PDF saves/cancels cannot
+      // be distinguished; copies and PDFs are not recorded.
+      if (request.action === 'convert' && request.format !== 'pdf') {
         void (async () => {
           try {
             const supabase = getSupabaseBrowserClient();
             const { data: { user } } = await supabase.auth.getUser();
             if (!user) return;
-            await supabase.from('conversion_history').insert({
-              user_id: user.id,
-              format,
-              filename,
-              file_size_bytes: blob ? blob.size : null,
-              source_size_bytes: sourceSize,
-              status: 'success',
+            const { error } = await supabase.from('conversion_history').insert({
+              user_id: user.id, format: request.format, filename,
+              file_size_bytes: blob?.size ?? null,
+              source_size_bytes: new Blob([request.markdown]).size, status: 'success',
             });
-          } catch (err) {
-            console.warn('[history] insert failed (non-fatal):', (err as Error).message);
-          }
+            if (error) console.warn('[history] insert failed:', error.message);
+          } catch (error) { console.warn('[history] unavailable:', error); }
         })();
       }
-    },
-    [format]
-  );
-
-  const copyHtml = useCallback(async (markdown: string) => {
-    try {
-      setLastAction('copy');
-      await copyHtmlToClipboard(markdown);
-      setStatus('success');
-      setTimeout(() => setStatus('idle'), 2000);
-    } catch {
-      setErrorMessage('Failed to copy HTML to clipboard.');
-      setStatus('error');
+    } catch (error) {
+      if (!isCurrent()) return;
+      console.error('[conversion] Action failed:', error);
+      if (current.current.markdown === request.markdown && current.current.format === request.format) {
+        failed.current = request;
+        setStatus('error');
+        setErrorMessage(request.action === 'copy' ? t.conversion.copyFailed :
+          t.conversion.failed.replace('{format}', request.format === 'word' ? 'Word' : request.format.toUpperCase()));
+      } else { setStatus('idle'); }
+    } finally {
+      if (id === operation.current) active.current = false;
     }
-  }, []);
-
+  }, [clearTimer, t.conversion.copyFailed, t.conversion.failed]);
+  const convert = useCallback(() => execute({ markdown, format, action: 'convert' }), [execute, markdown, format]);
+  const copyHtml = useCallback(() => execute({ markdown, format, action: 'copy' }), [execute, markdown, format]);
   const retry = useCallback(() => {
-    setStatus('idle');
-    setErrorMessage(undefined);
-  }, []);
-
-  return { status, lastAction, errorMessage, convert, copyHtml, retry };
+    const request = failed.current;
+    if (request && request.markdown === current.current.markdown && request.format === current.current.format) return execute(request);
+  }, [execute]);
+  return { status, lastAction, errorMessage, convert, copyHtml, retry,
+    canConvert: !!markdown.trim() && status !== 'loading' };
 }

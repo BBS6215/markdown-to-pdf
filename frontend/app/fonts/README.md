@@ -1,6 +1,6 @@
 # Self-hosted Fonts
 
-Two variable-font woff2 files used by `app/layout.tsx` via `next/font/local`:
+Two variable-font woff2 files used by `lib/layout/document-shell.tsx` via `next/font/local`:
 
 | File | Source | License | Latin axis range |
 |---|---|---|---|

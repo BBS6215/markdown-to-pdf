@@ -20,7 +20,7 @@
 - [ ] **Supabase 迁移** 已全部应用（7 个 migration 文件，最新为 `20260513150315`）
 - [ ] **域名 `markdown-to-pdf.app`** 注册商控制台可访问，能编辑 DNS 记录
 - [ ] 本地 `pnpm run build` 通过（Vercel build 大概率也会通过）
-- [ ] 本地 `pnpm run typecheck` 和 `pnpm run lint` 无 error
+- [ ] 本地 `pnpm run typecheck`、`pnpm run lint` 和 `pnpm test` 全部通过
 
 ---
 
@@ -125,7 +125,7 @@ Vercel 自动通过 Let's Encrypt 签发，无需操作。域名 DNS 验证通�
 - [ ] **F3** `/zh` 路径切换中文，`/en` 切换英文，header LanguageSwitcher 工作
 - [ ] **F4** 工具页 `/en` 输入简单 Markdown → 点击 "Convert to PDF" → 浏览器打印对话框弹出 → 选 "Save as PDF"
 - [ ] **F5** 工具页 `/en/to-word` 输入含中文 + 加粗 + 有序列表的 Markdown → 下载 `.docx` → 用 Word / WPS 打开，确认中文不是 Calibri 字体、有序列表 `1. 2. 3.` 正确（不是 bullet）、加粗保留
-- [ ] **F6** 工具页 `/en/to-html` 输入 Markdown → 点击 "Copy HTML" → 粘贴到 Notion / 飞书文档，HTML 渲染正确
+- [ ] **F6** 工具页 `/en/to-html` 输入Markdown → 点击“Copy HTML source” → 粘贴到纯文本编辑器，确认得到sanitize后的HTML源码；此功能不是富文本复制。
 - [ ] **F7** Supabase Auth：用 Google OAuth 登录 → 跳转回首页，cookie 写入正确
 - [ ] **F8** 登录后 Dashboard `/dashboard` 看到刚才的转换记录（HTML / Word，PDF 不写历史是正常）
 - [ ] **F9** F12 → Network 面板没有 4xx/5xx 异常请求；Console 没有红色 error
@@ -208,3 +208,16 @@ migration 已应用的话不能简单回滚，必须写补偿 migration。但前
 - 架构总览：[10-前端化架构补丁.md](./10-前端化架构补丁.md)
 - 原始技术方案：[05-技术方案文档.md](./05-技术方案文档.md)
 - 环境变量模板：`frontend/.env.example`
+
+
+## K. 2026-10-04 增强版本发布检查
+
+- 此版本经用户授权作本地Git提交；尚未push或部署，未修改Supabase配置。上线另按本Runbook执行。
+- 保持Root Directory=frontend、Node22、pnpm10以及原Supabase环境变量。不得把本地占位配置带入生产。
+- 对/en、/zh及三种工具格式检查正确html lang、canonical/hreflang，公共响应可缓存且没有刷新会话Set-Cookie；Dashboard仍为私有/no-store，未登录跳转正确，登录后按当前用户读取历史。
+- 根/保持308到/en；/fr、未知页面、未知指南返回404和noindex；robots/sitemap URL不变。Next15 globalNotFound为实验功能，升级框架时必须重新核对多根布局404行为。
+- 验证手机320/390px英文HTML双按钮、复制失败/重试长提示、编辑/预览切换、软键盘和安全区；iOS Safari及Android Chrome真机粘贴/打印/下载仍为上线前必要验证。
+- 验证上传.MD、GBK、UTF-16；存储不可用/满时不得静默丢稿。跨格式/语言和指南入口保持草稿。
+- Word样例包含混合嵌套列表、多段列表项、☐/☑任务、引用内代码/表格；表格不得越页边，字体和换行正确。HTML复制是源码，PDF仅能确认打开打印对话框，仍不写PDF历史。
+- 实际Google OAuth及登录后Word/HTML历史写入尚未用生产配置联调；发布时执行原F7/F8。没有新增schema或DB migration。
+- 回退保留H节现有流程；Word修复与布局静态化应分别审查。回退root布局时同时回退middleware范围/globalNotFound配置，不能留下半套布局。

@@ -1,43 +1,41 @@
-/**
- * File encoding detection and conversion.
- * Source: 05-技术方案 §5.5 (场景 5: .md 文件上传), §11 风险 10
- *
- * Strategy: Try UTF-8 first; if replacement chars (U+FFFD) appear,
- * use jschardet to guess encoding, then iconv-lite to decode.
- */
+/** Browser-native decoding; legacy detection is loaded only after UTF-8 fails. */
+export class FileReadError extends Error {
+  constructor(public readonly code: 'unsupported' | 'encoding' | 'read') {
+    super(code);
+    this.name = 'FileReadError';
+  }
+}
 
-import jschardet from 'jschardet';
-
-/**
- * Decode a file buffer to UTF-8 string, auto-detecting encoding.
- */
 export async function decodeFileBuffer(buffer: ArrayBuffer): Promise<string> {
-  const uint8 = new Uint8Array(buffer);
-
-  // Try UTF-8 first
-  const utf8Text = new TextDecoder('utf-8').decode(uint8);
-
-  // Check for replacement characters (sign of wrong encoding)
-  const replacementCount = (utf8Text.match(/\uFFFD/g) || []).length;
-
-  if (replacementCount === 0) {
-    // Strip BOM if present
-    return utf8Text.replace(/^\uFEFF/, '');
+  const bytes = new Uint8Array(buffer);
+  try {
+    if (bytes[0] === 0xff && bytes[1] === 0xfe) return new TextDecoder('utf-16le', { fatal: true }).decode(bytes);
+    if (bytes[0] === 0xfe && bytes[1] === 0xff) return new TextDecoder('utf-16be', { fatal: true }).decode(bytes);
+    return new TextDecoder('utf-8', { fatal: true }).decode(bytes);
+  } catch {
+    if ((bytes[0] === 0xff && bytes[1] === 0xfe) || (bytes[0] === 0xfe && bytes[1] === 0xff)) throw new FileReadError('encoding');
   }
-
-  // UTF-8 failed — detect actual encoding
-  const detected = jschardet.detect(Buffer.from(buffer));
-
-  if (detected.encoding && detected.confidence > 0.5) {
-    try {
-      // Dynamic import iconv-lite (browser version)
-      const iconv = await import('iconv-lite');
-      const decoded = iconv.decode(Buffer.from(buffer), detected.encoding);
-      return decoded;
-    } catch {
-      // iconv-lite fallback failed, return UTF-8 result
-    }
+  const { default: detector } = await import('jschardet');
+  // The detector accepts a binary string; chunks avoid argument/stack limits.
+  let binary = '';
+  for (let offset = 0; offset < bytes.length; offset += 4096) {
+    binary += String.fromCharCode(...bytes.subarray(offset, offset + 4096));
   }
+  const detected = detector.detect(binary);
+  if (!detected.encoding || detected.confidence <= 0.5) throw new FileReadError('encoding');
+  try {
+    return new TextDecoder(detected.encoding, { fatal: true }).decode(bytes);
+  } catch {
+    throw new FileReadError('encoding');
+  }
+}
 
-  return utf8Text;
+export async function readMarkdownFile(file: Pick<File, 'name' | 'arrayBuffer'>): Promise<string> {
+  if (!/\.(md|markdown|txt)$/i.test(file.name)) throw new FileReadError('unsupported');
+  try {
+    return await decodeFileBuffer(await file.arrayBuffer());
+  } catch (error) {
+    if (error instanceof FileReadError) throw error;
+    throw new FileReadError('read');
+  }
 }

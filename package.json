@@ -10,6 +10,7 @@
     "build": "pnpm --filter @mdpdf/frontend build",
     "typecheck": "pnpm --filter @mdpdf/frontend typecheck",
     "lint": "pnpm --filter @mdpdf/frontend lint",
+    "test": "pnpm --filter @mdpdf/frontend test",
     "build:all": "pnpm -r build",
     "typecheck:all": "pnpm -r typecheck",
     "lint:all": "pnpm -r lint"

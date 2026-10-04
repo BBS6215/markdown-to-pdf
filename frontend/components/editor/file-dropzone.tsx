@@ -11,42 +11,31 @@
 
 import { useState, useCallback } from 'react';
 import { Upload } from 'lucide-react';
-import { decodeFileBuffer } from '@/lib/editor/encoding-detector';
 import { getTranslations } from '@/lib/i18n/get-translations';
 
 interface FileDropzoneProps {
-  onFileContent: (content: string) => void;
+  onFile: (file: File) => void;
   children: React.ReactNode;
   lang?: string;
 }
 
-export function FileDropzone({ onFileContent, children, lang = 'en' }: FileDropzoneProps) {
+export function FileDropzone({ onFile, children, lang = 'en' }: FileDropzoneProps) {
   const [isDragging, setIsDragging] = useState(false);
   const t = getTranslations(lang);
 
-  const handleFile = useCallback(
-    async (file: File) => {
-      if (!file.name.endsWith('.md') && !file.name.endsWith('.markdown') && !file.name.endsWith('.txt')) {
-        return; // Only accept markdown/text files
-      }
-      const buffer = await file.arrayBuffer();
-      const content = await decodeFileBuffer(buffer);
-      onFileContent(content);
-    },
-    [onFileContent]
-  );
-
   const handleDrop = useCallback(
     (e: React.DragEvent) => {
+      if (!e.dataTransfer.types.includes('Files')) return;
       e.preventDefault();
       setIsDragging(false);
       const file = e.dataTransfer.files[0];
-      if (file) handleFile(file);
+      if (file) onFile(file);
     },
-    [handleFile]
+    [onFile]
   );
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
+    if (!e.dataTransfer.types.includes('Files')) return;
     e.preventDefault();
     setIsDragging(true);
   }, []);

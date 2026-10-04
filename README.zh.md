@@ -62,6 +62,7 @@ pnpm dev
 # 4. 类型检查 + lint
 pnpm typecheck
 pnpm lint
+pnpm test
 
 # 5. 生产构建
 pnpm build
@@ -110,3 +111,10 @@ markdown-to-pdf-app/
 ## License
 
 MIT —— 见 [LICENSE](./LICENSE)。
+
+
+## 可靠性与性能更新（2026-10-04）
+
+左右分别显示源码/正文统计；Word保留嵌套、任务及引用内内容；上传支持BOM及检测到的旧编码，浏览器不再依赖Buffer；重试实际重做且各动作共用锁。预览按UTF-8限制为200KiB片段，导出仍为全文，草稿防抖保存并在导航前flush。
+
+Markdown解析与正文分词进入Worker，故障时回退相同安全管线；未标注代码不再自动猜测语言。公共语言页面静态生成，Dashboard仍私有/动态。多根布局采用Next15实验globalNotFound；验证与未覆盖项见10号文档第9节及DEPLOY第K节。

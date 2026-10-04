@@ -46,7 +46,26 @@ ${bodyHtml}
  * Copy the sanitized HTML body fragment to the clipboard.
  */
 export async function copyHtmlToClipboard(markdown: string): Promise<string> {
-  const { html } = await exportHtml(markdown);
-  await navigator.clipboard.writeText(html);
-  return html;
+  const html = renderMarkdownToSafeHtml(markdown);
+  // Start the write while the click still has user activation (Safari).
+  // text/plain deliberately copies source code, not a rich-text document.
+  if (typeof ClipboardItem === 'function' && navigator.clipboard?.write) {
+    const data = html.then(value => new Blob([value], { type: 'text/plain' }));
+    // Clipboard permission may reject before the browser consumes this data.
+    // Keep that secondary promise handled; the action error still propagates.
+    void data.catch(() => {});
+    try {
+      await navigator.clipboard.write([new ClipboardItem({
+        'text/plain': data,
+      })]);
+      return await html;
+    } catch (error) {
+      // A rejected permission can precede a rejected render promise.
+      void html.catch(() => {});
+      throw error;
+    }
+  }
+  const value = await html;
+  await navigator.clipboard.writeText(value);
+  return value;
 }

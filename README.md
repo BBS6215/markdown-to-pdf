@@ -62,6 +62,7 @@ pnpm dev
 # 4. Typecheck + lint
 pnpm typecheck
 pnpm lint
+pnpm test
 
 # 5. Production build
 pnpm build
@@ -112,3 +113,10 @@ See [`docs/DEPLOY.md`](./docs/DEPLOY.md) — covers Vercel project setup, Supaba
 ## License
 
 MIT — see [LICENSE](./LICENSE).
+
+
+## Reliability and performance update (2026-10-04)
+
+The converter now shows source/body statistics, preserves nested Word lists and task states, handles BOM/legacy text files without browser Buffer dependencies, and provides real retries with one action lock. Preview uses a UTF-8-safe 200KiB excerpt; exports still use the complete input. Draft checkpoints are debounced and flushed before navigation.
+
+Markdown rendering and body segmentation run in a Worker with a safe fallback. Unlabelled code no longer triggers language detection. Public localized pages are statically rendered; Dashboard remains private/dynamic. Next.js 15 globalNotFound is enabled for the multiple root layouts. See docs/10 section 9 and DEPLOY section K for validation and remaining device/auth checks.

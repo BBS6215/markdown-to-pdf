@@ -4,7 +4,7 @@
  */
 
 import { notFound } from 'next/navigation';
-import { getGuideBySlug, getRelatedGuides, guidesIndexHref, GUIDES } from '@/lib/guides/content';
+import { getGuideBySlug, getRelatedGuides, guidesIndexHref, getGuides } from '@/lib/guides/content';
 import { getPageMetadata } from '@/lib/seo/metadata';
 import { Breadcrumbs } from '@/components/layout/breadcrumbs';
 import { MiniEditor } from '@/components/editor/mini-editor';
@@ -50,11 +50,9 @@ const SLUG_TO_PAGE_KEY: Record<
   'meeting-notes-template': 'guideMeetingNotes',
 };
 
-export function generateStaticParams() {
-  return GUIDES.flatMap((g) => [
-    { lang: 'en', slug: g.slug },
-    { lang: 'zh', slug: g.slug },
-  ]);
+export const dynamicParams = false;
+export function generateStaticParams({ params }: { params: { lang: string } }) {
+  return getGuides(params.lang).map(g => ({ slug: g.slug }));
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ lang: string; slug: string }> }) {

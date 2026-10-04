@@ -13,6 +13,9 @@ import { getSupabaseServerClient } from '@/lib/supabase/server';
 import { getPageMetadata } from '@/lib/seo/metadata';
 import { DashboardClient } from './dashboard-client';
 
+// Authenticated data must never be prerendered or shared in public caches.
+export const dynamic = 'force-dynamic';
+
 export async function generateMetadata({ params }: { params: Promise<{ lang: string }> }) {
   const { lang } = await params;
   return getPageMetadata(lang, 'dashboard');

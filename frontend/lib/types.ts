@@ -53,6 +53,5 @@ export type ConversionAction = 'download' | 'copy' | 'print' | null;
 
 /** Content limits */
 export const CONTENT_LIMITS = {
-  MAX_REQUEST_BODY: 500 * 1024,
   PREVIEW_TRUNCATION: 200 * 1024,
 } as const;
