@@ -248,7 +248,7 @@ migration 已应用的话不能简单回滚，必须写补偿 migration。但前
 
 ## K. 2026-10-04 增强版本发布检查
 
-- 此版本经用户授权作本地Git提交；尚未push或部署，未修改Supabase配置。上线另按本Runbook执行。
+- 历史交付时此版本经用户授权作本地Git提交，尚未push或部署；用户于2026-10-05确认已push且Vercel绿灯，Git已核验两个提交在origin/main。以下发布检查保留，不能据Vercel绿灯推定OAuth、真机和系统保存测试已完成。
 - 保持Root Directory=frontend、Node22、pnpm10以及原Supabase环境变量。不得把本地占位配置带入生产。
 - 对/en、/zh及三种工具格式检查正确html lang、canonical/hreflang，公共响应可缓存且没有刷新会话Set-Cookie；Dashboard仍为私有/no-store，未登录跳转正确，登录后按当前用户读取历史。
 - 根/保持308到/en；/fr、未知页面、未知指南返回404和noindex；robots/sitemap URL不变。Next15 globalNotFound为实验功能，升级框架时必须重新核对多根布局404行为。
@@ -257,3 +257,52 @@ migration 已应用的话不能简单回滚，必须写补偿 migration。但前
 - Word样例包含混合嵌套列表、多段列表项、☐/☑任务、引用内代码/表格；表格不得越页边，字体和换行正确。HTML复制是源码，PDF仅能确认打开打印对话框，仍不写PDF历史。
 - 实际Google OAuth及登录后Word/HTML历史写入尚未用生产配置联调；发布时执行原F7/F8。没有新增schema或DB migration。
 - 回退保留H节现有流程；Word修复与布局静态化应分别审查。回退root布局时同时回退middleware范围/globalNotFound配置，不能留下半套布局。
+
+## L. 2026-10-05 SEO增强的发布与收录交接
+
+### L.1 当前交付状态
+
+- 本节初次交付时为本地未提交版本；用户随后明确授权由Agent commit、push，等2分钟后提交GSC/Bing。按该顺序执行，实际部署和收录状态必须经线上回读确认，不能从授权或等待时间推定成功。
+- Node24.19.0/pnpm10.28.1下34项测试、lint、typecheck和带显式离线Supabase占位配置的build通过。生产继续使用Node22和真实公开配置；本地占位产物不能直接作为生产部署。
+- 30篇指南生产HTML含完整正文，48个公共页面的OG/Twitter元数据正确；Dashboard无静态HTML。分享PNG1200×630、66,200字节已查看。
+- UI浏览器验收尚未完成：启动本地Next服务被自动审批拒绝（仅返回blocked by policy），file协议被Browser明确拒绝。没有通过其他浏览器、直接CDP或替代命令绕过限制。
+
+### L.2 发布后的验收（先验证，再提交）
+
+1. 用户批准Git提交/推送后沿用现有Vercel发布流程，不修改域名、Supabase或环境变量设置。
+2. 查看EN/ZH换行、表格、简历模板指南：禁用JavaScript或直接读取初始HTML，确认`data-guide-body`内含正文标题、段落、代码/表格，正文无需等待Worker。
+3. 浏览器验证320/390/1280px：正文按页面自然滚动、无页面横向溢出，长代码/表格局部滚动；迷你编辑器输入与预览仍工作。Tab/Enter验证FAQ、CTA、相关指南。iOS/Safari仍需真机补验。
+4. `/og-image.png`返回200和image/png，页面OG图片绝对URL、1200×630、Twitter summary_large_image正确；分享平台缓存可能延迟更新。
+5. sitemap含48个200/canonical公共网址；指南lastmod为2026-10-05，目录为2026-07-05。再次核验登录noindex、未知路径404、Dashboard私有/no-store。
+
+### L.3 已授权的搜索引擎提交对象
+
+唯一产品为`markdown-to-pdf.app`，GSC property为`sc-domain:markdown-to-pdf.app`，Bing选择已有的`https://markdown-to-pdf.app/`站点；不要重新导入或创建站点。registry的bing_site仍是TODO，操作前需核对实际目标，不能把TODO当作未登记。
+
+地图：[https://markdown-to-pdf.app/sitemap.xml](https://markdown-to-pdf.app/sitemap.xml)。GSC和Bing各重提一次原地图，不删除重建、不拆分地图、不追加其他域名。
+
+重点网址白名单（不是把全部sitemap加入提交批次）：
+
+| 顺序 | 网址 | 选择依据 |
+|---|---|---|
+| 1 | `https://markdown-to-pdf.app/en/to-word` | GSC已抓取但未收录记录，核心工具入口 |
+| 2 | `https://markdown-to-pdf.app/en/guides/markdown-table` | 近3个月GSC页面报告26次曝光，正文渲染已修复 |
+| 3 | `https://markdown-to-pdf.app/en/guides/markdown-resume-template` | 近3个月GSC页面报告11次曝光，正文渲染已修复 |
+
+每条先检查当前收录和抓取版本；已收录且已抓到新版本则跳过，否则请求一次。请求成功不保证收录或排名；遇配额、登录墙、验证码或未知状态停止，不能换property继续。
+
+### L.4 当前执行入口限制与人工步骤
+
+现有[search-console-ops技能](C:/Users/ADMIN/.agents/skills/search-console-ops/SKILL.md)要求GSC URL请求通过Codex私有包装器，并从真实ledger/summary汇报。本机`C:/Users/ADMIN/.codex/private/search-console-ops/Invoke-SearchConsoleOps.ps1`缺失，技能根目录`config.json`存在且本轮未修改；业务执行不自动安装runtime、借用其他profile或手拼ledger。
+
+该技能引用的[浏览器证据合同](D:/07-AgentHub-AI资产/support/_shared/browser-evidence.md)第7节默认要求未启用自动提交时人工接管。用户在了解这一限制后明确要求由Agent完成本轮GSC/Bing提交，本轮按用户当前指令覆盖技能的默认人工流程，使用已登录的可见浏览器逐项执行和留证据；不安装缺失runtime，不复制profile，不修改共享技能源码。平台工具策略、登录/验证码、配额和实时状态核验仍必须遵守。
+
+部署并通过L.2后：
+
+1. 打开[GSC站点地图](https://search.google.com/search-console/sitemaps?resource_id=sc-domain%3Amarkdown-to-pdf.app)，输入上述完整地图URL，人工点击提交。
+2. 成功弹窗只表示接受提交；继续查看同一地图的读取日期、状态、发现数。旧记录“成功/42”不能作为新版本已抓取证明。
+3. 打开[Bing站点地图](https://www.bing.com/webmasters/sitemaps?siteUrl=https%3A%2F%2Fmarkdown-to-pdf.app%2F)，确认目标站点，选择原地图的Re-submit，人工点击，查看Last crawl/Status/URLs discovered。
+4. 在GSC顶部网址检查框逐条输入L.3白名单，核对回显URL，人工执行需要的“请求编入索引”；Bing如需单条通知，仅提交同一白名单。
+5. 每个动作单独保存成功/失败证据并回读，区分接受提交、实际抓取和实际收录。共享记录配置仍指向旧域，不直接执行；将现有事件记录脚本原样复制到本轮Staging任务目录，用任务配置指定当前registry和本轮证据/日志落点，再执行并回读summary。本輪记录写入`D:/99-Staging-整理暂存/markdown-to-pdf-seo-20261005`，不修改共享配置或写入旧域。
+
+本轮不接入IndexNow、不改DNS、不修改第三方账号资料。本节是执行前交接，实际结果以本轮任务目录中的证据和summary为准；仅有“接受提交”时不得宣称已抓取或已收录。

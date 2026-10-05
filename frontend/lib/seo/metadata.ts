@@ -133,6 +133,13 @@ export function getPageMetadata(lang: string, page: PageKey): Metadata {
       siteName: 'Markdown to PDF',
       locale: lang === 'zh' ? 'zh_CN' : 'en_US',
       type: 'website',
+      images: [{ url: `${SITE_URL}/og-image.png`, width: 1200, height: 630, alt: 'Markdown to PDF — PDF, Word and HTML' }],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: m.title,
+      description: m.description,
+      images: [`${SITE_URL}/og-image.png`],
     },
     robots: m.noindex ? { index: false, follow: false } : { index: true, follow: true },
   };

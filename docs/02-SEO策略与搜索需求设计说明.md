@@ -4,7 +4,9 @@
 > **依据**: 01-项目主线文档.md + SEO 调研数据（Ahrefs/Semrush/Google Trends，2026-03-17）+ 补充调研（2026-03-23）
 > **版本**: v1.1（工具页减负修订）
 > **创建日期**: 2026-03-23
-> **最后更新**: 2026-08-07
+> **最后更新**: 2026-10-05
+>
+> **现行技术补充**：第15节规定指南正文预渲染、分享图和发布后的收录步骤。前文页面数量及关键词指标保留为历史规划，不代表当前页面清单或实时搜索表现。
 
 ---
 
@@ -526,6 +528,20 @@ markdown 速查集群       →  /en/guides/markdown-cheat-sheet  →  指南页
 | 3 | Google Search Console 和 Bing Webmaster Tools 何时提交？ | 收录时间 | 建议上线当天提交 sitemap |
 | 4 | 是否需要在 V1.0 建设基础外链？（如提交到工具导航站） | 网站权重 | 建议上线后手动提交到 5-10 个工具导航站/目录 |
 | 5 | ~~产品结构文档需要回溯修正？~~ | ~~文档一致性~~ | ✅ 已确认删除重写，基于本 SEO 策略重新产出 |
+
+---
+
+## 15. 2026-10-05 指南抓取与分享元数据（现行）
+
+- 当前sitemap为48个公共网址，包括每种语言15篇指南；页面数量不作为新增薄内容的目标。
+- 指南正文在Next构建期使用与客户端相同的remark/rehype安全管线生成HTML。初始响应必须含正文标题、段落、代码和表格，不用RSC脚本中序列化的Markdown代替可见HTML验收；迷你编辑器仍由客户端提供交互。
+- 所有指南本次正文呈现发生实质变化，`lastmod`更新为2026-10-05；指南目录沿用已有模板卡片添加日期2026-07-05。其他页面没有正文变化时保留原日期，不把构建时间当作更新时间。
+- 页面共用`frontend/public/og-image.png`（1200×630、66,200字节），OG/Twitter使用绝对图片URL和各页本地化标题、描述。图片只用于分享展示，不作为搜索排名或收录保证。
+- 2026-10-05只读检查：GSC/Bing地图均显示成功、上次读取2026-06-21、发现42个网址；线上地图为48个。GSC索引报告更新于2026-09-21，显示12个已收录、6个未收录，其中`/en/to-word`为已抓取但未收录。Google近3个月57次曝光/0点击，Bing近3个月0曝光/0点击。报告存在时间差，不能用48减12推算当前全部未收录数量，也不能据此认定未收录根因。
+- 本轮不新增SEO页面，不按57次曝光过拟合关键词/TDK，不接入IndexNow。发布后GSC和Bing各重提一次原sitemap，再逐条核验Word工具页、英文表格指南、英文简历模板；已收录且版本已更新的页面跳过重复请求。
+- 具体网址白名单、提交步骤和状态判据见[DEPLOY.md](./DEPLOY.md)第L节。初次交付时为本地未提交改动；用户随后已授权Agent commit、push并提交搜索引擎，实际结果须经本轮线上回读和执行日志确认。
+
+官方依据：[Google JavaScript SEO](https://developers.google.com/search/docs/crawling-indexing/javascript/javascript-seo-basics)、[Google重新抓取](https://developers.google.com/search/docs/crawling-indexing/ask-google-to-recrawl)、[Bing站点地图](https://blogs.bing.com/webmaster/2025/7/Keeping-Content-Discoverable-with-Sitemaps-in-AI-Powered-Search/)。
 
 ---
 

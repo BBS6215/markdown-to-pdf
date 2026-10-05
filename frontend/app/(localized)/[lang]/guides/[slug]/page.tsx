@@ -13,7 +13,8 @@ import { RelatedGuides } from '@/components/guide/related-guides';
 import { FaqAccordion } from '@/components/seo/faq-accordion';
 import { JsonLd } from '@/components/seo/json-ld';
 import { articleSchema, faqSchema } from '@/lib/seo/json-ld-schemas';
-import { MarkdownPreview } from '@/components/editor/markdown-preview';
+import { renderMarkdownCore } from '@/lib/markdown/render-core';
+import 'github-markdown-css/github-markdown-light.css';
 
 const SLUG_TO_PAGE_KEY: Record<
   string,
@@ -67,6 +68,9 @@ export default async function GuidePage({ params }: { params: Promise<{ lang: st
   const guide = getGuideBySlug(slug, lang);
   if (!guide) notFound();
 
+  // Public guide prose belongs in the pre-rendered HTML, independently of
+  // the interactive editor's effects, Worker and preview truncation limit.
+  const { html } = await renderMarkdownCore(guide.content);
   const related = getRelatedGuides(slug, lang);
   const copy = lang === 'zh'
     ? {
@@ -93,10 +97,8 @@ export default async function GuidePage({ params }: { params: Promise<{ lang: st
       <h1 className="text-3xl font-semibold text-gray-900 mb-4">{guide.title}</h1>
       <p className="text-base text-gray-500 mb-8">{guide.description}</p>
 
-      {/* Guide content rendered as Markdown */}
-      <div>
-        <MarkdownPreview markdown={guide.content} lang={lang} />
-      </div>
+      <div className="markdown-body min-w-0" data-guide-body
+        dangerouslySetInnerHTML={{ __html: html }} />
 
       {/* CTA — mid-article */}
       <CtaBanner lang={lang} />
