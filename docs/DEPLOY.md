@@ -19,7 +19,8 @@
   - `anon public key`（Settings → API → Project API keys → `anon` `public`）
 - [ ] **Supabase 迁移** 已全部应用（7 个 migration 文件，最新为 `20260513150315`）
 - [ ] **域名 `markdown-to-pdf.app`** 注册商控制台可访问，能编辑 DNS 记录
-- [ ] 本地 `pnpm run build` 通过（Vercel build 大概率也会通过）
+- [ ] 在构建开始前为本地/CI配置两个Supabase公开变量，参见C节；不能只在服务器启动时设置
+- [ ] 本地 `pnpm run build` 在明确记录的环境变量配置下通过
 - [ ] 本地 `pnpm run typecheck`、`pnpm run lint` 和 `pnpm test` 全部通过
 
 ---
@@ -58,6 +59,41 @@
 不需要 `SUPABASE_SERVICE_ROLE_KEY`：前端化方案没有 backend 路径会用到。
 
 设置完成后回 Deployments 页 → **Redeploy**。
+
+### C.1 本地与 CI 的构建期要求
+
+公共页静态预渲染期间Header会创建Supabase客户端，因此两个公开变量是**构建期必需输入**，不是仅供运行时登录使用。Next会将NEXT_PUBLIC值写入客户端产物；构建完后再注入不能替代构建时的配置。
+
+本地从仓库根目录执行：
+
+```powershell
+if (-not (Test-Path -LiteralPath 'frontend/.env.local')) {
+  Copy-Item -LiteralPath 'frontend/.env.example' -Destination 'frontend/.env.local'
+}
+# 填写本项目真实的URL及anon key，保留已有本地配置文件。
+pnpm lint
+pnpm test
+pnpm typecheck
+pnpm build
+```
+
+CI在命令执行前注入本项目公开配置。仅在**不发布的离线编译验证**中可使用以下显式占位值：
+
+```powershell
+$env:NEXT_PUBLIC_SUPABASE_URL='https://example.supabase.co'
+$env:NEXT_PUBLIC_SUPABASE_ANON_KEY='offline-build-test-key'
+pnpm build
+```
+
+这只验证编译/预渲染，不验证OAuth、历史写入和RLS；生产/Preview构建必须使用真实项目配置。不要使用service_role。占位值不写入仓库或持久化到生产设置。
+
+build入口按Next的生产dotenv优先级读取文件，缺值时立即列出缺失变量名并退出，不打印key值。使用Node22.x和pnpm10.28.1，安装采用frozen-lockfile及前端filter。
+
+### C.2 lint 可复现入口
+
+统一运行 `pnpm lint`。入口仅为ESLint子进程设置项目依赖目录及eslint-config-next声明依赖的目录；Next构建的内嵌ESLint使用相同解析边界。不依赖pnpm的隐式提升目录，也不继承外部NODE_PATH；ESLint配置、插件/规则版本及Next构建内lint均未降级或关闭。
+
+干净副本使用 `pnpm install --frozen-lockfile --filter @mdpdf/frontend... --config.hoist=false` 后同样必须通过lint。已有模块目录切换布局时，只在隔离验证副本中重新安装，不改全局pnpm设置。
 
 ---
 

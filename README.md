@@ -47,10 +47,10 @@ Next.js (Vercel)  ──►  unified (remark + rehype-sanitize)  ──►  PDF 
 ## Quick start
 
 ```bash
-# 1. Install
-pnpm install
+# 1. Install the frontend with the committed dependency versions
+pnpm install --frozen-lockfile --filter @mdpdf/frontend...
 
-# 2. Copy env template
+# 2. Configure environment variables BEFORE dev or production build
 cp frontend/.env.example frontend/.env.local
 #    Fill in NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY
 #    (see frontend/.env.example for where to find them)
@@ -64,9 +64,24 @@ pnpm typecheck
 pnpm lint
 pnpm test
 
-# 5. Production build
+# 5. Production build (requires both Supabase public variables from step 2)
 pnpm build
 ```
+
+### Reproducible quality checks and CI builds
+
+Use `pnpm lint` (not a bare global ESLint command). The project entrypoint resolves plugins and parsers from this project and the Next preset's declared dependencies, so it also works without pnpm dependency hoisting. The ESLint presets and rule versions are unchanged.
+
+`pnpm build` loads production dotenv files using Next's normal precedence, then checks `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` before compilation. Provide them in `frontend/.env.local` or the CI process environment. They are build-time inputs baked into client bundles; setting them only after building is insufficient.
+
+For an **offline compile-only CI check**, explicit placeholders can be used:
+
+```bash
+NEXT_PUBLIC_SUPABASE_URL=https://example.supabase.co \
+NEXT_PUBLIC_SUPABASE_ANON_KEY=offline-build-test-key pnpm build
+```
+
+These values do not validate OAuth/history/RLS and must not be used for production or Preview deployments. Deployment builds require the real project's public configuration; never use a service-role key. Missing values fail immediately with variable names only. See [DEPLOY section C](./docs/DEPLOY.md#c-环境变量).
 
 ## Repository layout
 

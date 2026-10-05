@@ -48,7 +48,7 @@ Next.js (Vercel)  ──►  unified (remark + rehype-sanitize)  ──►  PDF 
 
 ```bash
 # 1. 安装依赖
-pnpm install
+pnpm install --frozen-lockfile --filter @mdpdf/frontend...
 
 # 2. 复制环境变量模板
 cp frontend/.env.example frontend/.env.local
@@ -67,6 +67,13 @@ pnpm test
 # 5. 生产构建
 pnpm build
 ```
+
+## 本地与 CI 的验证前置条件
+
+- 构建前必须配置 `NEXT_PUBLIC_SUPABASE_URL` 和 `NEXT_PUBLIC_SUPABASE_ANON_KEY`：本地复制模板到 `frontend/.env.local`，CI在运行 `pnpm build` 前注入环境变量。只在启动服务器时设置不够，公开变量会写入客户端构建产物。
+- `pnpm build` 按Next生产环境的dotenv优先级读取配置，然后执行缺值检查；缺失时在编译开始前退出，只输出变量名和配置位置。
+- lint统一使用 `pnpm lint`。入口为子进程明确提供项目和Next预设自身的依赖路径，默认安装及禁用提升的安装均可用；原ESLint配置、规则和版本保持不变，不依赖全局eslint或隐式NODE_PATH。
+- 仅做离线编译验证的CI可使用明确的占位配置，示例见 [DEPLOY第C节](./docs/DEPLOY.md#c-环境变量)。占位值不能验证OAuth、历史写入或RLS，也不能用于生产/Preview部署；部署必须使用真实项目的公开配置，不使用service_role。
 
 ## 仓库结构
 
