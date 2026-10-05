@@ -277,7 +277,7 @@ migration 已应用的话不能简单回滚，必须写补偿 migration。但前
 
 ### L.3 已授权的搜索引擎提交对象
 
-唯一产品为`markdown-to-pdf.app`，GSC property为`sc-domain:markdown-to-pdf.app`，Bing选择已有的`https://markdown-to-pdf.app/`站点；不要重新导入或创建站点。registry的bing_site仍是TODO，操作前需核对实际目标，不能把TODO当作未登记。
+唯一产品为`markdown-to-pdf.app`，GSC property为`sc-domain:markdown-to-pdf.app`，Bing选择已有的`https://markdown-to-pdf.app/`站点；不要重新导入或创建站点。registry原bing_site为TODO，本轮已用当前Bing界面核实并回填为该URL，没有新建或导入站点。
 
 地图：[https://markdown-to-pdf.app/sitemap.xml](https://markdown-to-pdf.app/sitemap.xml)。GSC和Bing各重提一次原地图，不删除重建、不拆分地图、不追加其他域名。
 
@@ -306,3 +306,13 @@ migration 已应用的话不能简单回滚，必须写补偿 migration。但前
 5. 每个动作单独保存成功/失败证据并回读，区分接受提交、实际抓取和实际收录。共享记录配置仍指向旧域，不直接执行；将现有事件记录脚本原样复制到本轮Staging任务目录，用任务配置指定当前registry和本轮证据/日志落点，再执行并回读summary。本輪记录写入`D:/99-Staging-整理暂存/markdown-to-pdf-seo-20261005`，不修改共享配置或写入旧域。
 
 本轮不接入IndexNow、不改DNS、不修改第三方账号资料。本节是执行前交接，实际结果以本轮任务目录中的证据和summary为准；仅有“接受提交”时不得宣称已抓取或已收录。
+
+### L.5 本轮实际执行结果（2026-10-05）
+
+- 代码提交`0f90482`已push到origin/main；推送确认时间01:27:28 UTC，01:30:00 UTC开始线上核验，满足用户要求的至少2分钟等待。线上48个公共页面均200、canonical/分享元数据正确，30篇指南初始HTML含完整正文；分享图200/image/png/66,200字节。
+- GSC原sitemap重提成功，提交日期更新为2026-10-05。最终回读仍为上次读取2026-06-21、发现42个网址，因此尚未确认新地图抓取。
+- Bing原sitemap重提成功；最终回读上次提交/抓取均2026-10-05、Success、发现48个网址，确认新地图已抓取。
+- GSC三个白名单网址均收到“已请求编入索引”弹窗。Word工具页与表格指南检查时未收录；简历模板已收录但上次抓取2026-07-05，本轮请求刷新其新正文。请求进入队列不等于已经完成收录或版本更新。
+- Bing同三个网址均出现在Submitted Urls list，时间Today at 09:46；今日提交数0→3，可用配额100→97。逐条记录已回读，没有配额拦截、失败或未知项。
+- 生产HTTP补验：根308至/en、未知页404、登录页noindex、Dashboard未登录307且private/no-store。Chrome1280px正文无固定高度/内部滚动，页面无横向溢出；迷你编辑器实时预览和FAQ Enter键展开通过。手机覆盖未完成：viewport请求390px后，指南实测DOM仍为1280px，未把该结果计作手机通过；iOS/Safari仍需真机验收。
+- 提交证据与事件summary位于`D:/99-Staging-整理暂存/markdown-to-pdf-seo-20261005`，摘要为`ledgers/markdown-to-pdf/2026-10-05-ops.summary.json`；各写入单元已收口并解除锁。本次提交动作已完成，后续实际收录由搜索引擎异步处理，不重复提交来催促。
