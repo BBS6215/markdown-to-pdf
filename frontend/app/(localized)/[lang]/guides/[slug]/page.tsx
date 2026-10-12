@@ -75,12 +75,12 @@ export default async function GuidePage({ params }: { params: Promise<{ lang: st
   const copy = lang === 'zh'
     ? {
         guidesLabel: '指南',
-        playground: '# 在这里试试\n\n修改这段文字，右侧预览会实时更新。\n\n- 第一项\n- 第二项\n\n> 示例引用',
+        playground: '## 在这里试试\n\n修改这段文字，右侧预览会实时更新。\n\n- 第一项\n- 第二项\n\n> 示例引用',
         cta: '将你的 Markdown 转为 PDF、Word 或 HTML →',
       }
     : {
         guidesLabel: 'Guides',
-        playground: '# Try it here\n\nEdit this text to see the preview update in real-time.\n\n- Item 1\n- Item 2\n\n> A sample quote',
+        playground: '## Try it here\n\nEdit this text to see the preview update in real-time.\n\n- Item 1\n- Item 2\n\n> A sample quote',
         cta: 'Convert your Markdown to PDF, Word, or HTML →',
       };
 
