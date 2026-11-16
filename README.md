@@ -4,7 +4,7 @@ Convert Markdown to PDF, Word, and HTML entirely in your browser.
 
 [English](./README.md) · [简体中文](./README.zh.md)
 
-> **Hosted-service retirement — November 16, 2026.** The original hosted service at `markdown-to-pdf.app` is being retired. The source code, commit history, screenshots, and self-hosting instructions remain available under the MIT license. Issues and pull requests remain open. Deployment status is recorded in [the retirement notice](./docs/RETIREMENT.md).
+> **Hosted-service retirement — November 16, 2026.** The original hosted service at `markdown-to-pdf.app` has been retired. The source code, commit history, screenshots, and self-hosting instructions remain available under the MIT license. Issues and pull requests remain open. Deployment status is recorded in [the retirement notice](./docs/RETIREMENT.md).
 >
 > For a standalone, offline **Markdown-to-Word** tool, see [Lighter · MD to Word](https://github.com/BBS6215/lighter-md-to-word). Lighter exports Word documents; it does not replace this project's PDF or HTML features.
 
@@ -40,7 +40,7 @@ Next.js (Vercel)  ──►  unified (remark + rehype-sanitize)  ──►  PDF 
                                        └──►  Supabase  (Auth + conversion_history log)
 ```
 
-- Self-hosting costs depend on your hosting, database plan, and domain; the original service used free-tier hosting
+- Hosting and database costs depend on your own account, plan, region, and domain; historical cost notes are not a quote for a new deployment
 - No quota, no rate limit
 - See [`docs/10-前端化架构补丁.md`](./docs/10-前端化架构补丁.md) for the architecture pivot rationale (this project initially designed a Render-backed Puppeteer service; that path is preserved in `backend/` but not deployed)
 

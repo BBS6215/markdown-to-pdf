@@ -4,7 +4,7 @@
 
 [English](./README.md) · [简体中文](./README.zh.md)
 
-> **线上服务退出说明（2026-11-16）：** 原站 `markdown-to-pdf.app` 正在停止运营。代码、Git 历史、截图和自行部署说明继续以 MIT 许可公开保留，Issues 和 PR 继续开放。实际处置状态见[退出说明](./docs/RETIREMENT.md)。
+> **线上服务退出说明（2026-11-16）：** 原站 `markdown-to-pdf.app` 已停止运营。代码、Git 历史、截图和自行部署说明继续以 MIT 许可公开保留，Issues 和 PR 继续开放。实际处置状态见[退出说明](./docs/RETIREMENT.md)。
 >
 > 如需单文件、离线使用的 **Markdown 转 Word** 工具，可使用 [Lighter · MD to Word](https://github.com/BBS6215/lighter-md-to-word)。Lighter 提供 Word 导出，不覆盖本项目的 PDF 和 HTML 功能。
 
@@ -40,7 +40,7 @@ Next.js (Vercel)  ──►  unified (remark + rehype-sanitize)  ──►  PDF 
                                        └──►  Supabase  (Auth + 历史记录)
 ```
 
-- 自行部署费用取决于自己的托管、数据库套餐和域名；原站使用免费额度
+- 自行部署费用取决于自己的托管、数据库套餐、地区和域名；历史成本说明不代表当前部署报价
 - 无配额、无限流
 - 架构变迁记录详见 [`docs/10-前端化架构补丁.md`](./docs/10-前端化架构补丁.md)（项目最初设计了 Render + Puppeteer 后端，那条路径 `backend/` 代码保留作冷备，未部署）
 
