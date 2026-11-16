@@ -1,9 +1,24 @@
 # Markdown to PDF
 
-> Markdown 在线转 PDF / Word / HTML 工具站，全部在浏览器本地完成。
-> 线上：[markdown-to-pdf.app](https://markdown-to-pdf.app)
+在浏览器本地将 Markdown 转成 PDF、Word 和 HTML。
+
+[English](./README.md) · [简体中文](./README.zh.md)
+
+> **线上服务退出说明（2026-11-16）：** 原站 `markdown-to-pdf.app` 正在停止运营。代码、Git 历史、截图和自行部署说明继续以 MIT 许可公开保留，Issues 和 PR 继续开放。实际处置状态见[退出说明](./docs/RETIREMENT.md)。
 >
-> [English README](./README.md)
+> 如需单文件、离线使用的 **Markdown 转 Word** 工具，可使用 [Lighter · MD to Word](https://github.com/BBS6215/lighter-md-to-word)。Lighter 提供 Word 导出，不覆盖本项目的 PDF 和 HTML 功能。
+
+## 网站截图
+
+以下为 2026-11-16 停服前从真实网站截取的页面，使用虚构演示内容。图片随仓库保存，域名失效后仍可查看。
+
+**英文 PDF 转换页**
+
+![英文 PDF 转换页：Markdown 编辑器与实时预览](./docs/images/site-en-pdf.jpg)
+
+**中文 Word 转换页**
+
+![中文 Word 转换页：虚构项目简报与实时预览](./docs/images/site-zh-word.jpg)
 
 ## 项目定位
 
@@ -25,7 +40,7 @@ Next.js (Vercel)  ──►  unified (remark + rehype-sanitize)  ──►  PDF 
                                        └──►  Supabase  (Auth + 历史记录)
 ```
 
-- 月运行成本 **$0**（仅域名年费）
+- 自行部署费用取决于自己的托管、数据库套餐和域名；原站使用免费额度
 - 无配额、无限流
 - 架构变迁记录详见 [`docs/10-前端化架构补丁.md`](./docs/10-前端化架构补丁.md)（项目最初设计了 Render + Puppeteer 后端，那条路径 `backend/` 代码保留作冷备，未部署）
 
@@ -113,11 +128,24 @@ markdown-to-pdf-app/
 
 ## 部署
 
-见 [`docs/DEPLOY.md`](./docs/DEPLOY.md) —— 涵盖 Vercel 项目创建、Supabase Auth URL 配置、DNS 解析、9 项上线烟雾测试。
+请使用自己的托管、数据库、凭据和域名。原站的 Supabase 项目及 Google 登录配置不再提供使用。
+
+1. 创建自己的 Supabase 项目，按文件名顺序执行七份 SQL 迁移，参见[数据库说明](./supabase/README.md)。
+2. 在开发或构建前配置自己的 `NEXT_PUBLIC_SUPABASE_URL` 和 `NEXT_PUBLIC_SUPABASE_ANON_KEY`。前端变量中不得放入 service-role 密钥或 Google 客户端密钥。
+3. 在 Vercel 或兼容的 Next.js 平台部署 `frontend/`。当前转换无需启动历史 `backend/` 中的 Express/Puppeteer 服务。
+4. 为自己的域名设置 Supabase Site URL 和重定向白名单。若启用 Google 登录，创建自己的 Google OAuth Web 客户端，登记 `https://<自己的项目ref>.supabase.co/auth/v1/callback`，再将客户端配置填入 Supabase Google Provider。Google 客户端密钥不得提交到 Git。
+5. 发布前替换 SEO 元数据、站点地图、robots、结构化数据、联系与法律页面中的原域名，并移除或替换原 AdSense 发布者标识。可运行 `rg -n 'markdown-to-pdf\.app|ca-pub-' frontend` 查找引用。仅设置 `NEXT_PUBLIC_SITE_URL` **不会**自动更新写死的 SEO 网址。
+6. 验证 PDF 打印、Word 导出、HTML 复制，以及自己启用的登录与历史功能。
+
+[`docs/DEPLOY.md`](./docs/DEPLOY.md) 保留原部署过程供参考。其中的旧项目名、凭据、域名绑定和历史验收记录不能直接视为新部署的配置或验证结果。
+
+## 反馈与维护
+
+欢迎提交 Issues 和 PR；本仓库不再运营原线上服务。报告问题请使用虚构示例，勿上传真实材料、账号数据或凭据。
 
 ## License
 
-MIT —— 见 [LICENSE](./LICENSE)。
+MIT —— 见 [LICENSE](./LICENSE)。内嵌字体适用 SIL OFL 1.1，详见[第三方许可说明](./THIRD_PARTY_NOTICES.md)。
 
 
 ## 可靠性与性能更新（2026-10-04）

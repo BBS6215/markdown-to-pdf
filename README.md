@@ -1,9 +1,24 @@
 # Markdown to PDF
 
-> Online tool that converts Markdown to PDF / Word / HTML — entirely in the browser.
-> Production: [markdown-to-pdf.app](https://markdown-to-pdf.app)
+Convert Markdown to PDF, Word, and HTML entirely in your browser.
+
+[English](./README.md) · [简体中文](./README.zh.md)
+
+> **Hosted-service retirement — November 16, 2026.** The original hosted service at `markdown-to-pdf.app` is being retired. The source code, commit history, screenshots, and self-hosting instructions remain available under the MIT license. Issues and pull requests remain open. Deployment status is recorded in [the retirement notice](./docs/RETIREMENT.md).
 >
-> [简体中文 README](./README.zh.md)
+> For a standalone, offline **Markdown-to-Word** tool, see [Lighter · MD to Word](https://github.com/BBS6215/lighter-md-to-word). Lighter exports Word documents; it does not replace this project's PDF or HTML features.
+
+## Screenshots
+
+Real screenshots of the original website, captured before shutdown on November 16, 2026 with fictional sample text. They are stored in this repository and remain available after the domain expires.
+
+**English PDF converter**
+
+![English PDF converter with a Markdown editor and live preview](./docs/images/site-en-pdf.jpg)
+
+**Chinese Word converter**
+
+![Chinese Word converter with fictional project notes and live preview](./docs/images/site-zh-word.jpg)
 
 ## What it does
 
@@ -25,7 +40,7 @@ Next.js (Vercel)  ──►  unified (remark + rehype-sanitize)  ──►  PDF 
                                        └──►  Supabase  (Auth + conversion_history log)
 ```
 
-- **$0/month** running cost (apart from the domain)
+- Self-hosting costs depend on your hosting, database plan, and domain; the original service used free-tier hosting
 - No quota, no rate limit
 - See [`docs/10-前端化架构补丁.md`](./docs/10-前端化架构补丁.md) for the architecture pivot rationale (this project initially designed a Render-backed Puppeteer service; that path is preserved in `backend/` but not deployed)
 
@@ -123,11 +138,24 @@ The original design docs are in Chinese. Architecture summary in English is abov
 
 ## Deployment
 
-See [`docs/DEPLOY.md`](./docs/DEPLOY.md) — covers Vercel project setup, Supabase Auth URL configuration, DNS records, and a 9-item smoke test.
+Use your own hosting, database, credentials, and domain. The retired service's Supabase project and Google login configuration are not reusable.
+
+1. Create your own Supabase project. Apply the seven SQL migrations in filename order; see [Supabase schema instructions](./supabase/README.md).
+2. Set your own `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` before development or production builds. Never put a service-role key or Google client secret in frontend variables.
+3. Deploy only `frontend/` to Vercel or another compatible Next.js host. The Express/Puppeteer `backend/` directory is historical and is not needed for the current conversion pipeline.
+4. Configure Supabase's Site URL and redirect allowlist for your domain. To enable Google sign-in, create your own Google OAuth web client, register `https://<your-project-ref>.supabase.co/auth/v1/callback`, and configure the Google provider in Supabase. No Google client secret belongs in Git.
+5. Before publishing, replace the original domain in SEO metadata, sitemap, robots, structured data, and contact/legal pages, and remove or replace the original AdSense publisher identifier. Run `rg -n 'markdown-to-pdf\.app|ca-pub-' frontend` to find these references. `NEXT_PUBLIC_SITE_URL` alone does **not** update the hard-coded SEO URLs.
+6. Verify PDF printing, Word export, HTML copying, and any login/history features you enable.
+
+[`docs/DEPLOY.md`](./docs/DEPLOY.md) preserves the original deployment runbook for reference. Its former project names, credentials, domain bindings, and historical operational results do not describe a new deployment.
+
+## Feedback and maintenance
+
+Issues and pull requests are welcome. The original hosted service will not be operated from this repository. Please use synthetic examples in bug reports and never upload private documents, account data, or credentials.
 
 ## License
 
-MIT — see [LICENSE](./LICENSE).
+MIT — see [LICENSE](./LICENSE). Bundled fonts use SIL OFL 1.1; see [third-party notices](./THIRD_PARTY_NOTICES.md).
 
 
 ## Reliability and performance update (2026-10-04)

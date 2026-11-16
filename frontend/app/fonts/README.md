@@ -27,3 +27,7 @@ pnpm --filter @mdpdf/frontend remove @fontsource-variable/inter @fontsource-vari
 ```
 
 The packages themselves are not kept as dependencies — only the two woff2 files are.
+
+## Included licenses
+
+The complete SIL OFL 1.1 texts are included as [Inter-OFL.txt](./Inter-OFL.txt) and [JetBrainsMono-OFL.txt](./JetBrainsMono-OFL.txt). Preserve them when redistributing the font files.
